@@ -16,6 +16,11 @@ const routes = [
     component: () =>
       import("@/pages/settlementManagement/settlementRules/index.vue"),
   },
+  {
+    path: "/settlement-management/history",
+    name: "History",
+    component: () => import("@/pages/settlementManagement/history/index.vue"),
+  },
 ];
 
 const router = createRouter({
