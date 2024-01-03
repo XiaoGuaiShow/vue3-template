@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import InvoiceRouter from './modules/invoice.ts'
-import SettlementRouter from "./modules/settlement.ts";
+import SettlementRouter from './modules/settlement.ts'
 
 const routes = [
 	...InvoiceRouter,
