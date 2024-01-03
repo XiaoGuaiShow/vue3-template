@@ -5,6 +5,7 @@ import ElementPlus from 'element-plus'
 import {createPinia} from "pinia";
 import './assets/styles/variable.css'
 import './assets/styles/custom.css'
+import './assets/styles/font.css'
 
 const pinia = createPinia()
 const app = createApp(App)
