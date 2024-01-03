@@ -23,6 +23,13 @@ export default defineConfig({
     },
     extensions: [".js", ".json", ".ts", ".vue"] // 使用路径别名时想要省略的后缀名
   },
+  css: {
+    preprocessorOptions: {
+      less: {
+        additionalData: ["@import './src/styles/index.less'; "],
+      },
+    },
+  },
   server: {
     proxy: {
       '/devApi': {
