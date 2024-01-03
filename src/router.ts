@@ -21,6 +21,12 @@ const routes = [
     name: "History",
     component: () => import("@/pages/settlementManagement/history/index.vue"),
   },
+  {
+    path: "/parent-company",  //子母公司
+    name: "SettlementRules",
+    component: () =>
+      import("@/pages/parentCompany/index.vue"),
+  },
 ];
 
 const router = createRouter({
