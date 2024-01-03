@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div>{{msg}}</div>
+    <div class="msg">{{msg}}</div>
     <el-button type="primary" @click="addCount">count+1</el-button>
     <div>{{count}}</div>
     <!-- getter 和 Vuex中的getter一样，在获取 State值之前做一些逻辑处理，具有缓存作用 -->
@@ -25,3 +25,8 @@ const addCount = () => {
   store.changeState()
 }
 </script>
+<style lang="less" scoped>
+.msg{
+  color: var(--brand-blue);
+}
+</style>
