@@ -1,7 +1,10 @@
 <template>
   <div class="container">
     <div class="section">
-      <div class="title">发票历史</div>
+      <div class="title">
+        账期
+        <div>10/01-10/31</div>
+      </div>
       <el-form :inline="true" :model="formInline" class="mt-24">
         <el-form-item label="结算周期">
           <el-select v-model="formInline.region" placeholder="请选择" clearable>
@@ -92,13 +95,6 @@ const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`);
 };
 
-const goLink = (row) => {
-  console.log(row);
-  console.log(row.value);
-
-  router.push(`/settlement-management/history/${row.id}`);
-};
-
 const formInline = reactive({
   user: "",
   region: "",
@@ -107,6 +103,12 @@ const formInline = reactive({
 
 const onSubmit = () => {
   console.log("submit!");
+};
+
+const goLink = (row) => {
+  console.log(row);
+  
+  router.push(`/settlement-management/history/${row.id}`);
 };
 
 const tableData = [

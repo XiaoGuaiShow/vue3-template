@@ -4,8 +4,17 @@
 .ml-12 {
   margin-left: 12px;
 }
+.mt-6 {
+  margin-top: 6px;
+}
+.mt-16 {
+  margin-top: 16px;
+}
 .mt-24 {
   margin-top: 24px;
+}
+.mr-16 {
+  margin-right: 16px;
 }
 .mr-24 {
   margin-right: 24px;

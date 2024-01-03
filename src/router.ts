@@ -21,6 +21,11 @@ const routes = [
     name: "History",
     component: () => import("@/pages/settlementManagement/history/index.vue"),
   },
+  {
+    path: "/settlement-management/history/:id",
+    name: "HistoryDetail",
+    component: () => import("@/pages/settlementManagement/history/detail.vue"),
+  },
 ];
 
 const router = createRouter({
