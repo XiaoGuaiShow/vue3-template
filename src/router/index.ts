@@ -13,7 +13,10 @@ const routes = [
 	{
 		path: '/home',
 		name: 'Home',
-		component: () => import('@/pages/home.vue') // 配置路径别名后，可以使用@
+		component: () => import('@/pages/home.vue'), // 配置路径别名后，可以使用@
+		meta: {
+			title: '首页'
+		}
 	}
 ]
 

@@ -1,5 +1,6 @@
 <template>
 	<div class="home">
+		<Breadcrumbs />
 		<div class="msg">{{ msg }}</div>
 		<el-button type="primary" @click="addCount">count+1</el-button>
 		<div>{{ count }}</div>
