@@ -3,9 +3,9 @@ import http from './httpInstance.js'
 const baseUrl = process.env.NODE_ENV === 'development' ? '/devApi' : ''
 
 export function getPlacePage(data) {
-    return http({
-        method: 'post',
-        url: baseUrl + '/pointatps/place/page',
-        data,
-    })
+	return http({
+		method: 'post',
+		url: baseUrl + '/pointatps/place/page',
+		data
+	})
 }
