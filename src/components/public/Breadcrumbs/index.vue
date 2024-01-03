@@ -8,7 +8,7 @@ const breadcrumbItems = ref()
 watch(
 	() => currentRoute.value,
 	(route: RouteLocationNormalizedLoaded) => {
-    console.log(route)
+		console.log(route)
 		breadcrumbItems.value = route.matched
 	},
 	{ immediate: true }
