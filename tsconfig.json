@@ -24,7 +24,7 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
 		/* Volar支持 */
-		"types": ["element-plus/global"]
+		"types": ["element-plus/global", "node"]
 	},
 	"include": [
 		"src/**/*.ts",
