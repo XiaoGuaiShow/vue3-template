@@ -15,12 +15,7 @@
 	</div>
 </template>
 
-<script setup lang="ts">
-// import AddEditCompany from '@/pages/parentCompany/components/AddEditCompany/index.vue'
-// import CompanyList from './components/CompanyList/index.vue'
-// import CompanyInfo from './components/CompanyInfo/index.vue'
-// import RuleSetting from './components/RuleSetting/index.vue'
-</script>
+<script setup lang="ts"></script>
 
 <style lang="less" scoped>
 .parent-company {

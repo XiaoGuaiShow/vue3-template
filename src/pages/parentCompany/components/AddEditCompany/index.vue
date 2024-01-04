@@ -8,7 +8,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import CompanyDialog from '@/pages/parentCompany/components/AddEditCompany/CompanyDialog.vue'
 
 let commonVisible = ref(false)
 
