@@ -10,7 +10,7 @@
 import { ref } from 'vue'
 
 // tree搜索
-const searchKey = ref<String>('')
+const searchKey = ref<string>('')
 
 interface Tree {
 	label: string

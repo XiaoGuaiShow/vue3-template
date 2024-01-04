@@ -18,9 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import CompanyList from './components/CompanyList.vue'
-import CompanyInfo from './components/CompanyInfo.vue'
-import RuleSetting from './components/RuleSetting.vue'
+import CompanyList from './components/CompanyList/index.vue'
+import CompanyInfo from './components/CompanyInfo/index.vue'
+import RuleSetting from './components/RuleSetting/index.vue'
 </script>
 
 <style lang="less" scoped>

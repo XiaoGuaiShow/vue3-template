@@ -2,7 +2,10 @@
 export default [
 	{
 		path: '/parent-company',
-		name: 'SettlementRules',
-		component: () => import('@/pages/parentCompany/index.vue')
+		name: 'ParentCompany',
+		component: () => import('@/pages/parentCompany/index.vue'),
+		meta: {
+			title: '子母公司'
+		}
 	}
 ]
