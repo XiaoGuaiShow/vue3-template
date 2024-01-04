@@ -16,10 +16,10 @@
 </template>
 
 <script setup lang="ts">
-import AddEditCompany from './components/AddEditCompany/index.vue'
-import CompanyList from './components/CompanyList/index.vue'
-import CompanyInfo from './components/CompanyInfo/index.vue'
-import RuleSetting from './components/RuleSetting/index.vue'
+import AddEditCompany from '@/pages/parentCompany/components/AddEditCompany/index.vue'
+import CompanyList from '@/pages/parentCompany/components/CompanyList/index.vue'
+import CompanyInfo from '@/pages/parentCompany/components/CompanyInfo/index.vue'
+import RuleSetting from '@/pages/parentCompany/components/RuleSetting/index.vue'
 </script>
 
 <style lang="less" scoped>
