@@ -7,8 +7,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-
 // tree搜索
 const searchKey = ref<string>('')
 
