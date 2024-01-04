@@ -9,7 +9,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { useGlobalStore } from '@/store/index'
+import { useGlobalStore } from '@/store'
 // 当store中的多个参数需要被使用到的时候，为了更简洁的使用这些变量，采用结构的方式一次性获取所有的变量名
 // ES传统方式解构(能获取到值，但是不具有响应性)
 // Pinia解构方法：storeToRefs

@@ -14,6 +14,8 @@ declare module 'vue' {
     CompanyDialog: typeof import('./src/pages/parentCompany/components/AddEditCompany/CompanyDialog.vue')['default']
     CompanyInfo: typeof import('./src/pages/parentCompany/components/CompanyInfo/index.vue')['default']
     CompanyList: typeof import('./src/pages/parentCompany/components/CompanyList/index.vue')['default']
+    ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
+    ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElDialog: typeof import('element-plus/es')['ElDialog']

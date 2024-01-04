@@ -20,7 +20,6 @@ export const useUserStore = defineStore({
 			this.userInfo = userInfo
 		}
 	},
-	// 进行持久化存储
 	persist: {
 		key: KEY,
 		storage: window.localStorage
