@@ -86,6 +86,7 @@ const companyStatus = ref<boolean>(true)
 	background: var(--bg-white);
 	border-radius: 8px;
 	padding: 24px;
+	margin-top: 12px;
 	.title-label {
 		font-size: 16px;
 		font-weight: 600;

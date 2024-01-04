@@ -49,6 +49,7 @@ const defaultProps = {
 	background: var(--bg-white);
 	padding: 24px 12px;
 	border-radius: 8px;
+	margin-top: 12px;
 	:deep(.el-tree-node__content) {
 		.el-tree-node__label {
 			color: var(--font-primary);
