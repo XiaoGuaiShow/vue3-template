@@ -2,10 +2,12 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { close, start } from '@/utils/nprogress'
 import InvoiceRouter from './modules/invoice.ts'
 import SettlementRouter from './modules/settlement.ts'
+import ParentCompanyRouter from './modules/parentCompany.ts'
 
 const routes = [
 	...InvoiceRouter,
 	...SettlementRouter,
+	...ParentCompanyRouter,
 	{
 		path: '/',
 		redirect: '/home'
