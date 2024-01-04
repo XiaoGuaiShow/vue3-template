@@ -26,6 +26,12 @@
 		/* Volar支持 */
 		"types": ["element-plus/global"]
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "./auto-import.d.ts"],
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"src/**/*.vue",
+		"./auto-import.d.ts",
+		"./components.d.ts"
+	],
 	"references": [{ "path": "./tsconfig.node.json" }]
 }
