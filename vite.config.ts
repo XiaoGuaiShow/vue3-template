@@ -13,13 +13,15 @@ export default defineConfig({
 			resolvers: [ElementPlusResolver()],
 			imports: ['vue', 'vue-router', 'pinia'],
 			eslintrc: {
-				enabled: true,
+				enabled: false,
 				files: ['src/**/*.{ts,vue}'],
 				globalsPropValue: true
 			}
 		}),
 		Components({
-			resolvers: [ElementPlusResolver()]
+			resolvers: [ElementPlusResolver()],
+			dts: true,
+			dirs: ['src/**/components']
 		})
 	],
 	resolve: {
