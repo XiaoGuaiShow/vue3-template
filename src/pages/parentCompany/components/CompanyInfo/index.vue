@@ -122,20 +122,17 @@ const companyStatus = ref<boolean>(true)
 				width: 50%;
 				line-height: 28px;
 				display: flex;
-				align-items: center;
 				span:nth-child(1) {
 					color: var(--font-hint);
 					font-size: 13px;
 					width: 65px;
-					overflow: hidden;
-					text-overflow: ellipsis;
-					white-space: nowrap;
 					margin-right: 12px;
 					align-self: flex-start;
 				}
 				span:nth-child(2) {
 					color: var(--font-primary);
 					font-size: 13px;
+					flex: 1;
 				}
 			}
 			.info-item-100 {
