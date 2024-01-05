@@ -18,6 +18,9 @@ export const useUserStore = defineStore({
 		// microApp存储用户信息
 		setUserInfo(userInfo: UserInfo) {
 			this.userInfo = userInfo
+		},
+		setMemberId(memberId: string) {
+			this.userInfo.memberId = memberId
 		}
 	},
 	persist: {
