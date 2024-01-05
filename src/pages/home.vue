@@ -20,7 +20,7 @@ const { msg, count } = storeToRefs(store)
 
 onMounted(() => {
 	showGlobalLoading()
-  download()
+	download()
 })
 
 const addCount = () => {
