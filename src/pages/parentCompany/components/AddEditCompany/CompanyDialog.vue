@@ -12,7 +12,7 @@
 					<el-input v-model="form.name" />
 				</el-form-item>
 				<el-form-item label="结算员">
-					<el-button plain @click="handleAddPerson">选择人员</el-button>
+					<el-button type="primary" plain @click="handleAddPerson">选择人员</el-button>
 				</el-form-item>
 				<el-form-item label="" v-if="form.settlementOfficers && form.settlementOfficers.length">
 					<div class="tag-list">
@@ -40,8 +40,10 @@
 
 <script setup lang="ts">
 import { reactive, watch, toRefs } from 'vue'
-import { ElMessage } from 'element-plus'
-const props = defineProps(['visible'])
+const props = defineProps({
+	visible: { type: Boolean },
+	enterpriseId: { type: String, default: '' }
+})
 const emit = defineEmits(['on-close'])
 
 watch(
@@ -53,7 +55,10 @@ watch(
 	}
 )
 
-const form = reactive({
+const form = reactive<{
+	name: string
+	settlementOfficers: { name: string }[]
+}>({
 	name: '',
 	settlementOfficers: []
 })

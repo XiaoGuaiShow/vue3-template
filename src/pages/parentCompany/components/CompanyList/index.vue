@@ -15,6 +15,7 @@
 
 <script setup lang="ts">
 import { Search } from '@element-plus/icons-vue'
+import { ElTree } from 'element-plus'
 import { ref, watch } from 'vue'
 // 点击tree节点
 const handleNodeClick = (data: Tree, node: Tree) => {
@@ -22,8 +23,7 @@ const handleNodeClick = (data: Tree, node: Tree) => {
 }
 
 interface Tree {
-	label: string
-	children?: Tree[]
+	[key: string]: any
 }
 
 const filterText = ref('')
