@@ -213,13 +213,13 @@ const beforeClose = () => {
 		flex-direction: row-reverse;
 	}
 	//表格内容颜色
-	/deep/ .el-table__body tbody tr:nth-child(odd) {
+	:deep(.el-table__body tbody tr:nth-child(odd)) {
 		background-color: var(--bg-white);
 	}
-	/deep/ .el-table__body tbody tr:nth-child(even) td {
+	:deep(.el-table__body tbody tr:nth-child(even) td) {
 		background-color: var(--bg_tbbody);
 	}
-	/deeep/ .el-table__header-wrapper {
+	:deep(.el-table__header-wrapper) {
 		thead {
 			th {
 				div {
