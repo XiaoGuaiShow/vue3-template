@@ -21,8 +21,8 @@
 			<div class="flex jc-sb ai-c">
 				<span class="info-title">财务信息</span>
 				<div class="info-title-right flex ai-c">
-					<span>设置余额提醒</span>
-					<span>充值</span>
+					<span @click="handleBalanceRemind">设置余额提醒</span>
+					<span @click="goToRechargeRecords">充值</span>
 				</div>
 			</div>
 			<div class="info-content flex wrap">
@@ -46,7 +46,7 @@
 			<div class="flex jc-sb ai-c">
 				<span class="info-title">结算员信息</span>
 				<div class="info-title-right flex ai-c">
-					<span>编辑</span>
+					<span @click="handleSettlementEdit">编辑</span>
 				</div>
 			</div>
 			<div class="info-content flex wrap">
@@ -72,13 +72,57 @@
 			</div>
 		</div>
 	</div>
+	<!-- 编辑公司 -->
+	<CompanyDialog
+		:visible="commonVisible"
+		:enterpriseId="companyInfo.enterpriseId"
+		@on-close="commonVisible = false"></CompanyDialog>
+	<!-- 设置余额提醒 -->
+	<BalanceRemind
+		:visible="balanceVisible"
+		:enterpriseId="companyInfo.enterpriseId"
+		:enterpriseName="companyInfo.enterpriseName"
+		:settlementOfficerInfos="settlementOfficerInfos"
+		@on-close="balanceVisible = false"
+		@on-confirm="handleBalanceRemindSuccess"></BalanceRemind>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 
 // 公司状态
 const companyStatus = ref<boolean>(true)
+let companyInfo = reactive({
+	enterpriseId: '8888',
+	enterpriseName: '思客集团'
+})
+
+// 公司编辑
+let commonVisible = ref<boolean>(false)
+const handleSettlementEdit = () => {
+	commonVisible.value = true
+}
+
+// 设置余额提醒
+const balanceVisible = ref<boolean>(false)
+const settlementOfficerInfos = ref<Array<any>>([])
+
+const handleBalanceRemind = () => {
+	settlementOfficerInfos.value = (settlementOfficerInfos.value || []).map((m) => {
+		return {
+			...m,
+			Name: m.name,
+			Phone: m.phone,
+			CustomerId: m.customerId
+		}
+	})
+	balanceVisible.value = true
+}
+// 设置提醒成功
+const handleBalanceRemindSuccess = () => {}
+
+// 跳转充值记录页面
+const goToRechargeRecords = () => {}
 </script>
 
 <style lang="less" scoped>
