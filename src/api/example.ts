@@ -12,8 +12,17 @@ export const showGlobalLoading = () => {
 export const download = (data: Data) => {
 	return axiosInstance.request<RequestConfig>({
 		method: 'post',
-		url: '/pointatps/place/download',
+		url: 'pointatps/place/download',
 		data,
 		isDownload: true // 是否下载
+	})
+}
+
+export const timeout = (data: Data) => {
+	return axiosInstance.request<RequestConfig>({
+		method: 'post',
+		url: 'pointatps/place/timeout',
+		data,
+		timeout: 1000 // 超时时间
 	})
 }
