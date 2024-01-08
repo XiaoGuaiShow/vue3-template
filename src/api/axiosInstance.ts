@@ -7,7 +7,15 @@ import axios, {
 import { ElMessage, ElLoading } from 'element-plus'
 import { RESPONSE_STATUS } from '@/api/reponseStatus.ts'
 import downloadFile from '@/utils/downloadFile.ts'
-import { getMemberId, getPlatId, getVersion, getRefId, getToken, getikey } from '@/utils/auth'
+import {
+	getMemberId,
+	getPlatId,
+	getVersion,
+	getRefId,
+	getToken,
+	getikey,
+	getApiUrl
+} from '@/utils/auth'
 
 type RequestMap = Record<string, CancelTokenSource>
 
@@ -24,7 +32,7 @@ interface ResponseOptions extends AxiosResponse {
 	config: RequestConfig
 }
 
-const BASE_URL = import.meta.env.VITE_BASE_API
+const BASE_URL = getApiUrl()
 const requestMap: RequestMap = {}
 let loadingInstance: any
 let requestsCount = 0

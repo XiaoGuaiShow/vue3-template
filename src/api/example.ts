@@ -1,13 +1,11 @@
 import axiosInstance, { RequestConfig } from './axiosInstance.ts'
 
 type Data = Record<string, any>
-export const showGlobalLoading = (data: Data) => {
+export const showGlobalLoading = () => {
 	return axiosInstance.request<RequestConfig>({
-		method: 'post',
-		url: '/pointatps/place/page',
-		data,
-		showGlobalLoading: true, // 是否显示全局loading
-		timeout: 100 // 超时时间
+		method: 'get',
+		url: 'platform/pc-businessopenrecord/getBusinessOpenRecords',
+		showGlobalLoading: true // 是否显示全局loading
 	})
 }
 

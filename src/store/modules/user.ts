@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia'
 
 interface UserInfo {
-	token: string
-	memberId: string
-	enterpriseId: string
+	apiUrl?: string
+	token?: string
+	memberId?: string
+	refId?: string
+	version?: string
+	enterpriseId?: number
 }
 
 const KEY = 'userState'

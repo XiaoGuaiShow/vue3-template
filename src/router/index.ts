@@ -30,9 +30,17 @@ const router = createRouter({
 })
 
 // 路由前置后卫
-router.beforeEach(() => {
+router.beforeEach((to) => {
 	// 开启进度条
 	start()
+
+	if (typeof to.meta.title === 'string') {
+		document.title = to.meta.title || '结算自动化'
+	}
+
+	if (window.microApp) {
+		window.microApp.dispatch({ currentRoute: to.fullPath })
+	}
 })
 // 路由后置后卫
 router.afterEach(() => {
