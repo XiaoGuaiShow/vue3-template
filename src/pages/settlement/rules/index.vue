@@ -365,19 +365,19 @@ const giveInfos = ref([
 }
 .section {
 	padding: 24px;
-	background-color: #fff;
+	background-color: var(--bg-white);
 	border-radius: 8px;
 }
 .block-title {
 	font-size: 14px;
 	font-weight: 500;
-	color: @font-primary;
+	color: var(--font-primary);
 	margin-top: 24px;
 }
 .flex-box {
 	display: flex;
 	flex-wrap: wrap;
-	background: #fff8ed;
+	background: var(--bg-warning);
 	padding: 12px;
 	border-radius: 8px;
 	margin-top: 12px;
@@ -388,19 +388,19 @@ const giveInfos = ref([
 	display: flex;
 	align-items: center;
 	.label {
-		color: #8c8c8c;
+		color: var(--font-hint);
 		font-size: 13px;
 		width: 65px;
 		margin-right: 12px;
 		white-space: nowrap;
 	}
 	.value {
-		color: @font-primary;
+		color: var(--font-primary);
 		font-size: 13px;
 	}
 }
 .inner-box {
-	background: @bg-brand;
+	background: var(--bg-brand);
 	padding: 12px 12px 0 12px;
 	border-radius: 8px;
 	.text-form {
@@ -412,41 +412,41 @@ const giveInfos = ref([
 	}
 }
 .link {
-	color: @brand-blue;
+	color: var(--brand-blue);
 	cursor: pointer;
 	font-size: 14px;
 }
 :deep(.el-tabs__item) {
 	font-size: 16px;
-	color: @font-secondary;
+	color: var(--font-secondary);
 }
 :deep(.el-tabs__item.is-active) {
-	color: @brand-blue;
+	color: var(--brand-blue);
 }
 :deep(.el-tabs__active-bar) {
-	background-color: @brand-blue;
+	background-color: var(--brand-blue);
 }
 
 .totle-box {
 	padding: 24px;
 	border-radius: 6px;
-	background: @bg-brand;
+	background: var(--bg-brand);
 	display: flex;
 	align-items: center;
 	.total-box-item {
 		width: 50%;
 		&.left {
-			border-right: 1px solid @line-rest;
+			border-right: 1px solid var(--line-rest);
 		}
 		.label {
-			color: @font-secondary;
+			color: var(--font-secondary);
 			font-size: 16px;
 			margin-bottom: 6px;
 		}
 		.number {
 			font-size: 20px;
 			font-weight: 600;
-			color: @font-primary;
+			color: var(--font-primary);
 		}
 	}
 }

@@ -3,11 +3,13 @@ import { close, start } from '@/utils/nprogress'
 import InvoiceRouter from './modules/invoice.ts'
 import SettlementRouter from './modules/settlement.ts'
 import ParentCompanyRouter from './modules/parentCompany.ts'
+import billRouter from './modules/bill.ts'
 
 const routes = [
 	...InvoiceRouter,
 	...SettlementRouter,
 	...ParentCompanyRouter,
+	...billRouter,
 	{
 		path: '/',
 		redirect: '/home'

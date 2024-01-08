@@ -9,8 +9,8 @@ export default [
 		}
 	},
 	{
-		path: '/invoice/detail',
-		name: 'History',
+		path: '/invoice/history/:id',
+		name: 'HistoryDetail',
 		component: () => import('@/pages/invoice/detail/index.vue'),
 		meta: {
 			title: '账期'
