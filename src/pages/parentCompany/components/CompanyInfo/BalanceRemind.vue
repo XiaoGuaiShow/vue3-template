@@ -293,7 +293,7 @@ const beforeClose = () => {
 			&:nth-child(n + 1) {
 				margin-right: 5px;
 			}
-			.person-item-input /deep/ .el-input__wrapper {
+			.person-item-input :deep(.el-input__wrapper) {
 				padding-left: 85px;
 			}
 			.peoson-item-name {

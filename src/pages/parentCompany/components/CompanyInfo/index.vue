@@ -84,7 +84,12 @@
 		:enterpriseName="companyInfo.enterpriseName"
 		:settlementOfficerInfos="settlementOfficerInfos"
 		@on-close="balanceVisible = false"
-		@on-confirm="handleBalanceRemindSuccess"></BalanceRemind>
+		@on-confirm="balanceRemindConfirm"></BalanceRemind>
+	<!-- 发票单位编辑 -->
+	<InvoiceTitle
+		:visible="invoiceVisible"
+		@on-close="invoiceVisible = false"
+		@on-confirm="invoiceTitleConfirm"></InvoiceTitle>
 </template>
 
 <script setup lang="ts">
@@ -118,11 +123,21 @@ const handleBalanceRemind = () => {
 	})
 	balanceVisible.value = true
 }
-// 设置提醒成功
-const handleBalanceRemindSuccess = () => {}
+
+// 设置余额提醒成功
+const balanceRemindConfirm = () => {}
 
 // 跳转充值记录页面
 const goToRechargeRecords = () => {}
+
+// 发票单位编辑
+const invoiceVisible = ref<boolean>(false)
+const handleInvoiceEdit = () => {
+	invoiceVisible.value = true
+}
+
+// 发票编辑成功
+const invoiceTitleConfirm = () => {}
 </script>
 
 <style lang="less" scoped>

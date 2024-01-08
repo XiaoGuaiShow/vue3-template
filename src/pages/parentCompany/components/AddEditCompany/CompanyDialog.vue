@@ -44,7 +44,7 @@ const props = defineProps({
 	visible: { type: Boolean },
 	enterpriseId: { type: String, default: '' }
 })
-const emit = defineEmits(['on-close'])
+const emit = defineEmits(['on-close', 'on-confirm'])
 
 watch(
 	() => props.visible,
@@ -80,6 +80,7 @@ const handleDeletePerson = (index: number): void => {
 // 保存
 const handleConfirm = () => {
 	console.log('确定', form, settlementOfficers.value)
+	emit('on-confirm')
 }
 // 关闭
 const beforeClose = () => {
