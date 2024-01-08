@@ -1,12 +1,17 @@
-import axios, { AxiosRequestConfig, CancelToken } from 'axios'
-import { ElMessage } from 'element-plus'
+import axios, {
+	AxiosResponse,
+	CancelToken,
+	CancelTokenSource,
+	InternalAxiosRequestConfig
+} from 'axios'
+import { ElMessage, ElLoading } from 'element-plus'
 import { RESPONSE_STATUS } from '@/api/reponseStatus.ts'
 import downloadFile from '@/utils/downloadFile.ts'
 import { getMemberId, getPlatId, getVersion, getRefId, getToken, getikey } from '@/utils/auth'
 
-type RequestMap = Record<string, CancelToken>
+type RequestMap = Record<string, CancelTokenSource>
 
-interface RequestOptions extends AxiosRequestConfig {
+export interface RequestConfig extends InternalAxiosRequestConfig {
 	showGlobalLoading?: boolean
 	isDownload?: boolean
 	downloadOptions?: {
@@ -15,42 +20,46 @@ interface RequestOptions extends AxiosRequestConfig {
 	}
 }
 
-const BASE_URL = 'https://api.example.com'
+interface ResponseOptions extends AxiosResponse {
+	config: RequestConfig
+}
+
+const BASE_URL = import.meta.env.VITE_BASE_API
 const requestMap: RequestMap = {}
 let loadingInstance: any
 let requestsCount = 0
 
-function getRequestKey(config: RequestOptions): string {
+function getRequestKey(config: RequestConfig): string {
 	const { url, method, params, data } = config
 	return `${method}-${url}-${JSON.stringify(params)}-${JSON.stringify(data)}`
 }
-function addRequestToMap(config: RequestOptions): CancelToken {
+function addRequestToMap(config: RequestConfig): CancelToken {
 	const requestKey = getRequestKey(config)
 	if (requestMap[requestKey]) {
 		requestMap[requestKey].cancel('Request canceled')
 	}
 
-	const source = CancelToken.source()
+	const source = axios.CancelToken.source()
 	requestMap[requestKey] = source
 
 	return source.token
 }
 
-function deleteRequestFromMap(config: RequestOptions): void {
+function deleteRequestFromMap(config: RequestConfig): void {
 	const requestKey = getRequestKey(config)
 	delete requestMap[requestKey]
 }
 
 const axiosInstance = axios.create({
 	baseURL: BASE_URL,
-	timeout: 20000,
+	timeout: 60000,
 	headers: {
 		'Content-Type': 'application/json'
 	}
 })
 
 axiosInstance.interceptors.request.use(
-	(config) => {
+	(config: RequestConfig) => {
 		if (config.showGlobalLoading) {
 			requestsCount++
 			loadingInstance = ElLoading.service({
@@ -79,7 +88,7 @@ axiosInstance.interceptors.request.use(
 )
 
 axiosInstance.interceptors.response.use(
-	(response) => {
+	(response: ResponseOptions) => {
 		requestsCount--
 		deleteRequestFromMap(response.config)
 
@@ -106,8 +115,10 @@ axiosInstance.interceptors.response.use(
 				return Promise.reject(response.data.msg)
 			}
 		} else {
-			const error = new Error(response.statusText || '请求出错')
-			error.response = response
+			const error = {
+				response,
+				msg: response.statusText || '请求出错'
+			}
 			return Promise.reject(error)
 		}
 	},
