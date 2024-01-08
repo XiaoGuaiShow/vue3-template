@@ -1,3 +1,7 @@
+.w-full {
+	width: 100%;
+}
+/* margin相关 */
 .mt-12 {
 	margin-top: 12px;
 }
@@ -31,6 +35,7 @@
 .mr-24 {
 	margin-right: 24px;
 }
+/* flex相关 */
 .flex {
 	display: flex;
 }
@@ -49,6 +54,13 @@
 .ai-c {
 	align-items: center;
 }
+.jc-c {
+	justify-content: center;
+}
 .jc-sb {
 	justify-content: space-between;
+}
+/* 字体颜色相关 */
+.c-font-primary {
+	color: var(--font-primary);
 }

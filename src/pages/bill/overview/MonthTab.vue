@@ -9,7 +9,6 @@
 			{{ value + '月' }}
 		</div>
 	</div>
-	<div class="section"></div>
 </template>
 
 <script lang="ts" setup>
