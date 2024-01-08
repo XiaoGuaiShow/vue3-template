@@ -1,13 +1,23 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-const REFRESH_BY_HEADER = 'pleaseRefreshByHeader'
-const REQUEST_SUCCESS = '0'
+import { getMemberId, getPlatId, getVersion, getRefId, getToken, getikey } from '@/utils/auth'
 
 const http = axios.create({
 	timeout: 20000,
 	withCredentials: true,
 	headers: { 'X-Requested-With': 'XMLHttpRequest' }
 })
+
+http.interceptors.request.use(
+	(config) => {
+		config.headers['MemberId'] = getMemberId()
+		return config
+	},
+	(e) => {
+		// 对请求错误做些什么
+		return Promise.reject(e)
+	}
+)
 
 // 相应拦截器
 http.interceptors.response.use(

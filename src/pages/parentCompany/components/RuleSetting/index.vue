@@ -5,17 +5,28 @@
 			<span>统一扣母公司</span>
 			<span>每个子公司可独立结算。根据关联的发票抬头从对应的子公司或者母公司扣</span>
 		</div>
-		<div class="rule-setting-btn">规则设置</div>
+		<div class="rule-setting-btn" @click="handleCommonSetting">规则设置</div>
 	</div>
+	<!-- 通用规则设置 -->
+	<CommonSetting :visible="commonVisible" @on-close="commonVisible = false"></CommonSetting>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue'
+// 通用设置
+let commonVisible = ref(false)
+
+const handleCommonSetting = () => {
+	commonVisible.value = true
+}
+</script>
 
 <style lang="less" scoped>
 .rule-setting {
 	background: var(--bg-white);
 	border-radius: 8px;
 	padding: 38px 24px;
+	margin-bottom: 12px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;

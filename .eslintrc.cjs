@@ -6,8 +6,10 @@ module.exports = {
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
+        'plugin:@typescript-eslint/stylistic',
         "plugin:vue/vue3-essential",
         'plugin:prettier/recommended',
+        './.eslintrc-auto-import.json'
     ],
     "overrides": [
         {

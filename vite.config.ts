@@ -10,10 +10,18 @@ export default defineConfig({
 	plugins: [
 		vue(),
 		AutoImport({
-			resolvers: [ElementPlusResolver()]
+			resolvers: [ElementPlusResolver()],
+			imports: ['vue', 'vue-router', 'pinia'],
+			eslintrc: {
+				enabled: false,
+				files: ['src/**/*.{ts,vue}'],
+				globalsPropValue: true
+			}
 		}),
 		Components({
-			resolvers: [ElementPlusResolver()]
+			resolvers: [ElementPlusResolver()],
+			dts: true,
+			dirs: ['src/**/components']
 		})
 	],
 	resolve: {

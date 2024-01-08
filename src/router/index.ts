@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { close, start } from '@/utils/nprogress'
+import { close, start } from '@/utils/nprogress.ts'
 import InvoiceRouter from './modules/invoice.ts'
 import SettlementRouter from './modules/settlement.ts'
 import ParentCompanyRouter from './modules/parentCompany.ts'
