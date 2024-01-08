@@ -61,7 +61,7 @@
 			<div class="flex jc-sb ai-c">
 				<span class="info-title">开票单位信息</span>
 				<div class="info-title-right flex ai-c">
-					<span>编辑</span>
+					<span @click="handleInvoiceEdit">编辑</span>
 				</div>
 			</div>
 			<div class="info-content flex wrap">

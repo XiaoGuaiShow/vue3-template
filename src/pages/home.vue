@@ -10,12 +10,18 @@
 </template>
 <script setup lang="ts">
 import { useGlobalStore } from '@/store'
+// import { showGlobalLoading, download } from '@/api/example.ts'
 // 当store中的多个参数需要被使用到的时候，为了更简洁的使用这些变量，采用结构的方式一次性获取所有的变量名
 // ES传统方式解构(能获取到值，但是不具有响应性)
 // Pinia解构方法：storeToRefs
 const store = useGlobalStore()
 // 解构store中的值
 const { msg, count } = storeToRefs(store)
+
+onMounted(() => {
+	// showGlobalLoading()
+	// download()
+})
 
 const addCount = () => {
 	// 通过`store.属性名`来直接修改值

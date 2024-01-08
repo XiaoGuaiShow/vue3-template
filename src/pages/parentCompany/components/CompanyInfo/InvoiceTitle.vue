@@ -10,7 +10,7 @@
 			<div class="search-action">
 				<span class="search-title">开票单位</span>
 				<el-input placeholder="请输入开票单位名称"></el-input>
-				<div class="add-invoice-title">
+				<div class="add-invoice-title" @click="handleAddInvoice">
 					<el-icon><Plus /></el-icon>
 					<span>新增开票单位</span>
 				</div>
@@ -36,7 +36,7 @@
 				<el-table-column prop="address" label="操作" align="center" width="100">
 					<template #default="scope">
 						<div class="table-action">
-							<span>编辑</span>
+							<span @click="handleEditInvoice(scope.row)">编辑</span>
 							<span>删除</span>
 						</div>
 					</template>
@@ -57,6 +57,10 @@
 			</template>
 		</el-dialog>
 	</div>
+	<!-- 新增编辑开票单位 -->
+	<AddEditInvoiceTitle
+		:visible="invoiceEditVisible"
+		@on-close="invoiceEditVisible = false"></AddEditInvoiceTitle>
 </template>
 
 <script setup lang="ts">
@@ -79,21 +83,25 @@ watch(
 )
 const tableData = [
 	{
+		id: 1,
 		date: '2016-05-03',
 		name: 'Tom',
 		address: 'No. 189, Grove St, Los Angeles'
 	},
 	{
+		id: 2,
 		date: '2016-05-02',
 		name: 'Tom',
 		address: 'No. 189, Grove St, Los Angeles'
 	},
 	{
+		id: 3,
 		date: '2016-05-04',
 		name: 'Tom',
 		address: 'No. 189, Grove St, Los Angeles'
 	},
 	{
+		id: 4,
 		date: '2016-05-01',
 		name: 'Tom',
 		address: 'No. 189, Grove St, Los Angeles'
@@ -155,6 +163,17 @@ const handleConfirm = () => {
 // 关闭
 const beforeClose = () => {
 	emit('on-close')
+}
+
+// 发票新增编辑
+const invoiceEditVisible = ref<boolean>(true)
+let invoiceRowInfo = ref<any>({})
+const handleAddInvoice = () => {
+	invoiceEditVisible.value = true
+}
+const handleEditInvoice = (row: any) => {
+	invoiceEditVisible.value = true
+	invoiceRowInfo.value = row
 }
 </script>
 
