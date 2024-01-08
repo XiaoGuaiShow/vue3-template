@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddEditCompany: typeof import('./src/pages/parentCompany/components/AddEditCompany/index.vue')['default']
+    AddEditInvoiceTitle: typeof import('./src/pages/parentCompany/components/CompanyInfo/AddEditInvoiceTitle.vue')['default']
     BalanceRemind: typeof import('./src/pages/parentCompany/components/CompanyInfo/BalanceRemind.vue')['default']
     Breadcrumbs: typeof import('./src/components/public/Breadcrumbs/index.vue')['default']
     CommonSetting: typeof import('./src/pages/parentCompany/components/RuleSetting/CommonSetting.vue')['default']
@@ -31,6 +32,7 @@ declare module 'vue' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTree: typeof import('element-plus/es')['ElTree']
+    InvoiceAddress: typeof import('./src/pages/parentCompany/components/InvoiceAddress/index.vue')['default']
     InvoiceTitle: typeof import('./src/pages/parentCompany/components/CompanyInfo/InvoiceTitle.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
