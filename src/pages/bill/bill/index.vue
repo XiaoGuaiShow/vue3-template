@@ -29,22 +29,22 @@
 					<span class="link">{{ row.name }}</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="range" label="结算周期" width="215" align="center" />
-			<el-table-column prop="needInvoiced" label="应结(元)" width="148" align="center" />
-			<el-table-column prop="invoiced" label="已结算(元)" width="138" align="center">
+			<el-table-column prop="range" label="结算周期" width="200" align="center" />
+			<el-table-column prop="needInvoiced" label="应结(元)" width="100" align="center" />
+			<el-table-column prop="invoiced" label="已结算(元)" width="100" align="center">
 				<template #default="{ row }">
 					<span class="link">{{ row.invoiced }}</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="uninvoiced" label="未结算(元)" width="138" align="center" />
-			<el-table-column prop="invoiced" label="发票信息" width="138" align="center">
+			<el-table-column prop="uninvoiced" label="未结算(元)" width="100" align="center" />
+			<el-table-column prop="invoiced" label="发票信息" width="100" align="center">
 				<template #default="{ row }">
 					<span class="link">发票构成</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="lastDay" label="快递单号" width="138" align="center" />
-			<el-table-column prop="status" label="结算单状态" width="138" align="center" />
-			<el-table-column prop="lastDay" label="最晚结算日" width="138" align="center" />
+			<el-table-column prop="lastDay" label="快递单号" width="100" align="center" />
+			<el-table-column prop="status" label="结算单状态" width="100" align="center" />
+			<el-table-column prop="lastDay" label="最晚结算日" width="100" align="center" />
 		</el-table>
 
 		<div class="flex jc-sb ai-c mt-16">
@@ -119,11 +119,7 @@ const handleCurrentChange = (val: number) => {
 	font-size: 13px;
 }
 .inner-section {
-	padding: 24px;
+	padding: 24px 0;
 	background: var(--bg-white);
-	border-radius: 0 0 8px 8px;
-	border-left: 1px solid var(--line-rest);
-	border-right: 1px solid var(--line-rest);
-	border-bottom: 1px solid var(--line-rest);
 }
 </style>

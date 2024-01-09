@@ -11,7 +11,9 @@
 				<el-tab-pane label="账单列表" name="third">
 					<BillList></BillList>
 				</el-tab-pane>
-				<el-tab-pane label="导出记录" name="fourth">Task</el-tab-pane>
+				<el-tab-pane label="导出记录" name="fourth">
+					<ExportRecord></ExportRecord>
+				</el-tab-pane>
 				<el-tab-pane label="导出模板" name="fifth">Task</el-tab-pane>
 			</el-tabs>
 		</div>
@@ -32,9 +34,10 @@ import SummaryTable from './overview/SummaryTable.vue'
 import Bill from './overview/Bill.vue'
 import ConsumptionTable from './consumption/index.vue'
 import BillList from './bill/index.vue'
+import ExportRecord from './record/ExportRecord.vue'
 
 const isSummary = ref(true)
-const activeName = ref('third')
+const activeName = ref('fourth')
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {
 	console.log(tab, event)
