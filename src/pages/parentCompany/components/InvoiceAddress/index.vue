@@ -1,5 +1,5 @@
 <template>
-	<div class="invoice-address">邮寄地址</div>
+  <div class="invoice-address">邮寄地址</div>
 </template>
 
 <script setup lang="ts">
