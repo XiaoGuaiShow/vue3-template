@@ -1,14 +1,14 @@
 <template>
-	<div class="custom-tab mt-12">
-		<div
-			class="tab-item"
-			:class="{ active: activeMonth === value }"
-			v-for="value in months"
-			:key="value"
-			@click="handleTabClick(value)">
-			{{ value + '月' }}
-		</div>
-	</div>
+  <div class="custom-tab mt-12">
+    <div
+      class="tab-item"
+      :class="{ active: activeMonth === value }"
+      v-for="value in months"
+      :key="value"
+      @click="handleTabClick(value)">
+      {{ value + '月' }}
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>

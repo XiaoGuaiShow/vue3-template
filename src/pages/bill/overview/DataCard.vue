@@ -92,13 +92,13 @@ const options = [
 ]
 const { year, company, loading, isSummary, handleSelectCompany } = useYearAndCompany()
 watch(
-	() => [year.value, company.value, isSummary.value],
-	(newVal) => {
-		emits('change', newVal)
-	},
-	{
-		immediate: true
-	}
+  () => [year.value, company.value, isSummary.value],
+  (newVal) => {
+    emits('change', newVal)
+  },
+  {
+    immediate: true
+  }
 )
 </script>
 
