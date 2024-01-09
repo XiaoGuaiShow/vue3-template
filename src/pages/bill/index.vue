@@ -8,7 +8,9 @@
 				<el-tab-pane label="消费数据" name="second">
 					<ConsumptionTable></ConsumptionTable>
 				</el-tab-pane>
-				<el-tab-pane label="账单列表" name="third">Role</el-tab-pane>
+				<el-tab-pane label="账单列表" name="third">
+					<BillList></BillList>
+				</el-tab-pane>
 				<el-tab-pane label="导出记录" name="fourth">Task</el-tab-pane>
 				<el-tab-pane label="导出模板" name="fifth">Task</el-tab-pane>
 			</el-tabs>
@@ -29,9 +31,10 @@ import MonthTab from './overview/MonthTab.vue'
 import SummaryTable from './overview/SummaryTable.vue'
 import Bill from './overview/Bill.vue'
 import ConsumptionTable from './consumption/index.vue'
+import BillList from './bill/index.vue'
 
 const isSummary = ref(true)
-const activeName = ref('second')
+const activeName = ref('third')
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {
 	console.log(tab, event)

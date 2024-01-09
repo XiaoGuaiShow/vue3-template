@@ -7,8 +7,7 @@
 					type="daterange"
 					range-separator="至"
 					start-placeholder="开始日期"
-					end-placeholder="结束日期"
-					:size="size" />
+					end-placeholder="结束日期" />
 			</el-form-item>
 			<el-form-item label="产品类型">
 				<el-select
@@ -45,7 +44,7 @@
 			</el-form-item>
 			<el-form-item>
 				<el-button type="primary" @click="onSubmit">查询</el-button>
-				<el-button type="primary" plain @click="onSubmit">导出账单</el-button>
+				<el-button type="primary" plain @click="handleExport">导出账单</el-button>
 			</el-form-item>
 		</el-form>
 
@@ -152,6 +151,11 @@ const handleSizeChange = (val: number) => {
 const handleCurrentChange = (val: number) => {
 	console.log(`current page: ${val}`)
 }
+
+const options = [
+	{ label: '1', value: 1 },
+	{ label: '2', value: 2 }
+]
 </script>
 
 <style lang="less" scoped>
