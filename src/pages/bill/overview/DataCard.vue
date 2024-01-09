@@ -51,7 +51,7 @@
 						<div class="item-money">￥2,000,000.00</div>
 						<div class="item-link">还款记录</div>
 					</div>
-					<img class="item-image" src="@/assets/images/bill/bpay_fill.png" />
+					<img class="item-image" src="@/assets/images/bill/bpay.png" />
 				</div>
 			</div>
 		</div>

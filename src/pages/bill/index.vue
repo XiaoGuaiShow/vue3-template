@@ -37,7 +37,7 @@ import BillList from './bill/index.vue'
 import ExportRecord from './record/ExportRecord.vue'
 
 const isSummary = ref(true)
-const activeName = ref('fourth')
+const activeName = ref('first')
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {
 	console.log(tab, event)

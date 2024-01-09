@@ -4,25 +4,36 @@
 			账期
 			<div class="blue-tab ml-12">10/01-10/31</div>
 		</div>
+
 		<div class="bill-card">
 			<div>
-				<div>
-					<div>
-						<img src="" alt="" />
-					</div>
-					<div>
-						<div>已出账</div>
-						<div>
-							<div>最晚结算日: 2023/11/15</div>
-							<div>
-								<img src="@/assets/images/bill/time.png" alt="" />
-								<span>距最晚结算日</span>
-								<span>12天</span>
+				<div class="flex jc-sb ai-c">
+					<div class="flex">
+						<div class="circle primary">
+							<img src="" alt="" />
+						</div>
+						<div class="ml-24 flex col jc-c">
+							<div class="fs-24 fw-600 c-brand-blue">已出账</div>
+							<div class="flex mt-12 ai-c">
+								<div class="fs-18 fw-500 c-font-primary">最晚结算日: 2023/11/15</div>
+								<div class="flex ai-c elliptic ml-12">
+									<img src="@/assets/images/bill/time.png" alt="" />
+									<div class="fs-12 h-12 lh-12 c-font-hint">距最晚结算日</div>
+									<div class="fs-16 h-16 lh-16 c-brand-blue">12天</div>
+								</div>
 							</div>
 						</div>
 					</div>
+					<div>
+						<el-button type="primary" plain>查看账单明细</el-button>
+						<el-button type="primary">确认账单</el-button>
+					</div>
 				</div>
 			</div>
+
+			<div style="height: 142px; background-color: #fff; margin-top: 24px"></div>
+
+			<div class="">123</div>
 		</div>
 	</div>
 </template>
@@ -62,5 +73,20 @@
 	background: var(--bg-brand);
 	border-radius: 8px;
 	margin-top: 24px;
+}
+.circle {
+	width: 80px;
+	height: 80px;
+	border-radius: 100%;
+	&.primary {
+		background: #e1eeff;
+	}
+}
+.elliptic {
+	border: 1px solid var(--line-brand);
+	background: var(--bg-brand);
+	height: 26px;
+	border-radius: 15px;
+	padding: 0 6px;
 }
 </style>

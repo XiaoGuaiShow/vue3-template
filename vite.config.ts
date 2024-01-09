@@ -30,7 +30,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 		resolve: {
 			// 配置别名
 			alias: {
-				'@': resolve(__dirname, 'src')
+				'@': resolve(__dirname, './src')
 			},
 			extensions: ['.js', '.json', '.ts', '.vue'] // 使用路径别名时想要省略的后缀名
 		},

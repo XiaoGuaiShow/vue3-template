@@ -14,6 +14,9 @@
 .ml-12 {
 	margin-left: 12px;
 }
+.ml-24 {
+	margin-left: 24px;
+}
 .mt-6 {
 	margin-top: 6px;
 }
@@ -60,7 +63,16 @@
 .jc-sb {
 	justify-content: space-between;
 }
+.col {
+	flex-direction: column;
+}
 /* 字体颜色相关 */
 .c-font-primary {
 	color: var(--font-primary);
+}
+.c-brand-blue {
+	color: var(--brand-blue);
+}
+.c-font-hint {
+	color: var(--font-hint);
 }
