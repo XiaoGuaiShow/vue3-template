@@ -6,56 +6,56 @@ const { currentRoute } = useRouter()
 const breadcrumbItems = ref()
 // 监听当前路由的name变化
 watch(
-	() => currentRoute.value,
-	(route: RouteLocationNormalizedLoaded) => {
-		console.log(route)
-		breadcrumbItems.value = route.matched
-	},
-	{ immediate: true }
+  () => currentRoute.value,
+  (route: RouteLocationNormalizedLoaded) => {
+    console.log(route)
+    breadcrumbItems.value = route.matched
+  },
+  { immediate: true }
 )
 </script>
 
 <template>
-	<el-breadcrumb separator="/">
-		<transition-group name="breadcrumb">
-			<el-breadcrumb-item
-				:key="item.path"
-				v-for="item in breadcrumbItems"
-				:to="{ path: `${item.path}` }"
-				class="breadcrumb-item">
-				{{ item.meta.title }}
-			</el-breadcrumb-item>
-		</transition-group>
-	</el-breadcrumb>
+  <el-breadcrumb separator="/">
+    <transition-group name="breadcrumb">
+      <el-breadcrumb-item
+        :key="item.path"
+        v-for="item in breadcrumbItems"
+        :to="{ path: `${item.path}` }"
+        class="breadcrumb-item">
+        {{ item.meta.title }}
+      </el-breadcrumb-item>
+    </transition-group>
+  </el-breadcrumb>
 </template>
 
 <style lang="less">
 .el-breadcrumb {
-	height: 48px;
-	line-height: 48px;
-	margin-left: 16px;
+  height: 48px;
+  line-height: 48px;
+  margin-left: 16px;
 }
 .el-breadcrumb__inner,
 .el-breadcrumb__inner a {
-	font-weight: 400 !important;
+  font-weight: 400 !important;
 }
 
 /* 面包屑过渡动画 */
 .breadcrumb-enter-active {
-	transition: all 0.4s;
+  transition: all 0.4s;
 }
 
 .breadcrumb-leave-active {
-	transition: all 0.3s;
+  transition: all 0.3s;
 }
 
 .breadcrumb-enter-from,
 .breadcrumb-leave-active {
-	opacity: 0;
-	transform: translateX(20px);
+  opacity: 0;
+  transform: translateX(20px);
 }
 
 .breadcrumb-leave-active {
-	position: absolute;
+  position: absolute;
 }
 </style>

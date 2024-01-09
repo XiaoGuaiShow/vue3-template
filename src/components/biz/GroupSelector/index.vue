@@ -353,7 +353,9 @@ async function loadNode({ node, resolve }: any) {
   selectedList.value.forEach((item: any) => {
     StuffList.value.forEach((v: any) => {
       if (String(v.CustomerId) === String(item.CustomerId)) {
-        let findDep = AllDepartmentList.value.find((x: any) => String(x.Id) === String(v.DepartmentId))
+        let findDep = AllDepartmentList.value.find(
+          (x: any) => String(x.Id) === String(v.DepartmentId)
+        )
         if (findDep) {
           FirstDepIdList.value = findDep.Path.split(',')
         }

@@ -1,3 +1,3 @@
 export const RESPONSE_STATUS = {
-	SUCCESS: '0000'
+  SUCCESS: '0000'
 }
