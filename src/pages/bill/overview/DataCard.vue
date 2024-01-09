@@ -59,9 +59,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-const year = ref('2024')
-const company = ref('sike')
+import { watch } from 'vue'
+import { useYearAndCompany } from '../hooks/overview'
+const emits = defineEmits(['change'])
 const options = [
   {
     label: '集团',
@@ -90,6 +90,16 @@ const options = [
     ]
   }
 ]
+const { year, company, loading, isSummary, handleSelectCompany } = useYearAndCompany()
+watch(
+	() => [year.value, company.value, isSummary.value],
+	(newVal) => {
+		emits('change', newVal)
+	},
+	{
+		immediate: true
+	}
+)
 </script>
 
 <style lang="less" scoped>

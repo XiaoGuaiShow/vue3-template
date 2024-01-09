@@ -140,7 +140,7 @@ const goLink = (row: TableItem) => {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
 .container {
   padding: 12px;
   background-color: rgb(242, 243, 245);
