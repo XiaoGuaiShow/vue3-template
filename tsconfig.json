@@ -30,7 +30,7 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "./auto-import.d.ts",
+    "./auto-imports.d.ts",
     "./components.d.ts"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
