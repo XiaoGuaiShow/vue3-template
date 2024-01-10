@@ -15,10 +15,11 @@ export const deleteExportRecordItem = (id: string): Promise<Result> => {
     params: { recordId: id }
   })
 }
-export const getRechargeList = (data: RechargeRequestParams): Promise<ExportRecordResult> => {
+export const getRechargeList = (data: RechargeRequestParams) => {
   return axiosInstance({
     method: 'post',
     url: 'common/api/Enterprise/GetRechargeListV2',
-    data
+    data,
+    defaultParamsInRequest: true
   })
 }

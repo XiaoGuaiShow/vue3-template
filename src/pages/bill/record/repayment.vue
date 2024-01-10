@@ -83,7 +83,7 @@ import { ref, onMounted } from 'vue'
 import { getRechargeList } from '@/api/bill'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { GetBaseAPIURL } from '@/utils/index'
+import { getApiUrl } from '@/utils/auth'
 import dayjs from 'dayjs'
 import type { RechargeRequestParams } from '@/api/types/index'
 
@@ -126,7 +126,7 @@ const onSearch = () => {
 const onExport = () => {
   const data = { ...searchParams.value }
   let userInfo = JSON.parse(localStorage.getItem('_User_Info_') || '{}')
-  let apiUrl = GetBaseAPIURL()
+  let apiUrl = getApiUrl()
   data.Status = data.Status === undefined ? -1 : data.Status
   window.open(
     apiUrl +

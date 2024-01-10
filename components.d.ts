@@ -17,6 +17,7 @@ declare module 'vue' {
     CompanyList: typeof import('./src/pages/parentCompany/components/CompanyList/index.vue')['default']
     CustomSelector: typeof import('./src/components/biz/GroupSelector/components/CustomSelector/index.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
     ElForm: typeof import('element-plus/es')['ElForm']
