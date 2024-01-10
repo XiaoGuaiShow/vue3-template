@@ -912,7 +912,9 @@ function travelChange({ event, data, key }: any) {
   } else {
     //删除
     selectedList.value = selectedList.value.filter((a: any) => String(a[key]) !== String(data[key]))
-    checkTravelList.value = checkTravelList.value.filter((a: any) => String(a) !== String(data[key]))
+    checkTravelList.value = checkTravelList.value.filter(
+      (a: any) => String(a) !== String(data[key])
+    )
   }
 }
 
