@@ -35,5 +35,13 @@ export function getEnterpriseId() {
 }
 
 export function getDefaultParams() {
-  return UserStore.userInfo
+  return {
+    MemberId: getMemberId(),
+    PlatId: getPlatId(),
+    RefId: getRefId(),
+    Version: getVersion(),
+    Token: getToken(),
+    EnterpriseId: getEnterpriseId(),
+    ikey: getikey()
+  }
 }
