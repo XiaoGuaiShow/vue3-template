@@ -6,8 +6,8 @@
       :close-on-press-escape="false"
       :before-close="dialogClose"
       width="660px">
-      <template #header>{{ title }}</template>
-      <div class="checkSonDepartment" v-if="isShowSonDep">
+      <template #header>{{ props.title }}</template>
+      <div class="checkSonDepartment" v-if="props.isShowSonDep">
         <el-checkbox v-model="needDepartment">含子部门</el-checkbox>
       </div>
       <div class="popu-main b-flex">
@@ -243,7 +243,8 @@ async function getReasonCodeList() {
 }
 
 async function getDepartmentList(DMId = 0, SearchByDeptId = true) {
-  return await GetDepartmentList({ DMId, SearchByDeptId })
+  const res = await GetDepartmentList({ DMId, SearchByDeptId })
+  return res.data as any
 }
 
 onBeforeMount(() => {
@@ -289,8 +290,7 @@ async function loadNode({ node, resolve }: any) {
   if (Number(node.level) === 0) {
     let resDep: any[] = []
     const res = await getDepartmentList()
-    const data = res.data as any
-    resDep = data.DepartmentList || []
+    resDep = res.DepartmentList || []
     AllDepartmentList.value = AllDepartmentList.value.concat(resDep[0].ChildDepartmentList)
     if (disableClickDepartment) {
       resDep.forEach((item) => {
@@ -333,8 +333,7 @@ async function loadNode({ node, resolve }: any) {
     }
     let resDep = []
     const res = await getDepartmentList(node.data.Id)
-    const data = res.data as any
-    resDep = (data.DepartmentList || []) as any[]
+    resDep = (res.DepartmentList || []) as any[]
     AllDepartmentList.value = AllDepartmentList.value.concat(resDep)
     if (disableClickDepartment) {
       resDep.forEach((item) => {
@@ -909,33 +908,6 @@ function reasonCodeChange({ event, data, key }: any) {
 
 <style lang="less" scoped>
 .GroupSelector {
-  :deep(.el-dialog__body) {
-    padding: 10px 20px;
-  }
-
-  :deep(.el-dialog__headerbtn) {
-    top: 16px;
-    right: 20px;
-  }
-
-  :deep(.el-input__prefix) {
-    left: 0;
-    top: 2px;
-  }
-
-  :deep(.el-input__suffix) {
-    top: 2px;
-  }
-
-  :deep(.el-dialog__header) {
-    border-bottom: 1px solid #e2e2e2;
-    padding: 15px 20px;
-  }
-
-  :deep(.el-dialog__footer) {
-    padding: 5px 20px 15px;
-  }
-
   .footer {
     display: flex;
     justify-content: center;

@@ -2,7 +2,7 @@
   <div>
     <el-input
       clearable
-      size="mini"
+      size="small"
       prefix-icon="el-icon-search"
       @input="handleSearch"
       v-model="searchKey"
@@ -39,11 +39,13 @@
                   (data, checked, indeterminate) =>
                     handleCheckTreeChange(data, checked, indeterminate, item.emitCheckChangeEvent)
                 ">
-                <span class="custom-tree-node" slot-scope="{ node, data }">
-                  <i class="icon ceekeefont wenjianjia" v-if="data.type !== 'person'"></i>
-                  {{ data[(item.props && item.props.label) || defaultTreeConfig.props.label] }}
-                  <span v-if="data.WorkCode">({{ data.WorkCode }})</span>
-                </span>
+                <template #default="{ data }">
+                  <span class="custom-tree-node">
+                    <i class="icon ceekeefont wenjianjia" v-if="data.type !== 'person'"></i>
+                    {{ data[(item.props && item.props.label) || defaultTreeConfig.props.label] }}
+                    <span v-if="data.WorkCode">({{ data.WorkCode }})</span>
+                  </span>
+                </template>
               </el-tree>
             </div>
             <div v-if="item.type === 'checkbox'" class="content">
@@ -80,7 +82,7 @@
           :key="index">
           <div v-if="item.Type === 'department'" class="ellipsis">
             <el-tooltip placement="bottom" effect="light">
-              <div slot="content">{{ item.Name }}</div>
+              <template #content>{{ item.Name }}</template>
               <span>
                 <i class="icon ceekeefont wenjianjia"></i>
                 {{ item.Name }}
