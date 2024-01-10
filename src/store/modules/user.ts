@@ -14,7 +14,14 @@ const KEY = 'userState'
 export const useUserStore = defineStore({
   id: KEY,
   state: () => ({
-    userInfo: {}
+    userInfo: {
+      apiUrl: '',
+      token: '',
+      memberId: '',
+      refId: '',
+      version: '',
+      enterpriseId: 0
+    } as UserInfo
   }),
   getters: {},
   actions: {

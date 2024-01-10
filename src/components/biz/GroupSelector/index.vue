@@ -1,7 +1,7 @@
 <template>
   <div class="GroupSelector">
     <el-dialog
-      v-model="visible"
+      v-model="props.visible"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :before-close="dialogClose"
@@ -403,21 +403,22 @@ async function getDepStuffList(DepartmentId: any) {
 }
 
 function selectStuff({ data, checked }: any) {
-  const { name } = MATCH_DATA.value[name](data, checked)
+  const matchData = MATCH_DATA.value
+  const { name } = matchData[name](data, checked)
 }
 
-function selectPerson(item, state) {
+function selectPerson(item: any, state: any): any {
   if (String(item.type) !== 'person') {
     //部门
     setChildrenChecked(item.Id, state)
   } else {
     if (state) {
       if (props.isSingleChoice && selectedList.value && selectedList.value.length > 0) {
-        selectedList.value.forEach((sitem) => {
+        selectedList.value.forEach((sitem: any) => {
           deleteSelected(sitem)
         })
       }
-      if (!selectedList.value.find((a) => String(a.CustomerId) === String(item.CustomerId))) {
+      if (!selectedList.value.find((a: any) => String(a.CustomerId) === String(item.CustomerId))) {
         selectedList.value.push({
           Id: item.Id,
           SIId: item.SIId,
@@ -430,10 +431,14 @@ function selectPerson(item, state) {
       }
     } else {
       if (
-        selectedList.value.findIndex((a) => String(a.CustomerId) === String(item.CustomerId)) !== -1
+        selectedList.value.findIndex(
+          (a: any) => String(a.CustomerId) === String(item.CustomerId)
+        ) !== -1
       ) {
         selectedList.value.splice(
-          selectedList.value.findIndex((a) => String(a.CustomerId) === String(item.CustomerId)),
+          selectedList.value.findIndex(
+            (a: any) => String(a.CustomerId) === String(item.CustomerId)
+          ),
           1
         )
       }
@@ -443,12 +448,12 @@ function selectPerson(item, state) {
   }
 }
 
-function selectDepAndStuff(item, state) {
+function selectDepAndStuff(item: any, state: any) {
   if (String(item.type) !== 'person') {
     //部门
     if (state) {
       //选中
-      if (!selectedList.value.find((a) => String(a.Id) === String(item.Id))) {
+      if (!selectedList.value.find((a: any) => String(a.Id) === String(item.Id))) {
         selectedList.value.push({
           Id: item.Id,
           SIId: '', //部门不存在该字段
@@ -461,15 +466,17 @@ function selectDepAndStuff(item, state) {
         })
       }
     } else {
-      let findIndex = selectedList.value.findIndex((a) => String(a.Id) === String(item.Id))
+      let findIndex = selectedList.value.findIndex((a: any) => String(a.Id) === String(item.Id))
       if (findIndex !== -1) {
         selectedList.value.splice(findIndex, 1)
       }
     }
   } else {
     if (state) {
-      if (!selectedList.value.find((a) => String(a.CustomerId) === String(item.CustomerId))) {
-        let siidIndex = selectedList.value.findIndex((a) => String(a.SIId) === String(item.SIId))
+      if (!selectedList.value.find((a: any) => String(a.CustomerId) === String(item.CustomerId))) {
+        let siidIndex = selectedList.value.findIndex(
+          (a: any) => String(a.SIId) === String(item.SIId)
+        )
         let temp = {
           Id: item.Id,
           SIId: item.SIId,
@@ -487,10 +494,14 @@ function selectDepAndStuff(item, state) {
       }
     } else {
       if (
-        selectedList.value.findIndex((a) => String(a.CustomerId) === String(item.CustomerId)) !== -1
+        selectedList.value.findIndex(
+          (a: any) => String(a.CustomerId) === String(item.CustomerId)
+        ) !== -1
       ) {
         selectedList.value.splice(
-          selectedList.value.findIndex((a) => String(a.CustomerId) === String(item.CustomerId)),
+          selectedList.value.findIndex(
+            (a: any) => String(a.CustomerId) === String(item.CustomerId)
+          ),
           1
         )
       }
@@ -501,17 +512,17 @@ function selectDepAndStuff(item, state) {
 }
 
 function checkNodeChildIsClean() {
-  AllDepartmentList.value.forEach((item) => {
+  AllDepartmentList.value.forEach((item: any) => {
     let isHasSelect = false
-    let allChildDep = AllDepartmentList.value.filter((v) => v.Path.includes(item.Id))
-    let tenpSelect = []
-    StuffList.value.forEach((x) => {
+    let allChildDep = AllDepartmentList.value.filter((v: any) => v.Path.includes(item.Id))
+    let tenpSelect = [] as any[]
+    StuffList.value.forEach((x: any) => {
       if (selectedList.value.find((y) => String(y.CustomerId) === String(x.CustomerId))) {
         tenpSelect.push({ ...x })
       }
     })
     tenpSelect.forEach((v) => {
-      if (allChildDep.find((x) => String(x.Id) === String(v.DepartmentId))) {
+      if (allChildDep.find((x: any) => String(x.Id) === String(v.DepartmentId))) {
         isHasSelect = true
       }
     })
@@ -521,10 +532,10 @@ function checkNodeChildIsClean() {
   })
 }
 
-function selectDepartment(data, state) {
+function selectDepartment(data: any, state: any) {
   if (state) {
     //选中
-    if (!selectedList.value.find((a) => String(a.Id) === String(data.Id))) {
+    if (!selectedList.value.find((a: any) => String(a.Id) === String(data.Id))) {
       selectedList.value.push({
         Id: data.Id,
         SIId: '', //部门不存在该字段
@@ -536,26 +547,26 @@ function selectDepartment(data, state) {
       })
     }
   } else {
-    let findIndex = selectedList.value.findIndex((a) => String(a.Id) === String(data.Id))
+    let findIndex = selectedList.value.findIndex((a: any) => String(a.Id) === String(data.Id))
     if (findIndex !== -1) {
       selectedList.value.splice(findIndex, 1)
     }
   }
 }
 
-function moveDepartment(data, state) {
+function moveDepartment(data: any, state: any) {
   if (state) {
     //选中
     //验证转移部门是否符合要求
-    if (data.Path.includes(tcurrentDepartment.value.DepartmentId)) {
+    if (data.Path.includes(currentDepartment.value.DepartmentId)) {
       setTreeChecked(data.Id, false)
       return ElMessage({
-        message: `不允许转移至${tcurrentDepartment.value.DepartmentName}及其子部门！`,
+        message: `不允许转移至${currentDepartment.value.DepartmentName}及其子部门！`,
         type: 'warning'
       })
     }
-    if (!selectedList.value.find((a) => String(a.Id) === String(data.Id))) {
-      selectedList.value.forEach((v) => {
+    if (!selectedList.value.find((a: any) => String(a.Id) === String(data.Id))) {
+      selectedList.value.forEach((v: any) => {
         deleteSelected(v)
       })
       selectedList.value = [
@@ -571,17 +582,19 @@ function moveDepartment(data, state) {
       ]
     }
   } else {
-    let findIndex = selectedList.value.findIndex((a) => String(a.Id) === String(data.Id))
+    let findIndex = selectedList.value.findIndex((a: any) => String(a.Id) === String(data.Id))
     if (findIndex !== -1) {
       selectedList.value.splice(findIndex, 1)
     }
   }
 }
 
-function setAllStuffCheckedById(CustomerId, flag) {
-  StuffList.value.forEach((v) => {
+function setAllStuffCheckedById(CustomerId: any, flag: any) {
+  StuffList.value.forEach((v: any) => {
     if (String(v.CustomerId) === String(CustomerId)) {
-      let findDep = AllDepartmentList.value.find((x) => String(x.Id) === String(v.DepartmentId))
+      let findDep = AllDepartmentList.value.find(
+        (x: any) => String(x.Id) === String(v.DepartmentId)
+      )
       if (findDep && flag) {
         FirstDepIdList.value = findDep.Path.split(',')
       }
@@ -590,11 +603,11 @@ function setAllStuffCheckedById(CustomerId, flag) {
   })
 }
 
-function setChildrenChecked(parentId, flag) {
+function setChildrenChecked(parentId: any, flag: any) {
   if (needDepartment.value) {
-    AllDepartmentList.value.forEach((item) => {
+    AllDepartmentList.value.forEach((item: any) => {
       if (item.Path.includes(parentId)) {
-        StuffList.value.forEach((v) => {
+        StuffList.value.forEach((v: any) => {
           if (String(v.DepartmentId) === String(item.Id)) {
             selectStuff({
               data: {
@@ -614,7 +627,7 @@ function setChildrenChecked(parentId, flag) {
       }
     })
   } else {
-    StuffList.value.forEach((item) => {
+    StuffList.value.forEach((item: any) => {
       if (String(item.DepartmentId) === String(parentId)) {
         selectStuff({
           data: {
@@ -633,17 +646,17 @@ function setChildrenChecked(parentId, flag) {
   }
 }
 
-function setTreeChecked(id, checked) {
+function setTreeChecked(id: any, checked: any) {
   CustomSelector.value.setTreeChecked(id, checked)
 }
 
-function deleteSelected(item) {
+function deleteSelected(item: any) {
   const { extra } = MATCH_DATA.value
   if (extra && extra.includes(String(item.Type))) {
   } else {
     let id = item.Id
     if (String(item.Type) === 'person' && String(item.Id) === '') {
-      let find = StuffList.value.find((x) => {
+      let find = StuffList.value.find((x: any) => {
         return String(x.CustomerId) === String(item.CustomerId)
       })
       if (find) {
@@ -653,7 +666,7 @@ function deleteSelected(item) {
     setTreeChecked(id, false)
   }
 
-  let findIndex = selectedList.value.findIndex((x) => {
+  let findIndex = selectedList.value.findIndex((x: any) => {
     return String(x.Name) === String(item.Name)
   })
   if (findIndex !== -1) {
@@ -661,10 +674,14 @@ function deleteSelected(item) {
   }
   if (extra) {
     if (extra.includes('role')) {
-      checkRoleList.value = checkRoleList.value.filter((n) => String(item.RoleId) !== String(n))
+      checkRoleList.value = checkRoleList.value.filter(
+        (n: any) => String(item.RoleId) !== String(n)
+      )
     }
     if (extra.includes('travel')) {
-      checkTravelList.value = checkTravelList.value.filter((n) => String(item.RoleId) !== String(n))
+      checkTravelList.value = checkTravelList.value.filter(
+        (n: any) => String(item.RoleId) !== String(n)
+      )
     }
     if (extra.includes('reasonCode')) {
       checkReasonCodeList.value = checkReasonCodeList.value.filter(
@@ -674,8 +691,8 @@ function deleteSelected(item) {
   }
 }
 
-async function searchStuff({ searchKey, tabType }) {
-  const { searchType, extra } = MATCH_DATA.value
+async function searchStuff({ searchKey, tabType }: any) {
+  const { searchType, extra } = MATCH_DATA.value as any
   if (String(tabType) === 'checkbox') {
     if (extra.includes('role')) {
       searchRole(searchKey)
@@ -692,16 +709,17 @@ async function searchStuff({ searchKey, tabType }) {
     Key: searchKey,
     RequestType: searchType
   }
-  const data = await SearchStuffAndDepartment(param)
+  const res = await SearchStuffAndDepartment(param)
+  const data = res.data as any
   let searchStuffList
-  searchStuffList = data.Result.StuffList.map((item) => {
+  searchStuffList = data.StuffList.map((item: any) => {
     return {
       ...item,
       Type: 'person'
     }
   })
   let searDepList
-  searDepList = data.Result.DepartmentList.map((item) => {
+  searDepList = data.DepartmentList.map((item: any) => {
     return {
       ...item,
       Type: 'department'
@@ -710,43 +728,43 @@ async function searchStuff({ searchKey, tabType }) {
   searchStuffList.value = searchStuffList.concat(searDepList)
 }
 
-function searchRole(key) {
+function searchRole(key: any) {
   if (!key) {
     filterRoleList.value = RoleList.value
   } else {
-    filterRoleList.value = RoleList.value.filter((item) => {
+    filterRoleList.value = RoleList.value.filter((item: any) => {
       return item.RoleName.includes(key)
     })
   }
 }
 
-function searchTravel(key) {
+function searchTravel(key: any) {
   if (!key) {
     filterTravelList.value = travelList.value
   } else {
-    filterTravelList.value = travelList.value.filter((item) => {
+    filterTravelList.value = travelList.value.filter((item: any) => {
       return item.RoleName.includes(key)
     })
   }
 }
 
-function searchReasonCode(key) {
+function searchReasonCode(key: any) {
   if (!key) {
     filterReasonCodeList.value = reasonCodeList.value
   } else {
-    filterReasonCodeList.value = reasonCodeList.value.filter((item) => {
+    filterReasonCodeList.value = reasonCodeList.value.filter((item: any) => {
       return item.Name.includes(key)
     })
   }
 }
 
-function searchSelectStuff(data) {
-  if (props.isSingleChoice && selectedList.value && selectedList.value.length > 0) {
-    selectedList.value.forEach((sitem) => {
+function searchSelectStuff(data: any) {
+  const list = selectedList.value as any[]
+  if (props.isSingleChoice && list?.length > 0) {
+    list.forEach((sitem: any) => {
       deleteSelected(sitem)
     })
   }
-  let selectedList = selectedList.value
   let isRepeat = false
   let obj = {
     Id: data.SIId || data.Id,
@@ -756,11 +774,11 @@ function searchSelectStuff(data) {
     CustomerId: data.Id,
     ParentDepartmentId: data.DepartmentId,
     Type: data.Type
-  }
-  for (let i = 0; i < selectedList.length; i++) {
+  } as any
+  for (let item of list) {
     if (
-      (selectedList[i].CustomerId && String(selectedList[i].CustomerId) === String(data.Id)) ||
-      String(selectedList[i].Id) === String(data.Id)
+      (item.CustomerId && String(item.CustomerId) === String(data.Id)) ||
+      String(item.Id) === String(data.Id)
     ) {
       isRepeat = true
       break
@@ -773,25 +791,24 @@ function searchSelectStuff(data) {
 
   if (!isRepeat) {
     if (Number(props.popSelectType) === 6) {
-      selectedList.forEach((v) => {
+      list.forEach((v: any) => {
         deleteSelected(v)
       })
-      selectedList = [{ ...obj }]
+      selectedList.value = [{ ...obj }]
     } else {
-      selectedList.push(obj)
+      selectedList.value.push(obj)
     }
   }
-  selectedList.value = selectedList
   isSearch.value = false
   data.PathList &&
-    data.PathList.forEach((item) => {
-      if (!FirstDepIdList.value.find((v) => String(v) === String(item.Id))) {
+    data.PathList.forEach((item: any) => {
+      if (!FirstDepIdList.value.find((v: any) => String(v) === String(item.Id))) {
         FirstDepIdList.value.push(item.Id)
       }
     })
   // let tempItem = FirstDepIdList.value.shift();
   // FirstDepIdList.value = [tempItem];
-  selectedList.value.forEach((item) => {
+  selectedList.value.forEach((item: any) => {
     setTreeChecked(item.Id, true)
   })
 }
@@ -811,7 +828,7 @@ function addOk() {
   })
 }
 
-function dialogClose(done) {
+function dialogClose(done: any) {
   done()
   isSearch.value = false
   searchStuffList.value = []
@@ -819,9 +836,9 @@ function dialogClose(done) {
   emit('update:visible', false)
 }
 
-function getCustomersById(CustomerId, _that) {
-  let temSelectList = []
-  _that.StuffList.forEach((v) => {
+function getCustomersById(CustomerId: any) {
+  let temSelectList = [] as any[]
+  StuffList.value.forEach((v: any) => {
     if (String(v.CustomerId) === String(CustomerId)) {
       temSelectList.push({
         Name: v.Name,
@@ -830,18 +847,18 @@ function getCustomersById(CustomerId, _that) {
         Id: v.SIId,
         SIId: v.SIId
       })
-      if (_that.FirstDepIdList.findIndex((a) => String(v.DepartmentId) === String(a)) === -1) {
-        _that.FirstDepIdList.push(v.DepartmentId)
+      if (FirstDepIdList.value.findIndex((a: any) => String(v.DepartmentId) === String(a)) === -1) {
+        FirstDepIdList.value.push(v.DepartmentId)
       }
-      _that.setTreeChecked(v.SIId, true)
+      setTreeChecked(v.SIId, true)
     }
   })
   return temSelectList
 }
 
-function delCustomersById(CustomerId) {
-  let temList = []
-  selectedList.value.forEach((item) => {
+function delCustomersById(CustomerId: any) {
+  let temList = [] as any[]
+  selectedList.value.forEach((item: any) => {
     temList.push(item)
   })
   for (let i = 0; i < temList.length; i++) {
@@ -855,11 +872,11 @@ function delCustomersById(CustomerId) {
   selectedList.value = temList
 }
 
-function checkTab(type) {
+function checkTab(type: any) {
   tabType.value = type
 }
 
-function roleChange({ event, data, key }) {
+function roleChange({ event, data, key }: any) {
   if (event) {
     //选中
     selectedList.value.push({
@@ -874,12 +891,12 @@ function roleChange({ event, data, key }) {
     checkRoleList.value.push(data[key])
   } else {
     //删除
-    selectedList.value = selectedList.value.filter((a) => String(a[key]) !== String(data[key]))
-    checkRoleList.value = checkRoleList.value.filter((a) => String(a) !== String(data[key]))
+    selectedList.value = selectedList.value.filter((a: any) => String(a[key]) !== String(data[key]))
+    checkRoleList.value = checkRoleList.value.filter((a: any) => String(a) !== String(data[key]))
   }
 }
 
-function travelChange({ event, data, key }) {
+function travelChange({ event, data, key }: any) {
   if (event) {
     //选中
     selectedList.value.push({
@@ -894,12 +911,12 @@ function travelChange({ event, data, key }) {
     checkTravelList.value.push(data[key])
   } else {
     //删除
-    selectedList.value = selectedList.value.filter((a) => String(a[key]) !== String(data[key]))
-    checkTravelList.value = checkTravelList.value.filter((a) => String(a) !== String(data[key]))
+    selectedList.value = selectedList.value.filter((a: any) => String(a[key]) !== String(data[key]))
+    checkTravelList.value = checkTravelList.value.filter((a: any) => String(a) !== String(data[key]))
   }
 }
 
-function reasonCodeChange({ event, data, key }) {
+function reasonCodeChange({ event, data, key }: any) {
   if (event) {
     //选中
     selectedList.value.push({
@@ -912,9 +929,9 @@ function reasonCodeChange({ event, data, key }) {
     checkReasonCodeList.value.push(data[key])
   } else {
     //删除
-    selectedList.value = selectedList.value.filter((a) => String(a[key]) !== String(data[key]))
+    selectedList.value = selectedList.value.filter((a: any) => String(a[key]) !== String(data[key]))
     checkReasonCodeList.value = checkReasonCodeList.value.filter(
-      (a) => String(a) !== String(data[key])
+      (a: any) => String(a) !== String(data[key])
     )
   }
 }

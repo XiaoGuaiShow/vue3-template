@@ -17,7 +17,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         imports: ['vue', 'vue-router', 'pinia'],
         eslintrc: {
           enabled: false,
-          files: ['src/**/*.{ts,vue}'],
           globalsPropValue: true
         }
       }),
