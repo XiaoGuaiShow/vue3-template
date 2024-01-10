@@ -26,7 +26,7 @@ export function getVersion() {
   return UserStore.userInfo.version ? UserStore.userInfo.version : '6.10.2'
 }
 
-export function getikey() {
+export function getIkey() {
   return ''
 }
 
@@ -35,5 +35,13 @@ export function getEnterpriseId() {
 }
 
 export function getDefaultParams() {
-  return UserStore.userInfo
+  return {
+    MemberId: getMemberId(),
+    PlatId: getPlatId(),
+    RefId: getRefId(),
+    Version: getVersion(),
+    Token: getToken(),
+    EnterpriseId: getEnterpriseId(),
+    ikey: getIkey()
+  }
 }
