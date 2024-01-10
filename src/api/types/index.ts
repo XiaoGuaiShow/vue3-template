@@ -3,6 +3,11 @@ export interface PageVo {
   pageSize: number
 }
 
+export interface PageVo2 {
+  Index: number
+  Size: number
+}
+
 export interface Result {
   code: string
   message: string
@@ -32,4 +37,12 @@ export interface ExportRecordResult extends Result {
 
 export interface DeleteRecordResult extends Result {
   data: any
+}
+
+export interface RechargeRequestParams {
+  StartTime: string
+  EndTime: string
+  Status: number | undefined
+  IsIncludingSubsidiary?: boolean
+  Page: PageVo2
 }
