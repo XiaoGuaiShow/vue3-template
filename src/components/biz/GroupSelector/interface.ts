@@ -5,13 +5,16 @@ export interface IProps {
 
 export interface ISelectedListOptions {
   Id: string
-  SIId: string
+  SIId?: string
   Name: string
-  CustomerId: string
-  WorkCode: string
+  CustomerId?: string
+  WorkCode?: string
   Type: string
-  ParentDepartmentId: string
+  ParentDepartmentId?: string
   IsIncludeChild?: boolean
+  RoleId?: string
+  OriginalName?: string
+  OuterCode?: string
 }
 
 export type ITypeMap = Record<

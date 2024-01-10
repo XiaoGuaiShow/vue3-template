@@ -15,7 +15,7 @@
           <div class="popu-main-sec-title">选择：</div>
           <div class="popu-main-sec-box">
             <CustomSelector
-              ref="CustomSelector"
+              ref="CustomSelectorRef"
               :placeholder="inputPlaceholder"
               :search-list="searchStuffList"
               :items="items"
@@ -74,7 +74,7 @@ import { GetRoleList, GetEnterpriseRoleSurvey } from '@/api/modules/common.ts'
 import { GetCostTypeList } from '@/api/modules/expensecontrol.ts'
 import { ISelectedListOptions, IItemsOptions } from '@/components/biz/GroupSelector/interface.ts'
 import { TYPES_MAP, TYPES as ALL_TYPES } from './TYPES_MAP.ts'
-import { computed, onBeforeMount, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 
 const props = defineProps({
   /*
@@ -124,29 +124,28 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'addOk'])
 
-const CustomSelector = ref(null)
-const DepartmentList = ref([])
-const AllDepartmentList = ref([])
-const StuffList = ref([])
-const searchStuffList = ref([])
-const FirstDepIdList = ref([])
-const selectedList = ref<[ISelectedListOptions]>([])
+const CustomSelectorRef = ref<any>(null)
+const DepartmentList = ref<any[]>([])
+const AllDepartmentList = ref<any[]>([])
+const StuffList = ref<any[]>([])
+const searchStuffList = ref<any[]>([])
+const FirstDepIdList = ref<any[]>([])
+const selectedList = ref<ISelectedListOptions[]>([])
 const isSearch = ref(false)
 const needDepartment = ref(true)
 const inputPlaceholder = ref<string>('')
 const errorMsg = ref('请选择人员或部门！')
-const currentDepartment = ref({})
-const tabType = ref(0)
-const RoleList = ref([])
-const checkRoleList = ref([])
-const filterRoleList = ref([])
-const travelList = ref([])
-const checkTravelList = ref([])
-const filterTravelList = ref([])
-const reasonCodeList = ref([])
-const checkReasonCodeList = ref([])
-const filterReasonCodeList = ref([])
-const TYPES = ref(ALL_TYPES)
+const currentDepartment = ref<any>({})
+const RoleList = ref<any[]>([])
+const checkRoleList = ref<any[]>([])
+const filterRoleList = ref<any[]>([])
+const travelList = ref<any[]>([])
+const checkTravelList = ref<any[]>([])
+const filterTravelList = ref<any[]>([])
+const reasonCodeList = ref<any[]>([])
+const checkReasonCodeList = ref<any[]>([])
+const filterReasonCodeList = ref<any[]>([])
+const TYPES = ref<any>(ALL_TYPES)
 
 watch(
   () => props.visible,
@@ -154,7 +153,7 @@ watch(
     if (newValue) {
       selectedList.value = []
       if (selectedList.value?.length > 0) {
-        selectedList.value = props.beforeList
+        selectedList.value = props.beforeList as ISelectedListOptions[]
         currentDepartment.value = props.beforeList[0] || {}
       }
     }
@@ -256,7 +255,7 @@ onBeforeMount(() => {
   checkTravelList.value = []
   checkReasonCodeList.value = []
   if (props.beforeList && props.beforeList.length > 0) {
-    selectedList.value = props.beforeList
+    selectedList.value = props.beforeList as ISelectedListOptions[]
     if (extra) {
       props.beforeList.forEach((item: any) => {
         if (String(item.Type) === 'role' && extra.includes('role')) {
@@ -402,9 +401,17 @@ async function getDepStuffList(DepartmentId: any) {
   })
 }
 
+const functions: any = {
+  selectPerson,
+  selectDepAndStuff,
+  selectDepartment,
+  moveDepartment
+}
+
 function selectStuff({ data, checked }: any) {
-  const matchData = MATCH_DATA.value
-  const { name } = matchData[name](data, checked)
+  const matchData: any = MATCH_DATA.value
+  const { name } = matchData
+  functions[name](data, checked)
 }
 
 function selectPerson(item: any, state: any): any {
@@ -647,12 +654,13 @@ function setChildrenChecked(parentId: any, flag: any) {
 }
 
 function setTreeChecked(id: any, checked: any) {
-  CustomSelector.value.setTreeChecked(id, checked)
+  CustomSelectorRef.value.setTreeChecked(id, checked)
 }
 
 function deleteSelected(item: any) {
   const { extra } = MATCH_DATA.value
   if (extra && extra.includes(String(item.Type))) {
+    /* empty */
   } else {
     let id = item.Id
     if (String(item.Type) === 'person' && String(item.Id) === '') {
@@ -836,46 +844,6 @@ function dialogClose(done: any) {
   emit('update:visible', false)
 }
 
-function getCustomersById(CustomerId: any) {
-  let temSelectList = [] as any[]
-  StuffList.value.forEach((v: any) => {
-    if (String(v.CustomerId) === String(CustomerId)) {
-      temSelectList.push({
-        Name: v.Name,
-        Type: 2,
-        CustomerId: v.CustomerId,
-        Id: v.SIId,
-        SIId: v.SIId
-      })
-      if (FirstDepIdList.value.findIndex((a: any) => String(v.DepartmentId) === String(a)) === -1) {
-        FirstDepIdList.value.push(v.DepartmentId)
-      }
-      setTreeChecked(v.SIId, true)
-    }
-  })
-  return temSelectList
-}
-
-function delCustomersById(CustomerId: any) {
-  let temList = [] as any[]
-  selectedList.value.forEach((item: any) => {
-    temList.push(item)
-  })
-  for (let i = 0; i < temList.length; i++) {
-    if (String(temList[i].CustomerId) === String(CustomerId)) {
-      let siid = temList[i].SIId
-      temList.splice(i, 1)
-      setTreeChecked(siid, false)
-      i--
-    }
-  }
-  selectedList.value = temList
-}
-
-function checkTab(type: any) {
-  tabType.value = type
-}
-
 function roleChange({ event, data, key }: any) {
   if (event) {
     //选中
@@ -941,30 +909,30 @@ function reasonCodeChange({ event, data, key }: any) {
 
 <style lang="less" scoped>
 .GroupSelector {
-  /deep/ .el-dialog__body {
+  :deep(.el-dialog__body) {
     padding: 10px 20px;
   }
 
-  /deep/ .el-dialog__headerbtn {
+  :deep(.el-dialog__headerbtn) {
     top: 16px;
     right: 20px;
   }
 
-  /deep/ .el-input__prefix {
+  :deep(.el-input__prefix) {
     left: 0;
     top: 2px;
   }
 
-  /deep/ .el-input__suffix {
+  :deep(.el-input__suffix) {
     top: 2px;
   }
 
-  /deep/ .el-dialog__header {
+  :deep(.el-dialog__header) {
     border-bottom: 1px solid #e2e2e2;
     padding: 15px 20px;
   }
 
-  /deep/ .el-dialog__footer {
+  :deep(.el-dialog__footer) {
     padding: 5px 20px 15px;
   }
 
