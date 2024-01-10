@@ -16,7 +16,7 @@
     <!--查询条件-->
     <div class="search">
       <div class="search-item">
-        <span class="search-item-label">还款时间</span>
+        <span class="search-item-label">创建时间</span>
         <el-date-picker
           v-model="time"
           type="daterange"
@@ -49,18 +49,25 @@
     <!--充值总额展示-->
     <div class="total">
       <i class="tripwise-manage icon-data_fill"></i>
-      <span class="total-text">还款总额：</span>
+      <span class="total-text">充值总额：</span>
       <span class="total-num">{{ total.toFixed(2) }}</span>
     </div>
     <!--表格-->
     <div class="table">
       <el-table :data="tableData" border stripe v-loading.lock="loading">
         <el-table-column prop="EnterpriseName" label="企业名称"></el-table-column>
-        <el-table-column prop="EnterpriseName" label="还款账期"></el-table-column>
         <el-table-column prop="CustomerName" label="用户" width="180"></el-table-column>
-        <el-table-column prop="PayPrice" label="还款金额" width="180"></el-table-column>
+        <el-table-column prop="PayPrice" label="充值金额" width="180"></el-table-column>
+        <el-table-column prop="RechargeType" label="充值类型" width="180"></el-table-column>
+        <el-table-column prop="Remark" label="备注" width="180">
+          <template #default="scope">
+            <div class="over-ellipsis" :title="scope.row.Remark">
+              {{ scope.row.Remark || '--' }}
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="Status" label="状态" width="180"></el-table-column>
-        <el-table-column prop="PayTime" label="还款日期" width="180"></el-table-column>
+        <el-table-column prop="PayTime" label="创建时间" width="180"></el-table-column>
       </el-table>
       <!--分页-->
       <div class="flex jc-sb ai-c mt-16">
@@ -90,7 +97,7 @@ import type { RechargeRequestParams } from '@/api/types/index'
 const router = useRouter()
 
 const hasChild = ref(Boolean(router.currentRoute.value.query?.hasChild))
-const title = ref('还款记录')
+const title = ref('充值记录')
 const total = ref(0)
 const tableData = ref([])
 const time = ref<[string, string]>()
