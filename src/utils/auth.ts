@@ -41,7 +41,6 @@ export function getDefaultParams() {
     RefId: getRefId(),
     Version: getVersion(),
     Token: getToken(),
-    EnterpriseId: getEnterpriseId(),
     ikey: getIkey()
   }
 }
