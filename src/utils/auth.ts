@@ -33,3 +33,7 @@ export function getikey() {
 export function getEnterpriseId() {
   return UserStore.userInfo.enterpriseId ? UserStore.userInfo.enterpriseId : 11
 }
+
+export function getDefaultParams() {
+  return UserStore.userInfo
+}
