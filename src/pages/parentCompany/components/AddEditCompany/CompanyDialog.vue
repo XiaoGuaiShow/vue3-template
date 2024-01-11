@@ -6,10 +6,10 @@
       :close-on-click-modal="false"
       :before-close="beforeClose"
       width="800px"
-      title="扣款规则设置">
+      :title="title">
       <el-form :model="form" label-width="90px">
         <el-form-item label="子公司名称">
-          <el-input v-model="form.name" />
+          <el-input v-model="form.companyName" />
         </el-form-item>
         <el-form-item label="结算员">
           <el-button type="primary" plain @click="handleAddPerson">选择人员</el-button>
@@ -39,27 +39,27 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, toRefs } from 'vue'
+import { saveEnterpriseAccount } from '@/api/modules/parentCompany.ts'
+import { ref, reactive, watch, toRefs } from 'vue'
+import mittBus from '@/utils/mitt.ts'
 const props = defineProps({
   visible: { type: Boolean },
-  enterpriseId: { type: String, default: '' }
+  companyInfo: { type: Object, default: {} }
 })
-const emit = defineEmits(['on-close', 'on-confirm'])
+const emit = defineEmits(['on-close'])
 
+const title = ref<string>('')
 watch(
   () => props.visible,
   (val) => {
     if (val) {
-      // getSettingInfo()
+      title.value = props.companyInfo.id ? '编辑子公司' : '新增子公司'
     }
   }
 )
 
-const form = reactive<{
-  name: string
-  settlementOfficers: { name: string }[]
-}>({
-  name: '',
+const form = reactive<any>({
+  companyName: '',
   settlementOfficers: []
 })
 const { settlementOfficers } = toRefs(form)
@@ -78,9 +78,14 @@ const handleDeletePerson = (index: number): void => {
 }
 
 // 保存
-const handleConfirm = () => {
+const handleConfirm = async () => {
   console.log('确定', form, settlementOfficers.value)
-  emit('on-confirm')
+  try {
+    let params = form
+    await saveEnterpriseAccount(params)
+    mittBus.emit('mittGetCompanyList')
+    beforeClose()
+  } catch (error) {}
 }
 // 关闭
 const beforeClose = () => {

@@ -1,7 +1,7 @@
 <template>
-  <div class="company-info">
+  <div class="company-info" v-loading="loading">
     <div class="flex jc-sb ai-c">
-      <div class="title-label">苏州比邻</div>
+      <div class="title-label">{{ companyInfo.companyName || '-' }}</div>
       <el-switch v-model="companyStatus" inline-prompt active-text="启用" inactive-text="关闭" />
     </div>
     <!-- 合作信息 -->
@@ -12,7 +12,7 @@
       <div class="info-content flex wrap">
         <div class="info-item">
           <span>合作模式</span>
-          <span>账户充值</span>
+          <span>{{ typeFilter(companyInfo.debitType) }}</span>
         </div>
       </div>
     </div>
@@ -28,16 +28,16 @@
       <div class="info-content flex wrap">
         <div class="info-item">
           <span>余额</span>
-          <span>1000000000</span>
+          <span>{{ companyInfo.balance || 0 }}</span>
         </div>
         <div class="info-item"></div>
         <div class="info-item">
           <span>日均消费</span>
-          <span>999元</span>
+          <span>{{ companyInfo.dailyConsumption || 0 }}元</span>
         </div>
         <div class="info-item">
           <span>可用天数</span>
-          <span>3天</span>
+          <span>{{ companyInfo.availableDays || 0 }}天</span>
         </div>
       </div>
     </div>
@@ -52,7 +52,7 @@
       <div class="info-content flex wrap">
         <div class="info-item">
           <span>结算员</span>
-          <span>李四</span>
+          <span>{{ companyInfo.settlementOfficer || '-' }}</span>
         </div>
       </div>
     </div>
@@ -67,7 +67,7 @@
       <div class="info-content flex wrap">
         <div class="info-item info-item-100">
           <span>开票单位</span>
-          <span>苏州比邻信息技术有限公司、苏州比邻信息科技有限公司</span>
+          <span>{{ companyInfo.invoiceTitles || '-' }}</span>
         </div>
       </div>
     </div>
@@ -75,13 +75,13 @@
   <!-- 编辑公司 -->
   <CompanyDialog
     :visible="commonVisible"
-    :enterpriseId="companyInfo.enterpriseId"
+    :enterpriseId="companyInfo.id"
     @on-close="commonVisible = false"></CompanyDialog>
   <!-- 设置余额提醒 -->
   <BalanceRemind
     :visible="balanceVisible"
-    :enterpriseId="companyInfo.enterpriseId"
-    :enterpriseName="companyInfo.enterpriseName"
+    :enterpriseId="companyInfo.id"
+    :enterpriseName="companyInfo.companyName"
     :settlementOfficerInfos="settlementOfficerInfos"
     @on-close="balanceVisible = false"
     @on-confirm="balanceRemindConfirm"></BalanceRemind>
@@ -93,14 +93,70 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { accountDetail } from '@/api/modules/parentCompany.ts'
+import { ref, onMounted, onUnmounted } from 'vue'
+import mittBus from '@/utils/mitt.ts'
+import type { CompanyInfo } from '../../types'
+
+// 企业id
+let companyId = ref<string>('')
+onMounted(() => {
+  mittBus.on('mittGetCompanyInfo', (id: any) => {
+    companyId.value = id
+    getCompanyInfo(id)
+  })
+})
+
+onUnmounted(() => {
+  mittBus.off('mittGetCompanyInfo')
+})
+// 公司详情
+const companyInfo = ref<CompanyInfo>({
+  availableDays: 0,
+  balance: 0,
+  companyName: '',
+  dailyConsumption: 0,
+  debitType: 0,
+  id: '',
+  invoiceTitles: '',
+  isValid: 0,
+  needRecharge: 0,
+  settlementOfficer: '',
+  settlements: []
+})
+let loading = ref<boolean>(false)
+const getCompanyInfo = async (id: string) => {
+  try {
+    loading.value = ref(true).value = true
+    const res = await accountDetail({ id })
+    const data = res.data as any
+    companyInfo.value = data
+    loading.value = ref(true).value = false
+    console.log('124========公司信息', companyInfo)
+  } catch (error) {
+    loading.value = ref(true).value = false
+  }
+}
+
+// 过滤器方法
+const typeFilter = (val: number) => {
+  let list = [
+    { value: 0, label: '无' },
+    { value: 1, label: '授信垫资' },
+    { value: 2, label: '单结' },
+    { value: 3, label: '线下' },
+    { value: 4, label: '账户充值' },
+    { value: 5, label: '支付宝代扣' },
+    { value: 6, label: '支付宝(单位代付)' },
+    { value: 7, label: '连连支付' },
+    { value: 111, label: '拉卡拉' }
+  ]
+  let obj = list.find((f) => f.value === val)
+  return obj ? obj.label : val
+}
 
 // 公司状态
 const companyStatus = ref<boolean>(true)
-let companyInfo = reactive({
-  enterpriseId: '8888',
-  enterpriseName: '思客集团'
-})
 
 // 公司编辑
 let commonVisible = ref<boolean>(false)
