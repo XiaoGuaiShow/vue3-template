@@ -43,3 +43,17 @@ export interface IItemsOptions {
   emitCheckboxChangeEvent?: string
   props?: IProps
 }
+
+export interface ITabDataOptions {
+  type?: string
+  label?: string
+  data?: any[]
+  defaultExpandedKeys?: any[]
+  emitLoadNodeEvent?: string
+  emitCheckChangeEvent?: string
+  nodeKey?: string
+  props?: {
+    label?: string
+    children?: string
+  }
+}
