@@ -120,9 +120,6 @@ const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const toggleSelection = (rows?: any[]) => {
   if (rows) {
     rows.forEach((row) => {
-      // TODO: improvement typing when refactor table
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
       multipleTableRef.value!.toggleRowSelection(row, undefined)
     })
   } else {
@@ -166,7 +163,7 @@ const beforeClose = () => {
 }
 
 // 发票新增编辑
-const invoiceEditVisible = ref<boolean>(true)
+const invoiceEditVisible = ref<boolean>(false)
 let invoiceRowInfo = ref<any>({})
 const handleAddInvoice = () => {
   invoiceEditVisible.value = true
