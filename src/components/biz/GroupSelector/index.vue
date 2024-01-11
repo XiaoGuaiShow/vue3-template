@@ -53,7 +53,9 @@
                   <span v-if="item.WorkCode">({{ item.WorkCode }})</span>
                   <span
                     v-if="
-                      item.IsIncludeChild && props.isShowSonDep && String(item.Type) === 'department'
+                      item.IsIncludeChild &&
+                      props.isShowSonDep &&
+                      String(item.Type) === 'department'
                     ">
                     （包含子部门）
                   </span>
