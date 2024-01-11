@@ -7,7 +7,7 @@ import axios, {
 import { ElMessage, ElLoading } from 'element-plus'
 import { RESPONSE_STATUS } from '@/api/reponseStatus.ts'
 import downloadFile from '@/utils/downloadFile.ts'
-import { lowercaseKeysObject } from '@/utils'
+import { formatResponse } from '@/utils'
 import { getDefaultParams, getApiUrl } from '@/utils/auth'
 
 type RequestMap = Record<string, CancelTokenSource>
@@ -105,7 +105,7 @@ axiosInstance.interceptors.response.use(
     }
 
     if (response.status >= 200 && response.status < 300) {
-      const data = lowercaseKeysObject(response.data) as any
+      const data = formatResponse(response) as any
       if (data.code === RESPONSE_STATUS.SUCCESS) {
         return Promise.resolve({
           code: data.code,

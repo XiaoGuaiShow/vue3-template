@@ -5,13 +5,16 @@ export interface IProps {
 
 export interface ISelectedListOptions {
   Id: string
-  SIId: string
+  SIId?: string
   Name: string
-  CustomerId: string
-  WorkCode: string
+  CustomerId?: string
+  WorkCode?: string
   Type: string
-  ParentDepartmentId: string
+  ParentDepartmentId?: string
   IsIncludeChild?: boolean
+  RoleId?: string
+  OriginalName?: string
+  OuterCode?: string
 }
 
 export type ITypeMap = Record<
@@ -39,4 +42,18 @@ export interface IItemsOptions {
   checkList?: any[]
   emitCheckboxChangeEvent?: string
   props?: IProps
+}
+
+export interface ITabDataOptions {
+  type?: string
+  label?: string
+  data?: any[]
+  defaultExpandedKeys?: any[]
+  emitLoadNodeEvent?: string
+  emitCheckChangeEvent?: string
+  nodeKey?: string
+  props?: {
+    label?: string
+    children?: string
+  }
 }

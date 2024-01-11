@@ -166,7 +166,7 @@ const beforeClose = () => {
 }
 
 // 发票新增编辑
-const invoiceEditVisible = ref<boolean>(true)
+const invoiceEditVisible = ref<boolean>(false)
 let invoiceRowInfo = ref<any>({})
 const handleAddInvoice = () => {
   invoiceEditVisible.value = true

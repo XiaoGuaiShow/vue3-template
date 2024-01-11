@@ -2,15 +2,14 @@
   <div>
     <el-input
       clearable
-      size="mini"
-      prefix-icon="el-icon-search"
+      :prefix-icon="Search"
       @input="handleSearch"
       v-model="searchKey"
       :placeholder="placeholder"></el-input>
     <div class="container">
       <div class="tabView b-flex" v-if="items.length > 1">
         <div
-          v-for="(item, index) in items"
+          v-for="(item, index) in props.items as any"
           :key="index"
           class="tabItem"
           :class="{ current: tabIndex === index }"
@@ -19,7 +18,7 @@
         </div>
       </div>
       <div v-show="!showSearchResult">
-        <div v-for="(item, index) in items" :key="index">
+        <div v-for="(item, index) in props.items as any" :key="index">
           <div
             v-show="tabIndex === index"
             class="scroll"
@@ -29,21 +28,23 @@
                 lazy
                 show-checkbox
                 check-strictly
-                :ref="`tree_${index}`"
+                :ref="treeRef"
                 :data="item.data"
                 :default-expanded-keys="item.defaultExpandedKeys"
                 :props="item.props || defaultTreeConfig.props"
                 :node-key="item.nodeKey || defaultTreeConfig.nodeKey"
                 :load="(node, resolve) => loadTreeNode(node, resolve, item.emitLoadNodeEvent)"
                 @check-change="
-                  (data, checked, indeterminate) =>
+                  (data: any, checked: any, indeterminate: any) =>
                     handleCheckTreeChange(data, checked, indeterminate, item.emitCheckChangeEvent)
                 ">
-                <span class="custom-tree-node" slot-scope="{ node, data }">
-                  <i class="icon ceekeefont wenjianjia" v-if="data.type !== 'person'"></i>
-                  {{ data[(item.props && item.props.label) || defaultTreeConfig.props.label] }}
-                  <span v-if="data.WorkCode">({{ data.WorkCode }})</span>
-                </span>
+                <template #default="{ data }">
+                  <span class="custom-tree-node">
+                    <i class="icon ceekeefont wenjianjia" v-if="data.type !== 'person'"></i>
+                    {{ data[(item.props && item.props.label) || defaultTreeConfig.props.label] }}
+                    <span v-if="data.WorkCode">({{ data.WorkCode }})</span>
+                  </span>
+                </template>
               </el-tree>
             </div>
             <div v-if="item.type === 'checkbox'" class="content">
@@ -76,11 +77,11 @@
         <div
           class="search-list b-flex b-flex-bettwen"
           @click="onSearchResultClick(item)"
-          v-for="(item, index) in searchList"
+          v-for="(item, index) in props.searchList as any"
           :key="index">
           <div v-if="item.Type === 'department'" class="ellipsis">
             <el-tooltip placement="bottom" effect="light">
-              <div slot="content">{{ item.Name }}</div>
+              <template #content>{{ item.Name }}</template>
               <span>
                 <i class="icon ceekeefont wenjianjia"></i>
                 {{ item.Name }}
@@ -100,117 +101,134 @@
     </div>
   </div>
 </template>
-<script>
+<script setup lang="ts">
 import { treeConfig, checkboxProps } from './config.ts'
-export default {
-  name: 'CustomSelector',
-  props: {
-    placeholder: {
-      type: String,
-      default: '请输入关键字'
-    },
-    scrollHeight: {
-      // 滚动区域高度
-      type: Number,
-      default: 260
-    },
-    searchList: {
-      type: Array,
-      default: []
-    }, // 搜索结果
-    items: {
-      type: Array,
-      default: [
-        {
-          type: 'tree',
-          label: '组织架构',
-          data: [],
-          defaultExpandedKeys: [],
-          emitLoadNodeEvent: '', // 加载节点事件
-          emitCheckChangeEvent: '', // 选中节点事件
-          nodeKey: '',
-          props: {
-            label: '',
-            children: ''
-          }
-        },
-        {
-          type: 'checkbox',
-          label: '角色',
-          data: [],
-          checkList: [],
-          emitCheckboxChangeEvent: '', // 选中节点事件
-          props: {
-            label: '',
-            key: ''
-          }
+import { Search } from '@element-plus/icons-vue'
+import { ITabDataOptions } from '@/components/biz/GroupSelector/interface.ts'
+
+const props = defineProps({
+  placeholder: {
+    type: String,
+    default: '请输入关键字'
+  },
+  scrollHeight: {
+    // 滚动区域高度
+    type: Number,
+    default: 362
+  },
+  searchList: {
+    type: Array,
+    default: [] as any[]
+  }, // 搜索结果
+  items: {
+    type: Array,
+    default: [
+      {
+        type: 'tree',
+        label: '组织架构',
+        data: [],
+        defaultExpandedKeys: [],
+        emitLoadNodeEvent: '', // 加载节点事件
+        emitCheckChangeEvent: '', // 选中节点事件
+        nodeKey: '',
+        props: {
+          label: '',
+          children: ''
         }
-      ]
-    }
-  },
-  data() {
-    return {
-      defaultTreeConfig: treeConfig, // 默认树配置
-      defaultCheckboxProps: checkboxProps, // 默认checkbox配置
-      showSearchResult: false, // 显示搜索结果
-      searchKey: '', // 搜索关键字
-      tabIndex: 0 // tab索引
-    }
-  },
-  methods: {
-    onTabClick(index) {
-      const tabType = this.items[index].type
-      this.tabIndex = index
-      this.searchKey = ''
-      this.showSearchResult = false
-      if (tabType === 'checkbox') {
-        this.$emit('search', { searchKey: '', tabType })
-      }
-    },
-    handleSearch() {
-      const tabType = this.items[this.tabIndex].type
-      if (tabType === 'checkbox') {
-        this.$emit('search', { searchKey: this.searchKey, tabType })
-      } else {
-        if (this.searchKey) {
-          this.showSearchResult = true
-          this.$emit('search', { searchKey: this.searchKey, tabType })
-        } else {
-          this.showSearchResult = false
+      },
+      {
+        type: 'checkbox',
+        label: '角色',
+        data: [],
+        checkList: [],
+        emitCheckboxChangeEvent: '', // 选中节点事件
+        props: {
+          label: '',
+          key: ''
         }
       }
-    },
-    handleCheckTreeChange(data, checked, indeterminate, emitEvent) {
-      if (emitEvent) {
-        this.$emit(emitEvent, { data, checked, indeterminate })
-      } else {
-        console.log('请传入emitEventName')
-      }
-    },
-    loadTreeNode(node, resolve, emitEvent) {
-      if (emitEvent) {
-        this.$emit(emitEvent, { node, resolve })
-      } else {
-        console.log('请传入emitEventName')
-      }
-    },
-    handleCheckboxChange(event, data, key, emitEvent) {
-      if (emitEvent) {
-        this.$emit(emitEvent, { event, data, key })
-      } else {
-        console.log('请传入emitEventName')
-      }
-    },
-    onSearchResultClick(item) {
-      this.$emit('searchResultClick', item)
-    },
-    setTreeChecked(id, checked) {
-      // 当前业务树都在第一个tab项，先写死0，后期再优化
-      this.$refs[`tree_${0}`][0].setChecked(id, checked)
+    ] as ITabDataOptions[]
+  }
+})
+
+const emit = defineEmits([
+  'search',
+  'searchResultClick',
+  'setTreeChecked',
+  'selectStuff',
+  'loadNode'
+])
+
+const treeRef = ref<any>()
+const defaultTreeConfig = ref(treeConfig) // 默认树配置
+const defaultCheckboxProps = ref(checkboxProps) // 默认checkbox配置
+const showSearchResult = ref(false) // 显示搜索结果
+const searchKey = ref('') // 搜索关键字
+const tabIndex = ref(0) // tab索引
+
+function onTabClick(index: number) {
+  const items = props.items as any
+  const tabType = items[index].type
+  tabIndex.value = index
+  searchKey.value = ''
+  showSearchResult.value = false
+  if (tabType === 'checkbox') {
+    emit('search', { searchKey: '', tabType })
+  }
+}
+
+function handleSearch() {
+  const items = props.items as any
+  const tabType = items[tabIndex.value].type
+  if (tabType === 'checkbox') {
+    emit('search', { searchKey: searchKey.value, tabType })
+  } else {
+    if (searchKey.value) {
+      showSearchResult.value = true
+      emit('search', { searchKey: searchKey.value, tabType })
+    } else {
+      showSearchResult.value = false
     }
   }
 }
+
+function handleCheckTreeChange(data: any, checked: boolean, indeterminate: any, emitEvent: any) {
+  if (emitEvent) {
+    emit(emitEvent, { data, checked, indeterminate })
+  } else {
+    console.log('请传入emitEventName')
+  }
+}
+
+function loadTreeNode(node: any, resolve: any, emitEvent: any) {
+  if (emitEvent) {
+    emit(emitEvent, { node, resolve })
+  } else {
+    console.log('请传入emitEventName')
+  }
+}
+
+function handleCheckboxChange(event: any, data: any, key: any, emitEvent: any) {
+  if (emitEvent) {
+    emit(emitEvent, { event, data, key })
+  } else {
+    console.log('请传入emitEventName')
+  }
+}
+
+function onSearchResultClick(item: any) {
+  emit('searchResultClick', item)
+}
+
+function setTreeChecked(id: any, checked: any) {
+  treeRef.value?.setChecked(id, checked)
+}
+
+defineExpose({
+  setTreeChecked
+})
 </script>
+
 <style lang="less" scoped>
 @import url('index.less');
 </style>

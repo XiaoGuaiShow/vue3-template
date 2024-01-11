@@ -6,16 +6,21 @@
       :close-on-press-escape="false"
       :before-close="dialogClose"
       width="660px">
-      <template #header>{{ title }}</template>
-      <div class="checkSonDepartment" v-if="isShowSonDep">
-        <el-checkbox v-model="needDepartment">含子部门</el-checkbox>
-      </div>
-      <div class="popu-main b-flex">
-        <div class="popu-main-sec popu-main-lf">
-          <div class="popu-main-sec-title">选择：</div>
-          <div class="popu-main-sec-box">
+      <template #header>{{ props.title }}</template>
+      <div class="b-flex">
+        <div class="area-wrapper">
+          <div class="area-header">
+            <span>选择</span>
+            <el-checkbox
+              class="checkbox"
+              v-model="includeChildDepartment"
+              v-if="props.isShowSonDep">
+              包含下级部门
+            </el-checkbox>
+          </div>
+          <div class="area-content">
             <CustomSelector
-              ref="CustomSelector"
+              ref="CustomSelectorRef"
               :placeholder="inputPlaceholder"
               :search-list="searchStuffList"
               :items="items"
@@ -28,12 +33,18 @@
               @reasonCodeChange="reasonCodeChange"></CustomSelector>
           </div>
         </div>
-        <div class="popu-main-sec popu-main-rt">
-          <div class="popu-main-sec-title">已选择：</div>
-          <div class="popu-main-sec-box">
-            <div class="scroll-rt-box">
+        <div class="area-wrapper">
+          <div class="area-header">
+            <span>已选择</span>
+          </div>
+          <div class="area-content">
+            <el-input
+              v-model="selectedInput"
+              :prefix-icon="Search"
+              :placeholder="inputPlaceholder" />
+            <div class="selected-list">
               <div
-                class="selected-list b-flex b-flex-bettwen"
+                class="selected-list-item b-flex b-flex-bettwen"
                 v-for="(item, index) in selectedList"
                 :key="index">
                 <div class="ellipsis" style="width: calc(100% - 20px)" :title="item.Name">
@@ -42,7 +53,9 @@
                   <span v-if="item.WorkCode">({{ item.WorkCode }})</span>
                   <span
                     v-if="
-                      item.IsIncludeChild && isShowSonDep && String(item.Type) === 'department'
+                      item.IsIncludeChild &&
+                      props.isShowSonDep &&
+                      String(item.Type) === 'department'
                     ">
                     （包含子部门）
                   </span>
@@ -56,9 +69,10 @@
         </div>
       </div>
       <template #footer>
-        <div class="footer">
-          <el-button type="primary" @click="addOk">确 定</el-button>
-        </div>
+        <span class="dialog-footer">
+          <el-button @click="onCancel">取消</el-button>
+          <el-button type="primary" @click="onOk">确定</el-button>
+        </span>
       </template>
     </el-dialog>
   </div>
@@ -74,7 +88,8 @@ import { GetRoleList, GetEnterpriseRoleSurvey } from '@/api/modules/common.ts'
 import { GetCostTypeList } from '@/api/modules/expensecontrol.ts'
 import { ISelectedListOptions, IItemsOptions } from '@/components/biz/GroupSelector/interface.ts'
 import { TYPES_MAP, TYPES as ALL_TYPES } from './TYPES_MAP.ts'
-import { computed, onBeforeMount, watch } from 'vue'
+import { ElMessage } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
 
 const props = defineProps({
   /*
@@ -122,31 +137,31 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:visible', 'addOk'])
+const emit = defineEmits(['update:visible', 'onOk', 'onCancel'])
 
-const CustomSelector = ref(null)
-const DepartmentList = ref([])
-const AllDepartmentList = ref([])
-const StuffList = ref([])
-const searchStuffList = ref([])
-const FirstDepIdList = ref([])
-const selectedList = ref<[ISelectedListOptions]>([])
+const selectedInput = ref<string>('')
+const CustomSelectorRef = ref<any>(null)
+const DepartmentList = ref<any[]>([])
+const AllDepartmentList = ref<any[]>([])
+const StuffList = ref<any[]>([])
+const searchStuffList = ref<any[]>([])
+const FirstDepIdList = ref<any[]>([])
+const selectedList = ref<ISelectedListOptions[]>([])
 const isSearch = ref(false)
-const needDepartment = ref(true)
+const includeChildDepartment = ref(true)
 const inputPlaceholder = ref<string>('')
 const errorMsg = ref('请选择人员或部门！')
-const currentDepartment = ref({})
-const tabType = ref(0)
-const RoleList = ref([])
-const checkRoleList = ref([])
-const filterRoleList = ref([])
-const travelList = ref([])
-const checkTravelList = ref([])
-const filterTravelList = ref([])
-const reasonCodeList = ref([])
-const checkReasonCodeList = ref([])
-const filterReasonCodeList = ref([])
-const TYPES = ref(ALL_TYPES)
+const currentDepartment = ref<any>({})
+const RoleList = ref<any[]>([])
+const checkRoleList = ref<any[]>([])
+const filterRoleList = ref<any[]>([])
+const travelList = ref<any[]>([])
+const checkTravelList = ref<any[]>([])
+const filterTravelList = ref<any[]>([])
+const reasonCodeList = ref<any[]>([])
+const checkReasonCodeList = ref<any[]>([])
+const filterReasonCodeList = ref<any[]>([])
+const TYPES = ref<any>(ALL_TYPES)
 
 watch(
   () => props.visible,
@@ -154,7 +169,7 @@ watch(
     if (newValue) {
       selectedList.value = []
       if (selectedList.value?.length > 0) {
-        selectedList.value = props.beforeList
+        selectedList.value = props.beforeList as ISelectedListOptions[]
         currentDepartment.value = props.beforeList[0] || {}
       }
     }
@@ -244,7 +259,8 @@ async function getReasonCodeList() {
 }
 
 async function getDepartmentList(DMId = 0, SearchByDeptId = true) {
-  return await GetDepartmentList({ DMId, SearchByDeptId })
+  const res = await GetDepartmentList({ DMId, SearchByDeptId })
+  return res.data as any
 }
 
 onBeforeMount(() => {
@@ -256,7 +272,7 @@ onBeforeMount(() => {
   checkTravelList.value = []
   checkReasonCodeList.value = []
   if (props.beforeList && props.beforeList.length > 0) {
-    selectedList.value = props.beforeList
+    selectedList.value = props.beforeList as ISelectedListOptions[]
     if (extra) {
       props.beforeList.forEach((item: any) => {
         if (String(item.Type) === 'role' && extra.includes('role')) {
@@ -290,8 +306,7 @@ async function loadNode({ node, resolve }: any) {
   if (Number(node.level) === 0) {
     let resDep: any[] = []
     const res = await getDepartmentList()
-    const data = res.data as any
-    resDep = data.DepartmentList || []
+    resDep = res.DepartmentList || []
     AllDepartmentList.value = AllDepartmentList.value.concat(resDep[0].ChildDepartmentList)
     if (disableClickDepartment) {
       resDep.forEach((item) => {
@@ -334,8 +349,7 @@ async function loadNode({ node, resolve }: any) {
     }
     let resDep = []
     const res = await getDepartmentList(node.data.Id)
-    const data = res.data as any
-    resDep = (data.DepartmentList || []) as any[]
+    resDep = (res.DepartmentList || []) as any[]
     AllDepartmentList.value = AllDepartmentList.value.concat(resDep)
     if (disableClickDepartment) {
       resDep.forEach((item) => {
@@ -402,9 +416,17 @@ async function getDepStuffList(DepartmentId: any) {
   })
 }
 
+const functions: any = {
+  selectPerson,
+  selectDepAndStuff,
+  selectDepartment,
+  moveDepartment
+}
+
 function selectStuff({ data, checked }: any) {
-  const matchData = MATCH_DATA.value
-  const { name } = matchData[name](data, checked)
+  const matchData: any = MATCH_DATA.value
+  const { name } = matchData
+  functions[name](data, checked)
 }
 
 function selectPerson(item: any, state: any): any {
@@ -461,7 +483,7 @@ function selectDepAndStuff(item: any, state: any) {
           CustomerId: item.CustomerId,
           WorkCode: '', //部门不存在该字段
           Type: 'department',
-          IsIncludeChild: needDepartment.value,
+          IsIncludeChild: includeChildDepartment.value,
           ParentDepartmentId: item.ParentDepartmentId
         })
       }
@@ -604,7 +626,7 @@ function setAllStuffCheckedById(CustomerId: any, flag: any) {
 }
 
 function setChildrenChecked(parentId: any, flag: any) {
-  if (needDepartment.value) {
+  if (includeChildDepartment.value) {
     AllDepartmentList.value.forEach((item: any) => {
       if (item.Path.includes(parentId)) {
         StuffList.value.forEach((v: any) => {
@@ -647,12 +669,13 @@ function setChildrenChecked(parentId: any, flag: any) {
 }
 
 function setTreeChecked(id: any, checked: any) {
-  CustomSelector.value.setTreeChecked(id, checked)
+  CustomSelectorRef.value.setTreeChecked(id, checked)
 }
 
 function deleteSelected(item: any) {
   const { extra } = MATCH_DATA.value
   if (extra && extra.includes(String(item.Type))) {
+    /* empty */
   } else {
     let id = item.Id
     if (String(item.Type) === 'person' && String(item.Id) === '') {
@@ -786,7 +809,7 @@ function searchSelectStuff(data: any) {
   }
 
   if (Number(props.popSelectType) === 3) {
-    obj.IsIncludeChild = needDepartment.value
+    obj.IsIncludeChild = includeChildDepartment.value
   }
 
   if (!isRepeat) {
@@ -813,7 +836,11 @@ function searchSelectStuff(data: any) {
   })
 }
 
-function addOk() {
+function onCancel() {
+  emit('onCancel')
+}
+
+function onOk() {
   if (selectedList.value.length < 1 && props.isNeed) {
     return ElMessage({
       message: errorMsg.value,
@@ -821,10 +848,10 @@ function addOk() {
     })
   }
   emit('update:visible', false)
-  emit('addOk', {
+  emit('onOk', {
     list: selectedList.value,
     type: props.popSelectType,
-    needSonDepartment: needDepartment.value
+    needSonDepartment: includeChildDepartment.value
   })
 }
 
@@ -832,48 +859,8 @@ function dialogClose(done: any) {
   done()
   isSearch.value = false
   searchStuffList.value = []
-  needDepartment.value = true
+  includeChildDepartment.value = true
   emit('update:visible', false)
-}
-
-function getCustomersById(CustomerId: any) {
-  let temSelectList = [] as any[]
-  StuffList.value.forEach((v: any) => {
-    if (String(v.CustomerId) === String(CustomerId)) {
-      temSelectList.push({
-        Name: v.Name,
-        Type: 2,
-        CustomerId: v.CustomerId,
-        Id: v.SIId,
-        SIId: v.SIId
-      })
-      if (FirstDepIdList.value.findIndex((a: any) => String(v.DepartmentId) === String(a)) === -1) {
-        FirstDepIdList.value.push(v.DepartmentId)
-      }
-      setTreeChecked(v.SIId, true)
-    }
-  })
-  return temSelectList
-}
-
-function delCustomersById(CustomerId: any) {
-  let temList = [] as any[]
-  selectedList.value.forEach((item: any) => {
-    temList.push(item)
-  })
-  for (let i = 0; i < temList.length; i++) {
-    if (String(temList[i].CustomerId) === String(CustomerId)) {
-      let siid = temList[i].SIId
-      temList.splice(i, 1)
-      setTreeChecked(siid, false)
-      i--
-    }
-  }
-  selectedList.value = temList
-}
-
-function checkTab(type: any) {
-  tabType.value = type
 }
 
 function roleChange({ event, data, key }: any) {
@@ -941,82 +928,80 @@ function reasonCodeChange({ event, data, key }: any) {
 
 <style lang="less" scoped>
 .GroupSelector {
-  /deep/ .el-dialog__body {
-    padding: 10px 20px;
+  :deep(.el-dialog__header) {
+    padding: 16px 20px;
+    color: #141414;
+    font-weight: 500;
+    font-size: 16px;
+    background: #f8f8f8;
+    margin-right: 0;
+
+    .el-dialog__headerbtn {
+      top: 0;
+    }
   }
 
-  /deep/ .el-dialog__headerbtn {
-    top: 16px;
-    right: 20px;
+  :deep(.el-dialog__body) {
+    padding: 20px;
   }
 
-  /deep/ .el-input__prefix {
-    left: 0;
-    top: 2px;
-  }
-
-  /deep/ .el-input__suffix {
-    top: 2px;
-  }
-
-  /deep/ .el-dialog__header {
-    border-bottom: 1px solid #e2e2e2;
-    padding: 15px 20px;
-  }
-
-  /deep/ .el-dialog__footer {
-    padding: 5px 20px 15px;
-  }
-
-  .footer {
-    display: flex;
-    justify-content: center;
-  }
-
-  .popu-main-sec {
-    flex: 1;
-    padding-right: 20px;
+  .area-wrapper {
+    width: 370px;
+    height: 500px;
+    border: 1px solid #eeeeee;
+    border-radius: 4px;
+    margin-right: 20px;
 
     &:last-child {
-      padding-right: 0;
+      margin-right: 0;
     }
   }
 
-  .popu-main-sec-title {
-    margin-bottom: 10px;
+  .area-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 34px;
+    line-height: 34px;
+    color: #141414;
+    font-size: 14px;
+    padding: 0 12px;
+    border-bottom: 1px solid #eeeeee;
+    font-weight: 500;
+
+    .checkbox {
+      font-weight: normal;
+    }
   }
 
-  .popu-main-sec-box {
-    background: #f8f8f8;
-    padding: 10px;
-    height: 360px;
-    width: 300px;
+  .area-content {
+    padding: 12px;
+  }
 
-    .scroll-lf-box,
-    .scroll-box {
-      height: 310px;
-      overflow-y: auto;
-    }
+  .selected-list {
+    padding: 10px 0;
 
-    .scroll-rt-box {
-      height: 340px;
-      overflow-y: auto;
-    }
-
-    .selected-list {
+    .selected-list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 32px;
+      line-height: 32px;
+      color: #141414;
       font-size: 14px;
-      line-height: 30px;
-      margin-right: 4px;
+      padding: 0 12px;
+      font-weight: 500;
 
-      i {
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .icon {
+        font-size: 16px;
+        color: #141414;
         cursor: pointer;
       }
     }
-  }
-
-  .checkSonDepartment {
-    width: 100%;
-    padding: 0 10px 20px 10px;
   }
 }
 </style>
