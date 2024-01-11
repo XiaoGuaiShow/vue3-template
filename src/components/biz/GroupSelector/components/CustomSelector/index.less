@@ -1,9 +1,4 @@
-/deep/ .el-tree-node__content {
-  &:hover {
-    background: #328bef;
-    color: #fff;
-  }
-
+:deep(.el-tree-node__content) {
   &:hover .icon {
     color: #fff;
   }
@@ -13,15 +8,13 @@
   }
 }
 
-/deep/ .el-tree {
-  padding: 10px 0;
+:deep(.el-tree) {
+  //padding: 10px 0;
   margin-right: 0;
 }
 
-/deep/ .el-tree-node {
+:deep(.el-tree-node) {
   &:focus > .el-tree-node__content {
-    background: #328bef;
-    color: #fff;
     .icon {
       color: #fff;
     }
@@ -29,7 +22,7 @@
 }
 
 .container {
-  margin-top: 10px;
+  padding-top: 10px;
 
   .scroll {
     overflow-y: auto;

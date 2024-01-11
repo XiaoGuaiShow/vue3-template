@@ -25,7 +25,7 @@
             <div class="item-money">￥1,000,000.00</div>
             <div class="item-link" v-if="!isSummary">查看</div>
           </div>
-          <img class="item-image" src="@/assets/images/bill/invoice.png" v-if="!isSummary" />
+          <img class="item-image" :src="invoiceImg" v-if="!isSummary" />
         </div>
       </div>
       <div class="yellow-card flex flex-2">
@@ -41,7 +41,7 @@
             <div class="item-link" v-if="!isSummary">查看</div>
           </div>
 
-          <img class="item-image" src="@/assets/images/bill/money.png" v-if="!isSummary" />
+          <img class="item-image" :src="moneyImg" v-if="!isSummary" />
         </div>
       </div>
       <div class="yellow-card flex-1 ml-12" v-if="!isSummary">
@@ -51,7 +51,7 @@
             <div class="item-money">￥2,000,000.00</div>
             <div class="item-link" @click="goToRechargeRecords">还款记录</div>
           </div>
-          <img class="item-image" src="@/assets/images/bill/bpay.png" />
+          <img class="item-image" :src="bpayImg" />
         </div>
       </div>
     </div>
@@ -86,6 +86,9 @@
 import { watch } from 'vue'
 import { useYearAndCompany } from '../hooks/overview'
 import { useRouter } from 'vue-router'
+import invoiceImg from '@/assets/images/bill/invoice.png'
+import moneyImg from '@/assets/images/bill/money.png'
+import bpayImg from '@/assets/images/bill/bpay.png'
 const router = useRouter()
 const emits = defineEmits(['change'])
 const options = [

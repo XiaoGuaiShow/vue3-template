@@ -6,7 +6,7 @@
     <div>{{ count }}</div>
     <!-- getter 和 Vuex中的getter一样，在获取 State值之前做一些逻辑处理，具有缓存作用 -->
     <div>{{ store.getCount }}</div>
-    <GroupSelector :visible="true" />
+    <!--    <GroupSelector :visible="true" />-->
   </div>
 </template>
 <script setup lang="ts">
