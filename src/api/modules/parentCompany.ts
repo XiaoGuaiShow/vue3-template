@@ -21,7 +21,7 @@ export const accountAllList = (data: Data) => {
 // 公司详情
 export const accountDetail = (data: Data) => {
   return axiosInstance.request<RequestConfig>({
-    params:data,
+    params: data,
     method: 'get',
     url: 'platform/account/detail'
   })
