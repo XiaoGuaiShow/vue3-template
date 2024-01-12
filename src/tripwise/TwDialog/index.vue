@@ -18,7 +18,7 @@
         <slot></slot>
       </div>
       <slot name="footer">
-        <div class="dialog-footer" v-if="footer !== null">
+        <div class="dialog-footer" v-if="props.footer !== null">
           <el-button @click="handleCancel" v-if="footer.showCancelButton">
             {{ props.cancelButtonText }}
           </el-button>
