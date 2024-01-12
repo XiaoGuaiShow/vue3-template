@@ -1,12 +1,17 @@
 <template>
   <div class="home">
     <Breadcrumbs />
+
     <div class="msg">{{ msg }}</div>
+
     <el-button type="primary" @click="addCount">count+1</el-button>
     <div>{{ count }}</div>
-    <!-- getter 和 Vuex中的getter一样，在获取 State值之前做一些逻辑处理，具有缓存作用 -->
     <div>{{ store.getCount }}</div>
-    <!--    <GroupSelector :visible="true" />-->
+
+    <el-button type="primary" @click="groupSelector = true">打开组织选择</el-button>
+    <el-button type="primary" @click="invoiceReminderDialog = true">打开开票弹框</el-button>
+    <GroupSelector v-model:visible="groupSelector" v-if="groupSelector" />
+    <InvoiceReminderDialog v-model:open="invoiceReminderDialog" v-if="invoiceReminderDialog" />
   </div>
 </template>
 <script setup lang="ts">
@@ -18,6 +23,8 @@ import { useGlobalStore } from '@/store'
 const store = useGlobalStore()
 // 解构store中的值
 const { msg, count } = storeToRefs(store)
+const invoiceReminderDialog = ref(false)
+const groupSelector = ref(false)
 
 onMounted(() => {
   // showGlobalLoading()

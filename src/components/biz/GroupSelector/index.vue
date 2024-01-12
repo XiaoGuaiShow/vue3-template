@@ -1,81 +1,64 @@
 <template>
-  <div class="GroupSelector">
-    <el-dialog
-      v-model="props.visible"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :before-close="dialogClose"
-      width="660px">
-      <template #header>{{ props.title }}</template>
-      <div class="b-flex">
-        <div class="area-wrapper">
-          <div class="area-header">
-            <span>选择</span>
-            <el-checkbox
-              class="checkbox"
-              v-model="includeChildDepartment"
-              v-if="props.isShowSonDep">
-              包含下级部门
-            </el-checkbox>
-          </div>
-          <div class="area-content">
-            <CustomSelector
-              ref="CustomSelectorRef"
-              :placeholder="inputPlaceholder"
-              :search-list="searchStuffList"
-              :items="items"
-              @search="searchStuff"
-              @searchResultClick="searchSelectStuff"
-              @loadNode="loadNode"
-              @selectStuff="selectStuff"
-              @roleChange="roleChange"
-              @travelChange="travelChange"
-              @reasonCodeChange="reasonCodeChange"></CustomSelector>
-          </div>
+  <TwDialog
+    v-model="props.visible"
+    @on-ok="onOk"
+    @on-cancel="onCancel"
+    :title="props.title"
+    width="660px">
+    <div class="GroupSelector">
+      <div class="area-wrapper">
+        <div class="area-header">
+          <span>选择</span>
+          <el-checkbox class="checkbox" v-model="includeChildDepartment" v-if="props.isShowSonDep">
+            包含下级部门
+          </el-checkbox>
         </div>
-        <div class="area-wrapper">
-          <div class="area-header">
-            <span>已选择</span>
-          </div>
-          <div class="area-content">
-            <el-input
-              v-model="selectedInput"
-              :prefix-icon="Search"
-              :placeholder="inputPlaceholder" />
-            <div class="selected-list">
-              <div
-                class="selected-list-item b-flex b-flex-bettwen"
-                v-for="(item, index) in selectedList"
-                :key="index">
-                <div class="ellipsis" style="width: calc(100% - 20px)" :title="item.Name">
-                  <span v-if="item.Type">{{ TYPES[item.Type] }}：</span>
-                  {{ item.Name }}
-                  <span v-if="item.WorkCode">({{ item.WorkCode }})</span>
-                  <span
-                    v-if="
-                      item.IsIncludeChild &&
-                      props.isShowSonDep &&
-                      String(item.Type) === 'department'
-                    ">
-                    （包含子部门）
-                  </span>
-                </div>
-                <i
-                  class="icon ceekeefont LC_icon_close_circle_line"
-                  @click="deleteSelected(item)"></i>
+        <div class="area-content">
+          <CustomSelector
+            ref="CustomSelectorRef"
+            :placeholder="inputPlaceholder"
+            :search-list="searchStuffList"
+            :items="items"
+            @search="searchStuff"
+            @searchResultClick="searchSelectStuff"
+            @loadNode="loadNode"
+            @selectStuff="selectStuff"
+            @roleChange="roleChange"
+            @travelChange="travelChange"
+            @reasonCodeChange="reasonCodeChange"></CustomSelector>
+        </div>
+      </div>
+      <div class="area-wrapper">
+        <div class="area-header">
+          <span>已选择</span>
+        </div>
+        <div class="area-content">
+          <el-input v-model="selectedInput" :prefix-icon="Search" :placeholder="inputPlaceholder" />
+          <div class="selected-list">
+            <div
+              class="selected-list-item b-flex b-flex-bettwen"
+              v-for="(item, index) in selectedList"
+              :key="index">
+              <div class="ellipsis" style="width: calc(100% - 20px)" :title="item.Name">
+                <span v-if="item.Type">{{ TYPES[item.Type] }}：</span>
+                {{ item.Name }}
+                <span v-if="item.WorkCode">({{ item.WorkCode }})</span>
+                <span
+                  v-if="
+                    item.IsIncludeChild && props.isShowSonDep && String(item.Type) === 'department'
+                  ">
+                  （包含子部门）
+                </span>
               </div>
+              <i
+                class="icon ceekeefont LC_icon_close_circle_line"
+                @click="deleteSelected(item)"></i>
             </div>
           </div>
         </div>
       </div>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="onCancel">取消</el-button>
-          <el-button type="primary" @click="onOk">确定</el-button>
-        </span>
-      </template>
-    </el-dialog>
-  </div>
+    </div>
+  </TwDialog>
 </template>
 
 <script setup lang="ts">
@@ -137,7 +120,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:visible', 'onOk', 'onCancel'])
+const emit = defineEmits(['update:visible', 'onOk'])
 
 const selectedInput = ref<string>('')
 const CustomSelectorRef = ref<any>(null)
@@ -837,30 +820,22 @@ function searchSelectStuff(data: any) {
 }
 
 function onCancel() {
-  emit('onCancel')
+  emit('update:visible', false)
 }
 
-function onOk() {
+function onOk(done: any) {
   if (selectedList.value.length < 1 && props.isNeed) {
     return ElMessage({
       message: errorMsg.value,
       type: 'warning'
     })
   }
-  emit('update:visible', false)
+  done()
   emit('onOk', {
     list: selectedList.value,
     type: props.popSelectType,
     needSonDepartment: includeChildDepartment.value
   })
-}
-
-function dialogClose(done: any) {
-  done()
-  isSearch.value = false
-  searchStuffList.value = []
-  includeChildDepartment.value = true
-  emit('update:visible', false)
 }
 
 function roleChange({ event, data, key }: any) {
@@ -928,25 +903,10 @@ function reasonCodeChange({ event, data, key }: any) {
 
 <style lang="less" scoped>
 .GroupSelector {
-  :deep(.el-dialog__header) {
-    padding: 16px 20px;
-    color: #141414;
-    font-weight: 500;
-    font-size: 16px;
-    background: #f8f8f8;
-    margin-right: 0;
-
-    .el-dialog__headerbtn {
-      top: 0;
-    }
-  }
-
-  :deep(.el-dialog__body) {
-    padding: 20px;
-  }
+  display: flex;
 
   .area-wrapper {
-    width: 370px;
+    width: calc(50% - 10px);
     height: 500px;
     border: 1px solid #eeeeee;
     border-radius: 4px;

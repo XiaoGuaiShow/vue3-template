@@ -24,7 +24,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       Components({
         resolvers: [ElementPlusResolver()],
         dts: true,
-        dirs: ['src/**/components']
+        dirs: ['src/**/components', 'src/tripwise/**']
       }),
       createSvgIconsPlugin({
         iconDirs: [resolve(process.cwd(), 'src/assets/svg')],
