@@ -23,5 +23,13 @@ export default [
     meta: {
       title: '充值记录'
     }
+  },
+  {
+    path: '/bill/details/:id',
+    name: 'BillDetail',
+    component: () => import('@/pages/bill/details/index.vue'),
+    meta: {
+      title: '汇总明细'
+    }
   }
 ]

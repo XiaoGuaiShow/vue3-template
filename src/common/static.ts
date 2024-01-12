@@ -1,10 +1,10 @@
-export const FEETYPE = new Map([
+export const FEE_TYPE = new Map([
   [1, '产品费'],
   [2, '服务费'],
   [3, '费用抵扣']
 ])
 
-export const PRODUCTTYPE = new Map([
+export const PRODUCT_TYPE = new Map([
   [0, '汇总'],
   [5, '国内机票'],
   [51, '国际机票'],
@@ -17,7 +17,7 @@ export const PRODUCTTYPE = new Map([
   [999, '滞纳金']
 ])
 
-export const FEECLASS = new Map([
+export const FEE_CLASS = new Map([
   [0, '本期应结'],
   [1, '本期消费'],
   [2, '上期未结'],

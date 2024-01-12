@@ -27,7 +27,6 @@
 import { accountAllList } from '@/api/modules/parentCompany.ts'
 import { Search } from '@element-plus/icons-vue'
 import { ElTree } from 'element-plus'
-import { ref, watch, onMounted, onUnmounted } from 'vue'
 import mittBus from '@/utils/mitt.ts'
 
 // 获取公司列表
@@ -64,6 +63,7 @@ const handleClickCompany = (data: Tree) => {
   }
 }
 
+// 公司列表搜索
 const filterText = ref('')
 const treeRef = ref<InstanceType<typeof ElTree>>()
 
@@ -84,9 +84,9 @@ const defaultProps = {
 }
 
 onMounted(() => {
+  // 监听新增编辑公司信息，刷新列表
   mittBus.on('mittGetCompanyList', () => {
     getDataList()
-    console.log('73========bus监听')
   })
 })
 
