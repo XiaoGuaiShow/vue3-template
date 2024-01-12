@@ -26,13 +26,16 @@
           </div>
           <div>
             <el-button type="primary" plain>查看账单明细</el-button>
-            <el-button type="primary">确认账单</el-button>
+            <el-button type="primary" @click="showBillDialog = true">确认账单</el-button>
             <el-button type="primary">查看发票</el-button>
           </div>
         </div>
       </div>
 
-      <div style="height: 142px; background-color: #fff; margin-top: 24px"></div>
+      <div class="section mt-24">
+        <div class="fs-20 fw-600 c-font-primary">账单汇总</div>
+        <SummaryExpression class="mt-12"></SummaryExpression>
+      </div>
 
       <div class="section mt-24">
         <div class="fs-20 fw-600 c-font-primary h-20 lh-20">账单分类概览</div>
@@ -65,6 +68,7 @@
       </div>
     </div>
   </div>
+  <BillConfirmationDialog v-if="showBillDialog" @close="showBillDialog = false" />
 </template>
 
 <script lang="ts" setup>
@@ -73,6 +77,8 @@ import { ref } from 'vue'
 import { FEE_TYPE, PRODUCT_TYPE, FEE_CLASS } from '@/common/static'
 import { sortBy } from 'lodash-es'
 import type { FeeTypeItem, ProductTypeItem, FeeClassItem } from './types'
+import SummaryExpression from '../components/SummaryExpression.vue'
+import BillConfirmationDialog from '../components/BillConfirmationDialog.vue'
 
 const billData = ref([
   {
@@ -529,6 +535,7 @@ const billData = ref([
     ]
   }
 ])
+const showBillDialog = ref(false)
 // feeType排序
 const sortFeeTypeList = [...FEE_TYPE.keys()]
 const feeTypeList = computed(() => {
