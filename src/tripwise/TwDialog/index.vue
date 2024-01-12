@@ -52,13 +52,19 @@ const props = defineProps({
 
 const emit = defineEmits(['onCancel', 'onOk'])
 
-const defaultFooter = {
+interface FooterOptions {
+  okButtonDisabled: boolean;
+  showCancelButton: boolean;
+  showOkButton: boolean;
+}
+
+const defaultFooter: FooterOptions = {
   okButtonDisabled: false,
   showCancelButton: true,
   showOkButton: true
 }
 const open = ref(true)
-const footer = ref<any>(
+const footer = ref<FooterOptions>(
   props.footer
     ? {
         ...defaultFooter,
