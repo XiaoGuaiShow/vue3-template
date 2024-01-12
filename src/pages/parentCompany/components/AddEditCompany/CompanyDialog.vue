@@ -40,7 +40,6 @@
 
 <script setup lang="ts">
 import { saveEnterpriseAccount } from '@/api/modules/parentCompany.ts'
-import { ref, reactive, watch, toRefs } from 'vue'
 import mittBus from '@/utils/mitt.ts'
 const props = defineProps({
   visible: { type: Boolean },

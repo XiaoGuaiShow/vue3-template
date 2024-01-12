@@ -58,7 +58,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, defineProps, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 
 const props = defineProps({

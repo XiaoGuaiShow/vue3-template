@@ -94,13 +94,13 @@
 
 <script setup lang="ts">
 import { accountDetail } from '@/api/modules/parentCompany.ts'
-import { ref, onMounted, onUnmounted } from 'vue'
 import mittBus from '@/utils/mitt.ts'
 import type { CompanyInfo } from '../../types'
 
 // 企业id
 let companyId = ref<string>('')
 onMounted(() => {
+  // 监听点击公司列表,获取公司详情
   mittBus.on('mittGetCompanyInfo', (id: any) => {
     companyId.value = id
     getCompanyInfo(id)

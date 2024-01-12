@@ -64,7 +64,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElTable } from 'element-plus'
 
@@ -140,10 +139,9 @@ const searchData = reactive({
   total: 100
 })
 
-// 页码
+// 页码  测试打钩用
 const handleCurrentChange = (val: number) => {
   searchData.currentIndex = val
-  console.log('122========页', val)
   if (val === 2) {
     toggleSelection([tableData[0], tableData[1]])
   } else if (val === 3) {
