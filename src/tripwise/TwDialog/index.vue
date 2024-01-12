@@ -53,9 +53,9 @@ const props = defineProps({
 const emit = defineEmits(['onCancel', 'onOk'])
 
 interface FooterOptions {
-  okButtonDisabled: boolean;
-  showCancelButton: boolean;
-  showOkButton: boolean;
+  okButtonDisabled: boolean
+  showCancelButton: boolean
+  showOkButton: boolean
 }
 
 const defaultFooter: FooterOptions = {
