@@ -146,19 +146,6 @@ const checkReasonCodeList = ref<any[]>([])
 const filterReasonCodeList = ref<any[]>([])
 const TYPES = ref<any>(ALL_TYPES)
 
-watch(
-  () => props.visible,
-  (newValue) => {
-    if (newValue) {
-      selectedList.value = []
-      if (selectedList.value?.length > 0) {
-        selectedList.value = props.beforeList as ISelectedListOptions[]
-        currentDepartment.value = props.beforeList[0] || {}
-      }
-    }
-  }
-)
-
 const MATCH_DATA = computed(() => {
   return TYPES_MAP[props.popSelectType]
 })
@@ -250,14 +237,10 @@ onBeforeMount(() => {
   const { inputPlaceholder: placeholder, errorMsg: msg, getInitialData, extra } = MATCH_DATA.value
   inputPlaceholder.value = placeholder
   errorMsg.value = msg
-  selectedList.value = []
-  checkRoleList.value = []
-  checkTravelList.value = []
-  checkReasonCodeList.value = []
-  if (props.beforeList && props.beforeList.length > 0) {
+  if (props?.beforeList?.length > 0) {
     selectedList.value = props.beforeList as ISelectedListOptions[]
     if (extra) {
-      props.beforeList.forEach((item: any) => {
+      props?.beforeList?.forEach((item: any) => {
         if (String(item.Type) === 'role' && extra.includes('role')) {
           checkRoleList.value.push(Number(item.RoleId))
         }

@@ -108,16 +108,16 @@ onUpdated(() => {
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    color: #141414;
+    color: var(--font-primary);
     font-weight: 500;
     font-size: 16px;
-    background: #f8f8f8;
+    background: var(--bg-rest);
     margin-right: 0;
 
     .close-icon {
       cursor: pointer;
       font-size: 16px;
-      color: #bfbfbf;
+      color: var(--font-disable);
     }
   }
 
