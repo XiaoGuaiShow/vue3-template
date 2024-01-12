@@ -12,7 +12,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 // 通用设置
 let commonVisible = ref(false)
 

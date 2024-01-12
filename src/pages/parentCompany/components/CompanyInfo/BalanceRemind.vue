@@ -83,10 +83,6 @@
 </template>
 
 <script setup lang="ts">
-// import request from '@/request/request.js'
-// import { platformApi } from '@/request/api/platform'
-// import { ElMessage } from 'element-plus'
-import { ref, reactive, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 const props = defineProps({
   visible: {

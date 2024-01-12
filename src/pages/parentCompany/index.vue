@@ -21,8 +21,6 @@
 .parent-company {
   display: flex;
   padding: 12px;
-  background: var(--bg_gary);
-  height: 100vh;
   .left-container {
     width: 25%;
     margin-right: 12px;
