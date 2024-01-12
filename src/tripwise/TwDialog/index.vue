@@ -47,7 +47,7 @@ const props = defineProps({
   okButtonText: {
     type: String,
     default: '确定'
-  },
+  }
 })
 
 const emit = defineEmits(['onCancel', 'onOk'])
