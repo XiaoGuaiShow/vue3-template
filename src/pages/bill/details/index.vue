@@ -20,7 +20,7 @@
     </div>
     <div class="section mt-12">
       <div class="fs-20 fw-600 c-font-primary">账单汇总</div>
-      <SummaryExpression></SummaryExpression>
+      <SummaryExpression class="mt-12"></SummaryExpression>
     </div>
     <div class="section mt-12">
       <el-tabs v-model="activeName">

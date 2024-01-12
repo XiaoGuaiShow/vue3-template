@@ -1,4 +1,3 @@
-import { log } from 'console';
 <template>
   <el-dialog v-model="dialogVisible" :title="dialogTitle" width="800" @closed="handleClose">
     <div>

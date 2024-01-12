@@ -36,7 +36,7 @@
         </div>
       </div>
       <div class="title mt-24 fs-16">票据</div>
-      <InvoiceTable></InvoiceTable>
+      <InvoiceTable from="invoiceDetail"></InvoiceTable>
     </div>
   </div>
 </template>

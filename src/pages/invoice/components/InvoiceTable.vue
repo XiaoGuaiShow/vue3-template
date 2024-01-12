@@ -4,10 +4,10 @@
       <el-option label="苏州科技" value="suzhou" />
       <el-option label="天津科技" value="tianjin" />
     </el-select>
-    <div class="link">批量下载</div>
+    <div class="link" v-if="from === 'invoiceDetail'">批量下载</div>
   </div>
 
-  <el-table class="mt-12" :data="tableData" stripe border max-height="250">
+  <el-table class="mt-12 my-table" :data="tableData" stripe border max-height="250">
     <el-table-column prop="number" label="开票编号" width="80" />
     <el-table-column prop="zhuti" label="销售主体" show-overflow-tooltip>
       <template #default="{ row }">
@@ -23,25 +23,33 @@
     <el-table-column prop="type" label="开票类型" align="center" show-overflow-tooltip />
     <el-table-column prop="category" label="开票类目" align="center" />
     <el-table-column prop="money" label="开票金额" align="center" />
-    <el-table-column prop="remark" label="备注" align="center">
+    <el-table-column prop="remark" label="备注" align="center" v-if="from === 'invoiceDetail'">
       <template #default="{ row }">
         <div>{{ row.remark || '--' }}</div>
       </template>
     </el-table-column>
-    <el-table-column prop="statusDesc" label="状态" align="center">
+    <el-table-column prop="statusDesc" label="状态" align="center" v-if="from === 'invoiceDetail'">
       <template #default="{ row }">
         <div class="color-success">{{ row.statusDesc }}</div>
       </template>
     </el-table-column>
     <el-table-column prop="email" label="邮寄信息" align="center" show-overflow-tooltip />
-    <el-table-column prop="sf" label="快递单号" align="center">
+    <el-table-column prop="sf" label="快递单号" align="center" v-if="from === 'invoiceDetail'">
       <template #default="{ row }">
         <div>{{ row.sf || '--' }}</div>
       </template>
     </el-table-column>
-    <el-table-column label="操作" align="center" width="74">
+    <el-table-column label="操作" align="center" width="74" v-if="from === 'invoiceDetail'">
       <template #default>
         <div class="link">下载</div>
+      </template>
+    </el-table-column>
+    <el-table-column label="备注" align="center" width="126" v-if="from === 'confirmationDialog'">
+      <template #default="{ row }">
+        <el-input
+          v-model="row.name"
+          placeholder="填写（选填）"
+          input-style="outline: none;border: none;box-shadow: 0 0 0 0 red;"></el-input>
       </template>
     </el-table-column>
   </el-table>
@@ -64,6 +72,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+const props = withDefaults(defineProps<{ from: string }>(), {
+  from: 'invoiceDetail'
+})
+const { from } = toRefs(props)
 const company = ref('suzhou')
 const tableData = [
   {
@@ -118,5 +130,9 @@ const handleCurrentChange = (val: number) => {
   font-size: 12px;
   font-weight: 600;
   color: var(--font-primary);
+}
+.my-table :deep(.el-input .el-input__wrapper) {
+  background: none;
+  box-shadow: unset;
 }
 </style>

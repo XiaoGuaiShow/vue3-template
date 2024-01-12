@@ -11,6 +11,7 @@ declare module 'vue' {
     AddEditInvoiceTitle: typeof import('./src/pages/parentCompany/components/CompanyInfo/AddEditInvoiceTitle.vue')['default']
     AdjustDialog: typeof import('./src/pages/bill/components/AdjustDialog.vue')['default']
     BalanceRemind: typeof import('./src/pages/parentCompany/components/CompanyInfo/BalanceRemind.vue')['default']
+    BillConfirmationDialog: typeof import('./src/pages/bill/components/BillConfirmationDialog.vue')['default']
     Breadcrumbs: typeof import('./src/components/public/Breadcrumbs/index.vue')['default']
     CommonSetting: typeof import('./src/pages/parentCompany/components/RuleSetting/CommonSetting.vue')['default']
     CompanyDialog: typeof import('./src/pages/parentCompany/components/AddEditCompany/CompanyDialog.vue')['default']
