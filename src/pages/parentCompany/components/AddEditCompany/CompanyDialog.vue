@@ -9,7 +9,7 @@
       :title="title">
       <el-form :model="form" label-width="90px">
         <el-form-item label="子公司名称">
-          <el-input v-model="form.companyName" />
+          <el-input v-model="form.companyName" placeholder="请输入子公司名称" />
         </el-form-item>
         <el-form-item label="结算员">
           <el-button type="primary" plain @click="handleAddPerson">选择人员</el-button>

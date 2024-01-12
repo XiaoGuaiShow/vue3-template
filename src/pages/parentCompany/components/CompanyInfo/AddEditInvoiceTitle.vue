@@ -40,7 +40,7 @@
           </span>
         </div>
         <p class="cut-line"></p>
-        <el-form-item label="试用范围" prop="" v-if="props.showAddressAndScope">
+        <el-form-item label="适用范围" prop="" v-if="props.showAddressAndScope">
           <div class="try-scope">
             <div class="try-tips">维护开具当前发票单位的部门或人员</div>
             <div class="mail-address">选择范围</div>
