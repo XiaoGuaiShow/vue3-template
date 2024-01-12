@@ -32,6 +32,12 @@
 .mt-24 {
   margin-top: 24px;
 }
+.mr-4 {
+  margin-right: 6px;
+}
+.mr-6 {
+  margin-right: 6px;
+}
 .mr-16 {
   margin-right: 16px;
 }
@@ -41,8 +47,14 @@
 .mr-24 {
   margin-right: 24px;
 }
+.mb-18 {
+  margin-bottom: 18px;
+}
 .mb-24 {
   margin-bottom: 24px;
+}
+.m-0-8 {
+  margin: 0 8px;
 }
 /* flex相关 */
 .flex {

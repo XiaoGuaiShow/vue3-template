@@ -1,46 +1,47 @@
 :root {
-  --bg-brand: #F6FAFF; /* 背景品牌 */
-  --bg-danger: #FFEEEE; /* 背景失败色 */
-  --bg-form: #FAFCFF; /* 背景表格背景 */
-  --bg-mask: rgba(0,0,0,0.50); /* 背景蒙层 */
-  --bg-rest: #F8F8F8; /* 背景默认 */
-  --bg-searchbar: #F5F6FA; /* 背景搜索框 */
-  --bg-select: #EDF6FF; /* 背景品牌选择 */
-  --bg-success: #E8FAF8; /* 背景成功色 */
-  --bg-unselect: #F7F8FA; /* 背景品牌未选择颜色 */
-  --bg-warning: #FFF8ED; /* 背景警告色 */
-  --bg-white: #FFFFFF; /* 背景白色 */
-  --bg_gary: #F2F3F5; /* 灰色背景色 */
-  --bg_tbbody: #F5F8FC; /* 表格斑马纹 */
-  --bg_tbhead: #E7EDF2; /* 表格头 */
-  --brand-blue: #057BFF; /* 品牌色蓝色 */
-  --el-color-primary: #057BFF; /* 品牌色蓝色 */
-  --brand_deep: #005BB8; /* 品牌色深蓝 */
-  --brand_hover: #006CDF; /* 蓝色侧边栏选中 */
-  --font-anti: #FFFFFF; /* 文字反白 */
-  --font-brand: #057BFF; /* 文字品牌 */
-  --font-disable: #BFBFBF; /* 文字禁用 */
-  --font-hint: #8C8C8C; /* 文字辅助 */
-  --font-link: #057BFF; /* 文字链接 */
+  --bg-brand: #f6faff; /* 背景品牌 */
+  --bg-danger: #ffeeee; /* 背景失败色 */
+  --bg-form: #fafcff; /* 背景表格背景 */
+  --bg-mask: rgba(0, 0, 0, 0.5); /* 背景蒙层 */
+  --bg-rest: #f8f8f8; /* 背景默认 */
+  --bg-searchbar: #f5f6fa; /* 背景搜索框 */
+  --bg-select: #edf6ff; /* 背景品牌选择 */
+  --bg-success: #e8faf8; /* 背景成功色 */
+  --bg-unselect: #f7f8fa; /* 背景品牌未选择颜色 */
+  --bg-warning: #fff8ed; /* 背景警告色 */
+  --bg-white: #ffffff; /* 背景白色 */
+  --bg_gary: #f2f3f5; /* 灰色背景色 */
+  --bg_tbbody: #f5f8fc; /* 表格斑马纹 */
+  --bg_tbhead: #e7edf2; /* 表格头 */
+  --brand-blue: #057bff; /* 品牌色蓝色 */
+  --el-color-primary: #057bff; /* 品牌色蓝色 */
+  --brand_deep: #005bb8; /* 品牌色深蓝 */
+  --brand_hover: #006cdf; /* 蓝色侧边栏选中 */
+  --font-anti: #ffffff; /* 文字反白 */
+  --font-brand: #057bff; /* 文字品牌 */
+  --font-disable: #bfbfbf; /* 文字禁用 */
+  --font-hint: #8c8c8c; /* 文字辅助 */
+  --font-link: #057bff; /* 文字链接 */
   --font-primary: #141414; /* 文字主要 */
   --font-secondary: #595959; /* 文字次要 */
-  --line-border: #EEEEEE; /* 线条边框 */
-  --line-brand: #AACDF4; /* 线条品牌 */
-  --line-brown: #E0CFC1; /* 线条棕色 */
-  --line-danger: #FEC0C0; /* 线条失败 */
-  --line-rest: #E4E4E4; /* 线条默认 */
-  --line-success: #B1E5DF; /* 线条成功 */
-  --line-warning: #FCDB9B; /* 线条警告 */
-  --tag-brown: #BB8352; /* 标签棕色 */
-  --tag-orange: #FA8C16; /* 标签橙色 */
-  --tag-red: #FF4D4F; /* 标签红色 */
-  --tag_blue: #E1EEFF; /* 浅蓝色标签背景色 */
-  --tip-danger: #FA2C2C; /* 提示色失败 */
-  --tip-disable: #BFBFBF; /* 提示色禁用 */
-  --tip-success: #00D1B6; /* 提示色成功 */
-  --tip-warning: #FAB938; /* 提示色警告 */
-  --shadow-bottom: 0px -12px 20px 0px rgba(0,0,0,0.02); /* 阴影吸底偏上 */
-  --shadow-card: 0px 8px 20px 0px rgba(0,0,0,0.02); /* 阴影卡片 */
-  --shadow-over: 0px 12px 20px 0px rgba(0,0,0,0.02); /* 阴影叠加偏下 */
-  --shadow-top: 0px 12px 20px 0px rgba(0,0,0,0.02); /* 阴影吸顶偏下 */
+  --line-border: #eeeeee; /* 线条边框 */
+  --line-brand: #aacdf4; /* 线条品牌 */
+  --line-brown: #e0cfc1; /* 线条棕色 */
+  --line-danger: #fec0c0; /* 线条失败 */
+  --line-rest: #e4e4e4; /* 线条默认 */
+  --line-success: #b1e5df; /* 线条成功 */
+  --line-warning: #fcdb9b; /* 线条警告 */
+  --tag-brown: #bb8352; /* 标签棕色 */
+  --tag-orange: #fa8c16; /* 标签橙色 */
+  --tag-red: #ff4d4f; /* 标签红色 */
+  --tag_blue: #e1eeff; /* 浅蓝色标签背景色 */
+  --tip-danger: #fa2c2c; /* 提示色失败 */
+  --el-color-danger: #fa2c2c;
+  --tip-disable: #bfbfbf; /* 提示色禁用 */
+  --tip-success: #00d1b6; /* 提示色成功 */
+  --tip-warning: #fab938; /* 提示色警告 */
+  --shadow-bottom: 0px -12px 20px 0px rgba(0, 0, 0, 0.02); /* 阴影吸底偏上 */
+  --shadow-card: 0px 8px 20px 0px rgba(0, 0, 0, 0.02); /* 阴影卡片 */
+  --shadow-over: 0px 12px 20px 0px rgba(0, 0, 0, 0.02); /* 阴影叠加偏下 */
+  --shadow-top: 0px 12px 20px 0px rgba(0, 0, 0, 0.02); /* 阴影吸顶偏下 */
 }

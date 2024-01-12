@@ -29,7 +29,7 @@
         <el-form-item label="银行账号" prop="bankNo">
           <el-input v-model.trim="addForm.bankNo" placeholder="请输入银行账号" clearable />
         </el-form-item>
-        <p class="cut-line"></p>
+        <p class="cut-line" v-if="props.showAddressAndScope"></p>
         <el-form-item label="邮寄地址" prop="" v-if="props.showAddressAndScope">
           <span class="mail-address" @click="handleChooseAddress">新增/选择</span>
         </el-form-item>
@@ -39,7 +39,7 @@
             <el-icon><CircleClose /></el-icon>
           </span>
         </div>
-        <p class="cut-line"></p>
+        <p class="cut-line" v-if="props.showAddressAndScope"></p>
         <el-form-item label="试用范围" prop="" v-if="props.showAddressAndScope">
           <div class="try-scope">
             <div class="try-tips">维护开具当前发票单位的部门或人员</div>

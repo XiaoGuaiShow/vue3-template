@@ -8,12 +8,12 @@
     <div class="bill-card">
       <div>
         <div class="flex jc-sb ai-c">
-          <div class="flex">
-            <div class="circle primary flex ai-c jc-c">
+          <div class="left-block flex primary green grey">
+            <div class="circle flex ai-c jc-c">
               <svg-icon class="icon" name="bill" size="48"></svg-icon>
             </div>
             <div class="ml-24 flex col jc-c">
-              <div class="fs-24 fw-600 c-brand-blue">已出账</div>
+              <div class="fs-24 fw-600 left-block-title">已出账</div>
               <div class="flex mt-12 ai-c">
                 <div class="fs-18 fw-500 c-font-primary">最晚结算日: 2023/11/15</div>
                 <div class="flex ai-c elliptic ml-12">
@@ -45,15 +45,15 @@
             <div class="l-label">
               {{
                 item2.productType === 0
-                  ? FEECLASS.get(item.feeClass)
-                  : PRODUCTTYPE.get(item2.productType)
+                  ? FEE_CLASS.get(item.feeClass)
+                  : PRODUCT_TYPE.get(item2.productType)
               }}
             </div>
             <div class="l-money">
               {{ +item2.productTotalPrice === 0 ? '-' : `￥${item2.productTotalPrice}` }}
             </div>
             <div v-for="(item3, index3) in feeTypeList(item2.feeDetailDTOList)" :key="index3">
-              <span class="s-label">{{ FEETYPE.get(item3.feeType) }}</span>
+              <span class="s-label">{{ FEE_TYPE.get(item3.feeType) }}</span>
               <template v-if="+item3.totalPrice === 0">-</template>
               <template v-else>
                 <span v-if="item2.productType === 0">￥</span>
@@ -70,7 +70,7 @@
 <script lang="ts" setup>
 import timeImg from '@/assets/images/bill/time.png'
 import { ref } from 'vue'
-import { FEETYPE, PRODUCTTYPE, FEECLASS } from '@/common/static'
+import { FEE_TYPE, PRODUCT_TYPE, FEE_CLASS } from '@/common/static'
 import { sortBy } from 'lodash-es'
 import type { FeeTypeItem, ProductTypeItem, FeeClassItem } from './types'
 
@@ -530,7 +530,7 @@ const billData = ref([
   }
 ])
 // feeType排序
-const sortFeeTypeList = [...FEETYPE.keys()]
+const sortFeeTypeList = [...FEE_TYPE.keys()]
 const feeTypeList = computed(() => {
   return (list: FeeTypeItem[]) => {
     const newList = sortBy(list, function (o) {
@@ -540,7 +540,7 @@ const feeTypeList = computed(() => {
   }
 })
 // productType排序
-const sortProductTypeList = [...PRODUCTTYPE.keys()]
+const sortProductTypeList = [...PRODUCT_TYPE.keys()]
 const productTypeList = computed(() => {
   return (list: ProductTypeItem[]) => {
     const newList = sortBy(list, function (o) {
@@ -550,7 +550,7 @@ const productTypeList = computed(() => {
   }
 })
 // feeClass排序
-const sortFeeClassList = [...FEECLASS.keys()]
+const sortFeeClassList = [...FEE_CLASS.keys()]
 const feeClassList = computed(() => {
   return (list: FeeClassItem[]) => {
     const newList = sortBy(list, function (o) {
@@ -597,15 +597,38 @@ const feeClassList = computed(() => {
   border-radius: 8px;
   margin-top: 24px;
 }
-.circle {
-  width: 80px;
-  height: 80px;
-  border-radius: 100%;
+.left-block {
   &.primary {
-    background: #e1eeff;
-    .icon {
+    .circle {
+      background: var(--tag_blue);
+    }
+    .icon,
+    .left-block-title {
       color: var(--brand-blue);
     }
+  }
+  &.green {
+    .circle {
+      background: var(--bg-success);
+    }
+    .icon,
+    .left-block-title {
+      color: var(--tip-success);
+    }
+  }
+  &.grey {
+    .circle {
+      background: var(--bg-white);
+    }
+    .icon,
+    .left-block-title {
+      color: var(--font-disable);
+    }
+  }
+  .circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 100%;
   }
 }
 .elliptic {
