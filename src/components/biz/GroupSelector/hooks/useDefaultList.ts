@@ -13,7 +13,6 @@ export function useDefaultList(
     defaultSelected.forEach((item: any) => {
       if (String(item.Type) === propsName.name && extra.includes(propsName.name)) {
         selectedList.splice(selectedList.length, 0, item[propsName.idKey])
-
       }
     })
   }
