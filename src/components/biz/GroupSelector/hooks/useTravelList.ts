@@ -28,6 +28,7 @@ export function useTravelList(defaultSelected: any[], extra: any[], selectedAll:
 
   return {
     travelConfig: {
+      name: propsName.name,
       type: 'checkbox',
       label,
       data: filterList,

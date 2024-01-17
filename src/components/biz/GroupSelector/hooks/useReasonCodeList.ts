@@ -36,6 +36,7 @@ export function useReasonCodeList(defaultSelected: any[], extra: any[], selected
 
   return {
     reasonCodeConfig: {
+      name: propsName.name,
       type: 'checkbox',
       label,
       data: filterList,

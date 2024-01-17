@@ -26,6 +26,7 @@ export function useRoleList(defaultSelected: any[], extra: any[], selectedAll: a
 
   return {
     roleConfig: {
+      name: propsName.name,
       type: 'checkbox',
       label,
       data: filterList,

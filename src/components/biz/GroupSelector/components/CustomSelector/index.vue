@@ -175,24 +175,24 @@ const tabIndex = ref(0) // tab索引
 
 function onTabClick(index: number) {
   const items = props.items as any
-  const tabType = items[index].type
+  const { type, name } = items[index]
   tabIndex.value = index
   searchKey.value = ''
   showSearchResult.value = false
-  if (tabType === 'checkbox') {
-    emit('search', { searchKey: '', tabType })
+  if (type === 'checkbox') {
+    emit('search', { searchKey: '', tabType: type, name })
   }
 }
 
 function handleSearch() {
   const items = props.items as any
-  const tabType = items[tabIndex.value].type
-  if (tabType === 'checkbox') {
-    emit('search', { searchKey: searchKey.value, tabType })
+  const { type, name } = items[tabIndex.value]
+  if (type === 'checkbox') {
+    emit('search', { searchKey: searchKey.value, tabType: type, name })
   } else {
     if (searchKey.value) {
       showSearchResult.value = true
-      emit('search', { searchKey: searchKey.value, tabType })
+      emit('search', { searchKey: searchKey.value, tabType: type })
     } else {
       showSearchResult.value = false
     }

@@ -14,7 +14,7 @@
           </el-checkbox>
         </div>
         <CustomSelector
-          ref="CustomSelectorRef"
+          ref="customSelectorRef"
           :placeholder="inputPlaceholder"
           :search-list="searchStuffList"
           :items="items"
@@ -143,9 +143,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'onOk'])
 
-const collapseKey = ref()
-const selectedInput = ref<string>('')
-const CustomSelectorRef = ref<any>(null)
+const collapseKey = ref() // 已选择数据折叠key
+const selectedInput = ref<string>('') // 已选择搜索框关键字
+const customSelectorRef = ref<any>(null) // 自定义选择器ref
 const DepartmentList = ref<any[]>([])
 const AllDepartmentList = ref<any[]>([])
 const StuffList = ref<any[]>([])
@@ -233,10 +233,13 @@ watch(selectedListClassify, (val) => {
   }
 })
 
-watch(selectedList.value, (val: any) => {
-  console.log(val)
-  selectedSearchList.value = val
-})
+watch(
+  selectedList,
+  (val: any) => {
+    selectedSearchList.value = val
+  },
+  { deep: true }
+)
 
 function handleSelectedSearch() {
   if (selectedInput.value) {
@@ -260,32 +263,26 @@ const fetchExtraData = () => {
   }
 }
 
-const searchExtraData = (searchKey: string) => {
-  if (extra.includes('role')) {
-    handleRoleSearch(searchKey)
+const searchExtraData = (searchKey: string, name: string) => {
+  const map = {
+    role: handleRoleSearch,
+    travel: handleTravelSearch,
+    reasonCode: handleReasonCodeSearch
   }
-  if (extra.includes('travel')) {
-    handleTravelSearch(searchKey)
-  }
-  if (extra.includes('reasonCode')) {
-    handleReasonCodeSearch(searchKey)
-  }
+  map[name](searchKey)
 }
 
 const deleteExtraData = (item: any) => {
-  if (item.Type === 'role') {
-    handleRoleDeleteByItem(item)
+  const map = {
+    role: handleRoleDeleteByItem,
+    travel: handleTravelDeleteByItem,
+    reasonCode: handleReasonCodeDeleteByItem
   }
-  if (item.Type === 'travel') {
-    handleTravelDeleteByItem(item)
-  }
-  if (item.Type === 'reasonCode') {
-    handleReasonCodeDeleteByItem(item)
-  }
+  map[item.Type](item)
 }
 
-async function getDepStuffList(DepartmentId: any) {
-  return await GetCustomerStuffList({
+async function fetchPersonData(DepartmentId: any) {
+  const res = await GetCustomerStuffList({
     Page: {
       Index: 1,
       Size: 10000
@@ -293,6 +290,7 @@ async function getDepStuffList(DepartmentId: any) {
     DepartmentId,
     IsSeachChildCustomer: true
   })
+  return res.data
 }
 
 async function getDepartmentList(DMId = 0, SearchByDeptId = true) {
@@ -302,8 +300,7 @@ async function getDepartmentList(DMId = 0, SearchByDeptId = true) {
 
 async function addPerson(resDep: any, id: string, resolve: any) {
   let resetList: any = []
-  const res = await getDepStuffList(id)
-  const data = res.data as any
+  const data = await fetchPersonData(id)
   let stuffList = (data.StuffList || []) as any[]
   StuffList.value = StuffList.value.concat(stuffList)
   stuffList.forEach((item) => {
@@ -336,8 +333,7 @@ async function loadNode({ node, resolve }: any) {
       })
     }
     if (includePerson) {
-      const depStuff = await getDepStuffList(response[0].Id)
-      const depData = depStuff.data as any
+      const depData = await fetchPersonData(response[0].Id)
       const stuffList = (depData.StuffList || []) as any[]
       StuffList.value = StuffList.value.concat(stuffList)
       stuffList.forEach((item: any) => {
@@ -505,18 +501,9 @@ function selectDepAndStuff(item: any, state: any) {
         }
       }
     } else {
-      if (
-        selectedList.value.findIndex(
-          (a: any) => String(a.CustomerId) === String(item.CustomerId)
-        ) !== -1
-      ) {
-        selectedList.value.splice(
-          selectedList.value.findIndex(
-            (a: any) => String(a.CustomerId) === String(item.CustomerId)
-          ),
-          1
-        )
-      }
+      selectedList.value = selectedList.value.filter(
+        (a: any) => String(a.CustomerId) !== String(item.CustomerId)
+      )
     }
     setAllStuffCheckedById(item.CustomerId, state)
   }
@@ -664,7 +651,7 @@ function setChildrenChecked(parentId: any, flag: any) {
 }
 
 function setTreeChecked(id: any, checked: any) {
-  CustomSelectorRef.value.setTreeChecked(id, checked)
+  customSelectorRef.value.setTreeChecked(id, checked)
 }
 
 function deleteSelected(item: any) {
@@ -685,26 +672,20 @@ function deleteSelected(item: any) {
   }
 }
 
-async function handleSearch({ searchKey, tabType }: any) {
+async function handleSearch({ searchKey, tabType, name }: any) {
   if (String(tabType) === 'checkbox') {
-    searchExtraData(searchKey)
-    return
+    searchExtraData(searchKey, name)
+  } else {
+    const { searchType } = MATCH_DATA.value as any
+    const res = await SearchStuffAndDepartment({
+      Key: searchKey,
+      RequestType: searchType
+    })
+    const data = res.data as any
+    const personList = data.StuffList.map((item: any) => (item.Type = 'person'))
+    const departmentList = data.DepartmentList.map((item: any) => (item.Type = 'department'))
+    searchStuffList.value = personList.concat(departmentList)
   }
-  const { searchType } = MATCH_DATA.value as any
-  const res = await SearchStuffAndDepartment({
-    Key: searchKey,
-    RequestType: searchType
-  })
-  const data = res.data as any
-  const StuffList = data.StuffList.map((item: any) => ({
-    ...item,
-    Type: 'person'
-  }))
-  const DepartmentList = data.DepartmentList.map((item: any) => ({
-    ...item,
-    Type: 'department'
-  }))
-  searchStuffList.value = StuffList.concat(DepartmentList)
 }
 
 function searchSelectStuff(data: any) {
