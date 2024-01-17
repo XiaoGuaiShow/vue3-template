@@ -10,7 +10,8 @@
 
     <el-button type="primary" @click="groupSelector = true">打开组织选择</el-button>
     <el-button type="primary" @click="invoiceReminderDialog = true">打开开票弹框</el-button>
-    <GroupSelector v-model:visible="groupSelector" v-if="groupSelector" />
+    <el-button type="primary" @click="jumpBillPage">jump</el-button>
+    <GroupSelector v-model:visible="groupSelector" :popSelectType="7" v-if="groupSelector" />
     <InvoiceReminderDialog v-model:open="invoiceReminderDialog" v-if="invoiceReminderDialog" />
   </div>
 </template>
@@ -25,6 +26,7 @@ const store = useGlobalStore()
 const { msg, count } = storeToRefs(store)
 const invoiceReminderDialog = ref(false)
 const groupSelector = ref(false)
+const router = useRouter()
 
 onMounted(() => {
   // showGlobalLoading()
@@ -36,6 +38,11 @@ const addCount = () => {
   store.count++
   // 通过store.方法名来调用action中的方法
   store.changeState()
+}
+
+function jumpBillPage() {
+  // 跳转到开票页面
+  router.push('bill')
 }
 </script>
 <style lang="less" scoped>

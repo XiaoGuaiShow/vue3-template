@@ -3,7 +3,7 @@
     v-model="props.visible"
     @on-ok="onOk"
     @on-cancel="onCancel"
-    :title="props.title"
+    :name="props.title"
     width="660px">
     <div class="GroupSelector">
       <div class="area-wrapper">
@@ -13,47 +13,64 @@
             包含下级部门
           </el-checkbox>
         </div>
-        <div class="area-content">
-          <CustomSelector
-            ref="CustomSelectorRef"
-            :placeholder="inputPlaceholder"
-            :search-list="searchStuffList"
-            :items="items"
-            @search="searchStuff"
-            @searchResultClick="searchSelectStuff"
-            @loadNode="loadNode"
-            @selectStuff="selectStuff"
-            @roleChange="roleChange"
-            @travelChange="travelChange"
-            @reasonCodeChange="reasonCodeChange"></CustomSelector>
-        </div>
+        <CustomSelector
+          ref="CustomSelectorRef"
+          :placeholder="inputPlaceholder"
+          :search-list="searchStuffList"
+          :items="items"
+          @search="handleSearch"
+          @searchResultClick="searchSelectStuff"
+          @loadNode="loadNode"
+          @selectStuff="selectStuff"
+          @roleChange="handleRoleChange"
+          @travelChange="handleTravelChange"
+          @reasonCodeChange="handleReasonCodeChange"></CustomSelector>
       </div>
       <div class="area-wrapper">
         <div class="area-header">
           <span>已选择</span>
         </div>
         <div class="area-content">
-          <el-input v-model="selectedInput" :prefix-icon="Search" :placeholder="inputPlaceholder" />
-          <div class="selected-list">
-            <div
-              class="selected-list-item b-flex b-flex-bettwen"
-              v-for="(item, index) in selectedList"
-              :key="index">
-              <div class="ellipsis" style="width: calc(100% - 20px)" :title="item.Name">
-                <span v-if="item.Type">{{ TYPES[item.Type] }}：</span>
-                {{ item.Name }}
-                <span v-if="item.WorkCode">({{ item.WorkCode }})</span>
-                <span
-                  v-if="
-                    item.IsIncludeChild && props.isShowSonDep && String(item.Type) === 'department'
-                  ">
-                  （包含子部门）
-                </span>
-              </div>
-              <i
-                class="icon ceekeefont LC_icon_close_circle_line"
-                @click="deleteSelected(item)"></i>
-            </div>
+          <el-input
+            clearable
+            v-model="selectedInput"
+            @input="handleSelectedSearch"
+            :prefix-icon="Search"
+            :placeholder="inputPlaceholder" />
+          <div class="selected-list" :class="{ 'only-one': selectedListClassify.length === 1 }">
+            <el-collapse v-model="collapseKey">
+              <el-collapse-item
+                :key="collapse.type"
+                :name="collapse.type"
+                v-for="collapse in selectedListClassify">
+                <template #title>
+                  <el-icon class="icon-arrow">
+                    <CaretRight />
+                  </el-icon>
+                  {{ TYPES[collapse.type] }}
+                </template>
+                <div
+                  class="selected-list-item b-flex b-flex-bettwen"
+                  v-for="(item, index) in collapse.data"
+                  :key="index">
+                  <div class="ellipsis" style="width: calc(100% - 20px)" :title="item.Name">
+                    {{ item.Name }}
+                    <span v-if="item.WorkCode">({{ item.WorkCode }})</span>
+                    <span
+                      v-if="
+                        item.IsIncludeChild &&
+                        includeChildDepartment &&
+                        String(item.Type) === 'department'
+                      ">
+                      （包含子部门）
+                    </span>
+                  </div>
+                  <el-icon class="close-icon" @click="deleteSelected(item)">
+                    <Close />
+                  </el-icon>
+                </div>
+              </el-collapse-item>
+            </el-collapse>
           </div>
         </div>
       </div>
@@ -67,12 +84,14 @@ import {
   SearchStuffAndDepartment,
   GetDepartmentList
 } from '@/api/modules/customer.ts'
-import { GetRoleList, GetEnterpriseRoleSurvey } from '@/api/modules/common.ts'
-import { GetCostTypeList } from '@/api/modules/expensecontrol.ts'
 import { ISelectedListOptions, IItemsOptions } from '@/components/biz/GroupSelector/interface.ts'
 import { TYPES_MAP, TYPES as ALL_TYPES } from './TYPES_MAP.ts'
 import { ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
+import { useRoleList } from './hooks/useRoleList.ts'
+import { useTravelList } from './hooks/useTravelList.ts'
+import { useReasonCodeList } from './hooks/useReasonCodeList.ts'
+import { computed, watch } from 'vue'
 
 const props = defineProps({
   /*
@@ -82,6 +101,8 @@ const props = defineProps({
   4、选择部门
   5、选择人员、部门、角色
   6、部门转移
+  7、选人员、部门、角色、差标
+  8、请选择理由码
    */
   popSelectType: {
     type: Number,
@@ -93,13 +114,13 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: '提示'
+    default: '选择人员'
   },
   isShowSonDep: {
     type: Boolean,
     default: true
   },
-  beforeList: {
+  selected: {
     type: Array,
     default: () => {
       return []
@@ -122,6 +143,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'onOk'])
 
+const collapseKey = ref()
 const selectedInput = ref<string>('')
 const CustomSelectorRef = ref<any>(null)
 const DepartmentList = ref<any[]>([])
@@ -130,202 +152,235 @@ const StuffList = ref<any[]>([])
 const searchStuffList = ref<any[]>([])
 const FirstDepIdList = ref<any[]>([])
 const selectedList = ref<ISelectedListOptions[]>([])
+const selectedSearchList = ref<any[]>([])
 const isSearch = ref(false)
 const includeChildDepartment = ref(true)
 const inputPlaceholder = ref<string>('')
 const errorMsg = ref('请选择人员或部门！')
 const currentDepartment = ref<any>({})
-const RoleList = ref<any[]>([])
-const checkRoleList = ref<any[]>([])
-const filterRoleList = ref<any[]>([])
-const travelList = ref<any[]>([])
-const checkTravelList = ref<any[]>([])
-const filterTravelList = ref<any[]>([])
-const reasonCodeList = ref<any[]>([])
-const checkReasonCodeList = ref<any[]>([])
-const filterReasonCodeList = ref<any[]>([])
 const TYPES = ref<any>(ALL_TYPES)
 
 const MATCH_DATA = computed(() => {
   return TYPES_MAP[props.popSelectType]
 })
+const { extra = [] } = MATCH_DATA.value
+
+const { roleConfig, getRoleList, handleRoleSearch, handleRoleChange, handleRoleDeleteByItem } =
+  useRoleList(props.selected, extra, selectedList.value)
+
+const {
+  travelConfig,
+  getTravelList,
+  handleTravelSearch,
+  handleTravelChange,
+  handleTravelDeleteByItem
+} = useTravelList(props.selected, extra, selectedList.value)
+
+const {
+  reasonCodeConfig,
+  getReasonCodeList,
+  handleReasonCodeSearch,
+  handleReasonCodeChange,
+  handleReasonCodeDeleteByItem
+} = useReasonCodeList(props.selected, extra, selectedList.value)
 
 const items = computed(() => {
   const { extra } = MATCH_DATA.value
-  let data: [IItemsOptions] = props.showDepartment
-    ? [
-        {
-          type: 'tree',
-          label: '组织架构',
-          data: DepartmentList.value,
-          defaultExpandedKeys: FirstDepIdList.value,
-          emitLoadNodeEvent: 'loadNode',
-          emitCheckChangeEvent: 'selectStuff'
-        }
-      ]
-    : ([] as any)
+  let data: [IItemsOptions] = [] as any
+  if (props.showDepartment) {
+    data.push({
+      type: 'tree',
+      label: '组织架构',
+      data: DepartmentList.value,
+      defaultExpandedKeys: FirstDepIdList.value,
+      emitLoadNodeEvent: 'loadNode',
+      emitCheckChangeEvent: 'selectStuff'
+    })
+  }
   if (extra) {
     if (extra.includes('role')) {
-      data.push({
-        type: 'checkbox',
-        label: '角色',
-        data: filterRoleList.value,
-        checkList: checkRoleList.value,
-        emitCheckboxChangeEvent: 'roleChange'
-      })
+      data.push(roleConfig)
     }
     if (extra.includes('travel')) {
-      data.push({
-        type: 'checkbox',
-        label: '差标',
-        data: filterTravelList.value,
-        checkList: checkTravelList.value,
-        emitCheckboxChangeEvent: 'travelChange'
-      })
+      data.push(travelConfig)
     }
     if (extra.includes('reasonCode')) {
-      data.push({
-        type: 'checkbox',
-        label: '理由码',
-        data: filterReasonCodeList.value,
-        checkList: checkReasonCodeList.value,
-        emitCheckboxChangeEvent: 'reasonCodeChange',
-        props: {
-          label: 'Name',
-          key: 'Id'
-        }
-      })
+      data.push(reasonCodeConfig)
     }
   }
   return data
 })
-
-async function getRoleList() {
-  const res = await GetRoleList()
-  const data = res.data as any
-  filterRoleList.value = RoleList.value = data.RoleList || []
-}
-
-async function getTravelList() {
-  const res = await GetEnterpriseRoleSurvey()
-  const data = res.data as any
-  filterTravelList.value = travelList.value = data.RoleList || []
-}
-
-async function getReasonCodeList() {
-  const res = await GetCostTypeList({
-    type: '2',
-    page: { page: 1, size: 10000 }
-  })
-  const data = res.data as any
-  const list = data.List as any[]
-  filterReasonCodeList.value = reasonCodeList.value = list.map((item) => {
-    return {
-      ...item,
-      OriginalName: item.Name,
-      Name: `【${item.OuterCode}】${item.Name}`
+const selectedListClassify = computed(() => {
+  const newList = [] as any[]
+  selectedSearchList.value.forEach((item) => {
+    const type = item.Type
+    const findIndex = newList.findIndex((n) => n.type === type)
+    if (findIndex > -1) {
+      newList[findIndex].data.push(item)
+    } else {
+      newList.push({
+        type: type,
+        data: [item]
+      })
     }
+  })
+  return newList
+})
+
+watch(selectedListClassify, (val) => {
+  if (val.length === 1) {
+    collapseKey.value = val[0]?.type
+  }
+})
+
+watch(selectedList.value, (val: any) => {
+  console.log(val)
+  selectedSearchList.value = val
+})
+
+function handleSelectedSearch() {
+  if (selectedInput.value) {
+    selectedSearchList.value = selectedList.value.filter((item) => {
+      return item.Name.includes(selectedInput.value)
+    })
+  } else {
+    selectedSearchList.value = selectedList.value
+  }
+}
+
+const fetchExtraData = () => {
+  if (extra.includes('role')) {
+    getRoleList()
+  }
+  if (extra.includes('travel')) {
+    getTravelList()
+  }
+  if (extra.includes('reasonCode')) {
+    getReasonCodeList()
+  }
+}
+
+const searchExtraData = (searchKey: string) => {
+  if (extra.includes('role')) {
+    handleRoleSearch(searchKey)
+  }
+  if (extra.includes('travel')) {
+    handleTravelSearch(searchKey)
+  }
+  if (extra.includes('reasonCode')) {
+    handleReasonCodeSearch(searchKey)
+  }
+}
+
+const deleteExtraData = (item: any) => {
+  if (item.Type === 'role') {
+    handleRoleDeleteByItem(item)
+  }
+  if (item.Type === 'travel') {
+    handleTravelDeleteByItem(item)
+  }
+  if (item.Type === 'reasonCode') {
+    handleReasonCodeDeleteByItem(item)
+  }
+}
+
+async function getDepStuffList(DepartmentId: any) {
+  return await GetCustomerStuffList({
+    Page: {
+      Index: 1,
+      Size: 10000
+    },
+    DepartmentId,
+    IsSeachChildCustomer: true
   })
 }
 
 async function getDepartmentList(DMId = 0, SearchByDeptId = true) {
   const res = await GetDepartmentList({ DMId, SearchByDeptId })
-  return res.data as any
+  return (res.data || []) as any
 }
 
-onBeforeMount(() => {
-  const { inputPlaceholder: placeholder, errorMsg: msg, getInitialData, extra } = MATCH_DATA.value
-  inputPlaceholder.value = placeholder
-  errorMsg.value = msg
-  if (props?.beforeList?.length > 0) {
-    selectedList.value = props.beforeList as ISelectedListOptions[]
-    if (extra) {
-      props?.beforeList?.forEach((item: any) => {
-        if (String(item.Type) === 'role' && extra.includes('role')) {
-          checkRoleList.value.push(Number(item.RoleId))
-        }
-        if (String(item.Type) === 'travel' && extra.includes('travel')) {
-          checkTravelList.value.push(Number(item.RoleId))
-        }
-        if (String(item.Type) === 'reasonCode' && extra.includes('reasonCode')) {
-          checkReasonCodeList.value.push(Number(item.Id))
-        }
+async function addPerson(resDep: any, id: string, resolve: any) {
+  let resetList: any = []
+  const res = await getDepStuffList(id)
+  const data = res.data as any
+  let stuffList = (data.StuffList || []) as any[]
+  StuffList.value = StuffList.value.concat(stuffList)
+  stuffList.forEach((item) => {
+    if (item.Name) {
+      resetList.push({
+        Id: item.SIId,
+        SIId: item.SIId,
+        Name: item.Name,
+        Type: 'person',
+        ChildDepartmentList: [],
+        WorkCode: item.WorkCode,
+        CustomerId: item.CustomerId,
+        ParentDepartmentId: item.DepartmentId
       })
     }
-  }
-  if (getInitialData && extra) {
-    if (extra.includes('role')) {
-      getRoleList()
-    }
-    if (extra.includes('travel')) {
-      getTravelList()
-    }
-    if (extra.includes('reasonCode')) {
-      getReasonCodeList()
-    }
-  }
-})
+  })
+  resolve(resetList.concat(resDep))
+}
 
 async function loadNode({ node, resolve }: any) {
   const { disableClickDepartment, includePerson } = MATCH_DATA.value
   const ChildDepartmentList = node.data.ChildDepartmentList as any[]
   if (Number(node.level) === 0) {
-    let resDep: any[] = []
     const res = await getDepartmentList()
-    resDep = res.DepartmentList || []
-    AllDepartmentList.value = AllDepartmentList.value.concat(resDep[0].ChildDepartmentList)
+    const response = res.DepartmentList || []
+    AllDepartmentList.value = AllDepartmentList.value.concat(response[0].ChildDepartmentList)
     if (disableClickDepartment) {
-      resDep.forEach((item) => {
+      response.forEach((item: any) => {
         item.disabled = true
       })
     }
     if (includePerson) {
-      const response = await getDepStuffList(resDep[0].Id)
-      const depData = response.data as any
-      let stuffList = (depData.StuffList || []) as any[]
+      const depStuff = await getDepStuffList(response[0].Id)
+      const depData = depStuff.data as any
+      const stuffList = (depData.StuffList || []) as any[]
       StuffList.value = StuffList.value.concat(stuffList)
-      stuffList.forEach((item) => {
-        let obj = {
-          //确保id 唯一
-          Id: item.SIId,
-          SIId: item.SIId,
-          Name: item.Name,
-          type: 'person',
-          ChildDepartmentList: [],
-          WorkCode: item.WorkCode,
-          CustomerId: item.CustomerId,
-          ParentDepartmentId: item.DepartmentId
+      stuffList.forEach((item: any) => {
+        if (item.Name) {
+          response[0].ChildDepartmentList.unshift({
+            Type: 'person',
+            Id: item.SIId,
+            SIId: item.SIId,
+            Name: item.Name,
+            ChildDepartmentList: [],
+            WorkCode: item.WorkCode,
+            CustomerId: item.CustomerId,
+            ParentDepartmentId: item.DepartmentId
+          })
         }
-        resDep[0].ChildDepartmentList.unshift(obj)
       })
     }
-    resolve(resDep)
-    DepartmentList.value = resDep
-    FirstDepIdList.value = [resDep[0].Id]
+    DepartmentList.value = response
+    FirstDepIdList.value = [response[0].Id]
+    resolve(response)
   } else if (ChildDepartmentList.length !== 0) {
     if (disableClickDepartment) {
       ChildDepartmentList.forEach((item) => {
-        if (String(item.type) !== 'person') item.disabled = true
+        if (String(item.Type) !== 'person') item.disabled = true
       })
     }
     return resolve(node.data.ChildDepartmentList)
   } else {
-    if (String(node.data.type) === 'person') {
+    if (String(node.data.Type) === 'person') {
       return resolve([])
     }
-    let resDep = []
     const res = await getDepartmentList(node.data.Id)
-    resDep = (res.DepartmentList || []) as any[]
-    AllDepartmentList.value = AllDepartmentList.value.concat(resDep)
+    const response = res.DepartmentList || []
+    AllDepartmentList.value = AllDepartmentList.value.concat(response)
     if (disableClickDepartment) {
-      resDep.forEach((item) => {
+      response.forEach((item: any) => {
         item.disabled = true
       })
     }
     if (includePerson) {
-      await addPerson(resDep, node.data.Id, resolve)
+      await addPerson(response, node.data.Id, resolve)
     } else {
-      resolve(resDep)
+      resolve(response)
     }
   }
   await nextTick()
@@ -333,7 +388,7 @@ async function loadNode({ node, resolve }: any) {
   selectedList.value.forEach((item: any) => {
     StuffList.value.forEach((v: any) => {
       if (String(v.CustomerId) === String(item.CustomerId)) {
-        let findDep = AllDepartmentList.value.find(
+        const findDep = AllDepartmentList.value.find(
           (x: any) => String(x.Id) === String(v.DepartmentId)
         )
         if (findDep) {
@@ -348,56 +403,29 @@ async function loadNode({ node, resolve }: any) {
   })
 }
 
-async function addPerson(resDep: any, id: string, resolve: any) {
-  let resetList: any = []
-  let res = await getDepStuffList(id)
-  const data = res.data as any
-  let stuffList = (data.StuffList || []) as any[]
-  StuffList.value = StuffList.value.concat(stuffList)
-  stuffList.forEach((item) => {
-    let obj = {
-      //确保id 唯一
-      Id: item.SIId,
-      SIId: item.SIId,
-      Name: item.Name,
-      type: 'person',
-      ChildDepartmentList: [],
-      WorkCode: item.WorkCode,
-      CustomerId: item.CustomerId,
-      ParentDepartmentId: item.DepartmentId
-    }
-    resetList.push(obj)
-  })
-  resolve(resetList.concat(resDep))
-}
-
-async function getDepStuffList(DepartmentId: any) {
-  return await GetCustomerStuffList({
-    Page: {
-      Index: 1,
-      Size: 10000
-    },
-    DepartmentId,
-    IsSeachChildCustomer: true
-  })
-}
-
-const functions: any = {
-  selectPerson,
-  selectDepAndStuff,
-  selectDepartment,
-  moveDepartment
-}
-
-function selectStuff({ data, checked }: any) {
-  const matchData: any = MATCH_DATA.value
-  const { name } = matchData
-  functions[name](data, checked)
-}
+// function checkNodeChildIsClean() {
+//   AllDepartmentList.value.forEach((item: any) => {
+//     let isHasSelect = false
+//     let allChildDep = AllDepartmentList.value.filter((v: any) => v.Path.includes(item.Id))
+//     let tenpSelect = [] as any[]
+//     StuffList.value.forEach((x: any) => {
+//       if (selectedList.value.find((y) => String(y.CustomerId) === String(x.CustomerId))) {
+//         tenpSelect.push({ ...x })
+//       }
+//     })
+//     tenpSelect.forEach((v) => {
+//       if (allChildDep.find((x: any) => String(x.Id) === String(v.DepartmentId))) {
+//         isHasSelect = true
+//       }
+//     })
+//     if (!isHasSelect) {
+//       setTreeChecked(item.Id, false)
+//     }
+//   })
+// }
 
 function selectPerson(item: any, state: any): any {
-  if (String(item.type) !== 'person') {
-    //部门
+  if (String(item.Type) !== 'person') {
     setChildrenChecked(item.Id, state)
   } else {
     if (state) {
@@ -408,12 +436,12 @@ function selectPerson(item: any, state: any): any {
       }
       if (!selectedList.value.find((a: any) => String(a.CustomerId) === String(item.CustomerId))) {
         selectedList.value.push({
+          Type: 'person',
           Id: item.Id,
           SIId: item.SIId,
           Name: item.Name,
           CustomerId: item.CustomerId,
           WorkCode: item.WorkCode,
-          Type: 'person',
           ParentDepartmentId: item.ParentDepartmentId
         })
       }
@@ -430,14 +458,13 @@ function selectPerson(item: any, state: any): any {
           1
         )
       }
-      checkNodeChildIsClean()
     }
     setAllStuffCheckedById(item.CustomerId, state)
   }
 }
 
 function selectDepAndStuff(item: any, state: any) {
-  if (String(item.type) !== 'person') {
+  if (String(item.Type) !== 'person') {
     //部门
     if (state) {
       //选中
@@ -454,10 +481,7 @@ function selectDepAndStuff(item: any, state: any) {
         })
       }
     } else {
-      let findIndex = selectedList.value.findIndex((a: any) => String(a.Id) === String(item.Id))
-      if (findIndex !== -1) {
-        selectedList.value.splice(findIndex, 1)
-      }
+      selectedList.value = selectedList.value.filter((a: any) => String(a.Id) !== String(item.Id))
     }
   } else {
     if (state) {
@@ -493,31 +517,9 @@ function selectDepAndStuff(item: any, state: any) {
           1
         )
       }
-      // this.checkNodeChildIsClean();
     }
     setAllStuffCheckedById(item.CustomerId, state)
   }
-}
-
-function checkNodeChildIsClean() {
-  AllDepartmentList.value.forEach((item: any) => {
-    let isHasSelect = false
-    let allChildDep = AllDepartmentList.value.filter((v: any) => v.Path.includes(item.Id))
-    let tenpSelect = [] as any[]
-    StuffList.value.forEach((x: any) => {
-      if (selectedList.value.find((y) => String(y.CustomerId) === String(x.CustomerId))) {
-        tenpSelect.push({ ...x })
-      }
-    })
-    tenpSelect.forEach((v) => {
-      if (allChildDep.find((x: any) => String(x.Id) === String(v.DepartmentId))) {
-        isHasSelect = true
-      }
-    })
-    if (!isHasSelect) {
-      setTreeChecked(item.Id, false)
-    }
-  })
 }
 
 function selectDepartment(data: any, state: any) {
@@ -577,6 +579,33 @@ function moveDepartment(data: any, state: any) {
   }
 }
 
+const functions: any = {
+  selectPerson,
+  selectDepAndStuff,
+  selectDepartment,
+  moveDepartment
+}
+
+function selectStuff({ data, checked }: any) {
+  const matchData: any = MATCH_DATA.value
+  const { name } = matchData
+  functions[name](data, checked)
+}
+
+onBeforeMount(() => {
+  const {
+    inputPlaceholder: placeholder,
+    errorMsg: msg,
+    getInitialData,
+    extra = []
+  } = MATCH_DATA.value
+  inputPlaceholder.value = placeholder
+  errorMsg.value = msg
+  if (getInitialData && extra) {
+    fetchExtraData()
+  }
+})
+
 function setAllStuffCheckedById(CustomerId: any, flag: any) {
   StuffList.value.forEach((v: any) => {
     if (String(v.CustomerId) === String(CustomerId)) {
@@ -602,7 +631,7 @@ function setChildrenChecked(parentId: any, flag: any) {
                 Id: v.SIId,
                 SIId: v.SIId,
                 Name: v.Name,
-                type: 'person',
+                Type: 'person',
                 WorkCode: v.WorkCode,
                 CustomerId: v.CustomerId,
                 ParentDepartmentId: v.DepartmentId
@@ -622,7 +651,7 @@ function setChildrenChecked(parentId: any, flag: any) {
             Id: item.SIId,
             SIId: item.SIId,
             Name: item.Name,
-            type: 'person',
+            Type: 'person',
             WorkCode: item.WorkCode,
             CustomerId: item.CustomerId,
             ParentDepartmentId: item.DepartmentId
@@ -641,7 +670,7 @@ function setTreeChecked(id: any, checked: any) {
 function deleteSelected(item: any) {
   const { extra } = MATCH_DATA.value
   if (extra && extra.includes(String(item.Type))) {
-    /* empty */
+    deleteExtraData(item)
   } else {
     let id = item.Id
     if (String(item.Type) === 'person' && String(item.Id) === '') {
@@ -654,104 +683,35 @@ function deleteSelected(item: any) {
     }
     setTreeChecked(id, false)
   }
-
-  let findIndex = selectedList.value.findIndex((x: any) => {
-    return String(x.Name) === String(item.Name)
-  })
-  if (findIndex !== -1) {
-    selectedList.value.splice(findIndex, 1)
-  }
-  if (extra) {
-    if (extra.includes('role')) {
-      checkRoleList.value = checkRoleList.value.filter(
-        (n: any) => String(item.RoleId) !== String(n)
-      )
-    }
-    if (extra.includes('travel')) {
-      checkTravelList.value = checkTravelList.value.filter(
-        (n: any) => String(item.RoleId) !== String(n)
-      )
-    }
-    if (extra.includes('reasonCode')) {
-      checkReasonCodeList.value = checkReasonCodeList.value.filter(
-        (n) => String(item.Id) !== String(n)
-      )
-    }
-  }
 }
 
-async function searchStuff({ searchKey, tabType }: any) {
-  const { searchType, extra } = MATCH_DATA.value as any
+async function handleSearch({ searchKey, tabType }: any) {
   if (String(tabType) === 'checkbox') {
-    if (extra.includes('role')) {
-      searchRole(searchKey)
-    }
-    if (extra.includes('travel')) {
-      searchTravel(searchKey)
-    }
-    if (extra.includes('reasonCode')) {
-      searchReasonCode(searchKey)
-    }
+    searchExtraData(searchKey)
     return
   }
-  let param = {
+  const { searchType } = MATCH_DATA.value as any
+  const res = await SearchStuffAndDepartment({
     Key: searchKey,
     RequestType: searchType
-  }
-  const res = await SearchStuffAndDepartment(param)
+  })
   const data = res.data as any
-  let searchStuffList
-  searchStuffList = data.StuffList.map((item: any) => {
-    return {
-      ...item,
-      Type: 'person'
-    }
-  })
-  let searDepList
-  searDepList = data.DepartmentList.map((item: any) => {
-    return {
-      ...item,
-      Type: 'department'
-    }
-  })
-  searchStuffList.value = searchStuffList.concat(searDepList)
-}
-
-function searchRole(key: any) {
-  if (!key) {
-    filterRoleList.value = RoleList.value
-  } else {
-    filterRoleList.value = RoleList.value.filter((item: any) => {
-      return item.RoleName.includes(key)
-    })
-  }
-}
-
-function searchTravel(key: any) {
-  if (!key) {
-    filterTravelList.value = travelList.value
-  } else {
-    filterTravelList.value = travelList.value.filter((item: any) => {
-      return item.RoleName.includes(key)
-    })
-  }
-}
-
-function searchReasonCode(key: any) {
-  if (!key) {
-    filterReasonCodeList.value = reasonCodeList.value
-  } else {
-    filterReasonCodeList.value = reasonCodeList.value.filter((item: any) => {
-      return item.Name.includes(key)
-    })
-  }
+  const StuffList = data.StuffList.map((item: any) => ({
+    ...item,
+    Type: 'person'
+  }))
+  const DepartmentList = data.DepartmentList.map((item: any) => ({
+    ...item,
+    Type: 'department'
+  }))
+  searchStuffList.value = StuffList.concat(DepartmentList)
 }
 
 function searchSelectStuff(data: any) {
   const list = selectedList.value as any[]
   if (props.isSingleChoice && list?.length > 0) {
-    list.forEach((sitem: any) => {
-      deleteSelected(sitem)
+    list.forEach((sItem: any) => {
+      deleteSelected(sItem)
     })
   }
   let isRepeat = false
@@ -820,78 +780,53 @@ function onOk(done: any) {
     needSonDepartment: includeChildDepartment.value
   })
 }
-
-function roleChange({ event, data, key }: any) {
-  if (event) {
-    //选中
-    selectedList.value.push({
-      Id: '',
-      RoleId: data.RoleId,
-      SIId: '',
-      Name: data.RoleName,
-      CustomerId: '',
-      WorkCode: '',
-      Type: 'role'
-    })
-    checkRoleList.value.push(data[key])
-  } else {
-    //删除
-    selectedList.value = selectedList.value.filter((a: any) => String(a[key]) !== String(data[key]))
-    checkRoleList.value = checkRoleList.value.filter((a: any) => String(a) !== String(data[key]))
-  }
-}
-
-function travelChange({ event, data, key }: any) {
-  if (event) {
-    //选中
-    selectedList.value.push({
-      Id: '',
-      RoleId: data.RoleId,
-      SIId: '',
-      Name: data.RoleName,
-      CustomerId: '',
-      WorkCode: '',
-      Type: 'travel'
-    })
-    checkTravelList.value.push(data[key])
-  } else {
-    //删除
-    selectedList.value = selectedList.value.filter((a: any) => String(a[key]) !== String(data[key]))
-    checkTravelList.value = checkTravelList.value.filter(
-      (a: any) => String(a) !== String(data[key])
-    )
-  }
-}
-
-function reasonCodeChange({ event, data, key }: any) {
-  if (event) {
-    //选中
-    selectedList.value.push({
-      Id: data.Id,
-      Name: data.Name,
-      OriginalName: data.OriginalName,
-      OuterCode: data.OuterCode,
-      Type: 'reasonCode'
-    })
-    checkReasonCodeList.value.push(data[key])
-  } else {
-    //删除
-    selectedList.value = selectedList.value.filter((a: any) => String(a[key]) !== String(data[key]))
-    checkReasonCodeList.value = checkReasonCodeList.value.filter(
-      (a: any) => String(a) !== String(data[key])
-    )
-  }
-}
 </script>
 
 <style lang="less" scoped>
 .GroupSelector {
   display: flex;
 
+  :deep(.el-collapse) {
+    border: none;
+  }
+
+  :deep(.el-collapse-item__header) {
+    height: 32px;
+    line-height: 32px;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--font-hint);
+    border-bottom: none;
+
+    .el-collapse-item__arrow {
+      display: none;
+    }
+
+    .icon-arrow {
+      margin-right: 12px;
+      color: var(--font-hint);
+      transition: transform 0.3s;
+    }
+
+    &.is-active {
+      .icon-arrow {
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  :deep(.el-collapse-item__content) {
+    padding-bottom: 0;
+  }
+
+  :deep(.el-collapse-item__wrap) {
+    border-bottom: none;
+  }
+
   .area-wrapper {
     width: calc(50% - 10px);
     height: 500px;
-    border: 1px solid #eeeeee;
+    border: 1px solid var(--line-border);
     border-radius: 4px;
     margin-right: 20px;
 
@@ -906,10 +841,10 @@ function reasonCodeChange({ event, data, key }: any) {
     justify-content: space-between;
     height: 34px;
     line-height: 34px;
-    color: #141414;
+    color: var(--font-primary);
     font-size: 14px;
     padding: 0 12px;
-    border-bottom: 1px solid #eeeeee;
+    border-bottom: 1px solid var(--line-border);
     font-weight: 500;
 
     .checkbox {
@@ -923,25 +858,36 @@ function reasonCodeChange({ event, data, key }: any) {
 
   .selected-list {
     padding: 10px 0;
+    height: 400px;
+    overflow: auto;
+
+    &.only-one {
+      :deep(.el-collapse-item__header) {
+        display: none;
+      }
+
+      .selected-list-item {
+        padding-left: 6px;
+      }
+    }
 
     .selected-list-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 32px;
-      line-height: 32px;
-      color: #141414;
+      padding: 4px 6px 4px 24px;
+      color: var(--font-primary);
       font-size: 14px;
-      padding: 0 12px;
       font-weight: 500;
+      border-radius: 3px;
 
-      &:last-child {
-        border-bottom: none;
+      &:hover {
+        background: var(--bg-rest);
       }
 
-      .icon {
-        font-size: 16px;
-        color: #141414;
+      .close-icon {
+        font-size: 14px;
+        color: var(--font-hint);
         cursor: pointer;
       }
     }

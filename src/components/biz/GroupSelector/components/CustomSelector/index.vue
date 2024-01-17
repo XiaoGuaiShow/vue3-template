@@ -1,22 +1,23 @@
 <template>
   <div>
-    <el-input
-      clearable
-      :prefix-icon="Search"
-      @input="handleSearch"
-      v-model="searchKey"
-      :placeholder="placeholder"></el-input>
-    <div class="container">
-      <div class="tabView b-flex" v-if="items.length > 1">
-        <div
-          v-for="(item, index) in props.items as any"
-          :key="index"
-          class="tabItem"
-          :class="{ current: tabIndex === index }"
-          @click="onTabClick(index)">
-          {{ item.label }}
-        </div>
+    <div class="tabView" v-if="items.length > 1">
+      <div
+        v-for="(item, index) in props.items as any"
+        :key="index"
+        class="tabItem"
+        :class="{ current: tabIndex === index }"
+        @click="onTabClick(index)">
+        {{ item.label }}
       </div>
+    </div>
+    <div class="container">
+      <el-input
+        clearable
+        class="search"
+        :prefix-icon="Search"
+        @input="handleSearch"
+        v-model="searchKey"
+        :placeholder="placeholder" />
       <div v-show="!showSearchResult">
         <div v-for="(item, index) in props.items as any" :key="index">
           <div
@@ -28,7 +29,7 @@
                 lazy
                 show-checkbox
                 check-strictly
-                :ref="treeRef"
+                ref="treeRef"
                 :data="item.data"
                 :default-expanded-keys="item.defaultExpandedKeys"
                 :props="item.props || defaultTreeConfig.props"
@@ -39,16 +40,20 @@
                     handleCheckTreeChange(data, checked, indeterminate, item.emitCheckChangeEvent)
                 ">
                 <template #default="{ data }">
-                  <span class="custom-tree-node">
-                    <i class="icon ceekeefont wenjianjia" v-if="data.type !== 'person'"></i>
+                  <span
+                    class="custom-tree-node"
+                    :title="
+                      data[(item.props && item.props.label) || defaultTreeConfig.props.label]
+                    ">
+                    <el-icon v-if="data.Type !== 'person'"><Folder /></el-icon>
                     {{ data[(item.props && item.props.label) || defaultTreeConfig.props.label] }}
                     <span v-if="data.WorkCode">({{ data.WorkCode }})</span>
                   </span>
                 </template>
               </el-tree>
             </div>
-            <div v-if="item.type === 'checkbox'" class="content">
-              <el-checkbox-group v-model="item.checkList" class="b-flex b-flex-column">
+            <div v-if="item.type === 'checkbox'" class="checkbox-content">
+              <el-checkbox-group v-model="item.checkList">
                 <el-checkbox
                   @change="
                     (e) =>
@@ -83,7 +88,7 @@
             <el-tooltip placement="bottom" effect="light">
               <template #content>{{ item.Name }}</template>
               <span>
-                <i class="icon ceekeefont wenjianjia"></i>
+                <el-icon><Folder /></el-icon>
                 {{ item.Name }}
               </span>
             </el-tooltip>
@@ -104,6 +109,7 @@
 <script setup lang="ts">
 import { treeConfig, checkboxProps } from './config.ts'
 import { Search } from '@element-plus/icons-vue'
+import { ElTree } from 'element-plus'
 import { ITabDataOptions } from '@/components/biz/GroupSelector/interface.ts'
 
 const props = defineProps({
@@ -156,10 +162,11 @@ const emit = defineEmits([
   'searchResultClick',
   'setTreeChecked',
   'selectStuff',
-  'loadNode'
+  'loadNode',
+  'roleChange'
 ])
 
-const treeRef = ref<any>()
+const treeRef = ref()
 const defaultTreeConfig = ref(treeConfig) // 默认树配置
 const defaultCheckboxProps = ref(checkboxProps) // 默认checkbox配置
 const showSearchResult = ref(false) // 显示搜索结果
@@ -221,7 +228,7 @@ function onSearchResultClick(item: any) {
 }
 
 function setTreeChecked(id: any, checked: any) {
-  treeRef.value?.setChecked(id, checked)
+  treeRef.value[0]!.setChecked(id, checked)
 }
 
 defineExpose({

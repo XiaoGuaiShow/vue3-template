@@ -84,6 +84,12 @@
 .col {
   flex-direction: column;
 }
+.ellipsis{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all;
+}
 /* 字体颜色相关 */
 .c-font-primary {
   color: var(--font-primary);

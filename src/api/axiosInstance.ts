@@ -16,6 +16,7 @@ export interface RequestConfig extends InternalAxiosRequestConfig {
   defaultParamsInRequest?: boolean
   showGlobalLoading?: boolean
   isDownload?: boolean
+  skipTypeCheck?: boolean
   downloadOptions?: {
     fileName?: string
     contentType?: string
@@ -76,7 +77,9 @@ axiosInstance.interceptors.request.use(
     if (config.isDownload) {
       config.responseType = 'blob'
     }
-    config.cancelToken = addRequestToMap(config)
+    if (config) {
+      config.cancelToken = addRequestToMap(config)
+    }
 
     if (config.defaultParamsInRequest) {
       config.data = Object.assign({}, defaultParams, config.data)
@@ -94,7 +97,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response: ResponseOptions): any => {
     requestsCount--
-    deleteRequestFromMap(response.config)
+    response.config && deleteRequestFromMap(response.config)
 
     if (requestsCount === 0 && loadingInstance) {
       loadingInstance.close()
@@ -106,7 +109,7 @@ axiosInstance.interceptors.response.use(
 
     if (response.status >= 200 && response.status < 300) {
       const data = formatResponse(response) as any
-      if (data.code === RESPONSE_STATUS.SUCCESS) {
+      if (data.code === RESPONSE_STATUS.SUCCESS || response.config.skipTypeCheck) {
         return Promise.resolve({
           code: data.code,
           msg: data.msg,
@@ -129,7 +132,7 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     requestsCount--
-    deleteRequestFromMap(error.config)
+    error.config && deleteRequestFromMap(error.config)
 
     if (requestsCount === 0 && loadingInstance) {
       loadingInstance.close()

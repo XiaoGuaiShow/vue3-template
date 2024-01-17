@@ -42,6 +42,7 @@ export interface IItemsOptions {
   checkList?: any[]
   emitCheckboxChangeEvent?: string
   props?: IProps
+  nodeKey?: any
 }
 
 export interface ITabDataOptions {

@@ -7,7 +7,8 @@ export const GetDepartmentList = (data: Data) => {
     data,
     method: 'post',
     url: 'b2b/Customer/GetDepartmentList',
-    defaultParamsInRequest: true
+    defaultParamsInRequest: true,
+    skipTypeCheck: true
   } as RequestConfig)
 }
 
