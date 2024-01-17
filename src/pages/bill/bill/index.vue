@@ -11,8 +11,9 @@
       </el-form-item>
       <el-form-item label="结算状态">
         <el-select v-model="formInline.status" placeholder="请选择" clearable>
-          <el-option label="Zone one" value="shanghai" />
-          <el-option label="Zone two" value="beijing" />
+          <el-option label="全部" :value="0" />
+          <el-option label="已结算" :value="1" />
+          <el-option label="未结算" :value="2" />
         </el-select>
       </el-form-item>
       <el-form-item label="结算单名称">
@@ -67,11 +68,20 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, watchEffect } from 'vue'
 import type { TableItem } from '../types'
+const props = defineProps<{
+  status: number
+}>()
+const { status } = toRefs(props)
+
 const formInline = reactive({
-  status: '',
+  status: 0,
   name: ''
+})
+watchEffect(() => {
+  formInline.status = status.value
+  console.log('准备刷新列表')
 })
 const onSubmit = () => {
   console.log('submit!')

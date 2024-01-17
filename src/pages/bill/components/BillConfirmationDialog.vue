@@ -3,15 +3,15 @@
     <div>
       <div class="section">
         <div class="fs-20 fw-600 c-font-primary">账单汇总</div>
-        <SummaryExpression class="mt-12"></SummaryExpression>
+        <SummaryExpression class="mt-12" :summary="summaryData"></SummaryExpression>
       </div>
       <div class="fs-16 fw-600 c-font-primary mt-24">开票概览</div>
-      <InvoiceTable from="confirmationDialog"></InvoiceTable>
+      <InvoiceTable from="confirmationDialog" :periodId="periodId"></InvoiceTable>
     </div>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确认</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确认并提交开票申请</el-button>
       </span>
     </template>
   </el-dialog>
@@ -25,6 +25,23 @@
 import { ref, toRefs, onMounted } from 'vue'
 import SummaryExpression from '../components/SummaryExpression.vue'
 import InvoiceTable from '@/pages/invoice/components/InvoiceTable.vue'
+import { getBillPeriodSummary } from '@/api/bill'
+import type { PeriodSumDTO } from '@/pages/bill/types'
+
+const props = defineProps<{
+  enterpriseId: number
+  periodId: number
+}>()
+const summaryData: Ref<Partial<PeriodSumDTO>> = ref({})
+watchEffect(() => {
+  getBillPeriodSummary({
+    enterpriseId: props.enterpriseId,
+    periodId: props.periodId
+  }).then((res) => {
+    console.log(res)
+    summaryData.value = res.data
+  })
+})
 
 const emits = defineEmits(['close'])
 

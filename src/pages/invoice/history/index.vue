@@ -10,9 +10,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="开票状态">
-          <el-select v-model="formInline.region" placeholder="请选择" clearable>
-            <el-option label="Zone one" value="shanghai" />
-            <el-option label="Zone two" value="beijing" />
+          <el-select v-model="formInline.status" placeholder="请选择">
+            <el-option label="全部" :value="0" />
+            <el-option label="已开票" :value="1" />
+            <el-option label="未开票" :value="2" />
           </el-select>
         </el-form-item>
         <el-form-item label="结算单名称">
@@ -60,7 +61,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import type { TableItem } from './types'
 const router = useRouter()
 const currentPage4 = ref(4)
@@ -70,6 +71,19 @@ const handleSizeChange = (val: number) => {
 }
 const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`)
+}
+const formInline = reactive({
+  user: '',
+  region: '',
+  date: '',
+  status: 0
+})
+// 获取路由参数信息，给搜索条件-开票状态赋值
+const routeInfo = useRoute()
+if (routeInfo?.query?.status) {
+  formInline.status = Number(routeInfo.query.status as string)
+} else {
+  formInline.status = 0
 }
 
 const tableData = [
@@ -123,12 +137,6 @@ const tableData = [
     uninvoiced: '1,000.00'
   }
 ]
-
-const formInline = reactive({
-  user: '',
-  region: '',
-  date: ''
-})
 
 const onSubmit = () => {
   console.log('submit!')

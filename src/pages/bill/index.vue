@@ -3,13 +3,13 @@
     <div class="section">
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="账单总览" name="first">
-          <DataCard @change="handleChange"></DataCard>
+          <DataCard @change="handleChange" @link-change="goLink"></DataCard>
         </el-tab-pane>
         <el-tab-pane label="消费数据" name="second">
           <ConsumptionTable></ConsumptionTable>
         </el-tab-pane>
         <el-tab-pane label="账单列表" name="third">
-          <BillList></BillList>
+          <BillList :status="status"></BillList>
         </el-tab-pane>
         <el-tab-pane label="导出记录" name="fourth">
           <ExportRecord></ExportRecord>
@@ -18,9 +18,9 @@
       </el-tabs>
     </div>
     <template v-if="activeName === 'first'">
-      <MonthTab></MonthTab>
-      <SummaryTable v-if="isSummary"></SummaryTable>
-      <Bill v-else></Bill>
+      <MonthTab @month-change="monthChange"></MonthTab>
+      <SummaryTable v-if="isSummary" :basicParams="basicParams"></SummaryTable>
+      <Bill v-else :basicParams="basicParams" @switch-tab="switchTab"></Bill>
     </template>
   </div>
 </template>
@@ -28,6 +28,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import type { TabsPaneContext } from 'element-plus'
+import { useRouter } from 'vue-router'
 import DataCard from './overview/DataCard.vue'
 import MonthTab from './overview/MonthTab.vue'
 import SummaryTable from './overview/SummaryTable.vue'
@@ -35,17 +36,57 @@ import Bill from './overview/Bill.vue'
 import ConsumptionTable from './consumption/index.vue'
 import BillList from './bill/index.vue'
 import ExportRecord from './record/ExportRecord.vue'
+import type { BasicParams } from './types'
 
-const isSummary = ref(true)
+const router = useRouter()
+
+const isSummary = ref(false)
 const activeName = ref('first')
+const basicParams = reactive<BasicParams>({
+  year: new Date().getFullYear(),
+  month: new Date().getMonth() + 1,
+  enterpriseIdList: []
+})
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {
   console.log(tab, event)
 }
-const handleChange = (arr: [number, string, boolean, boolean]) => {
-  console.log(arr)
-  const [year, company, isSummaryProp] = arr
+const handleChange = (arr: [number, number[], boolean]) => {
+  const [year, enterpriseIdList, isSummaryProp] = arr
   isSummary.value = isSummaryProp
+  basicParams.year = year
+  basicParams.enterpriseIdList = enterpriseIdList
+}
+
+const monthChange = (month: number) => {
+  console.log(month)
+  basicParams.month = month
+}
+
+const status = ref(0) // 0 全部 1已结算 2未结算
+const goLink = (type: number) => {
+  // 1总消费 2已结算 3未结算 4还款记录 5已开票 6未开票
+  if (type === 1) {
+    activeName.value = 'second'
+  } else if (type === 2) {
+    activeName.value = 'third'
+    status.value = 1
+  } else if (type === 3) {
+    activeName.value = 'third'
+    status.value = 1
+  } else if (type === 4) {
+    const childSurveys = []
+    const hasChild = childSurveys.length > 0
+    router.push('/repayment?hasChild=' + Number(hasChild))
+  } else if (type === 5) {
+    router.push(`/invoice/history?status=1`)
+  } else if (type === 6) {
+    router.push(`/invoice/history?status=2`)
+  }
+}
+
+const switchTab = (tab: string) => {
+  activeName.value = tab
 }
 </script>
 

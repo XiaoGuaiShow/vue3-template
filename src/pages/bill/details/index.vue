@@ -6,7 +6,7 @@
         class="c-brand-blue fs-14 flex ai-c"
         :underline="false"
         type="primary"
-        @click="goLink">
+        @click="goBack">
         <ArrowLeft style="width: 1em; height: 1em; margin-right: 4px" />
         返回
       </el-link>
@@ -51,7 +51,13 @@
 import { ref } from 'vue'
 import OrderTable from './OrderTable.vue'
 import SummaryExpression from '../components/SummaryExpression.vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const activeName = ref('first')
+
+const goBack = () => {
+  router.go(-1)
+}
 </script>
 
 <style lang="less" scoped>

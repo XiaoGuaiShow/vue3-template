@@ -1,13 +1,13 @@
 import { Script } from 'vm';
 <template>
   <div class="flex ai-c jc-sb">
-    <div class="flex col ai-c item">
+    <div class="flex col ai-c item" v-if="typeof summary.totalPrice === 'number'">
       <div class="title">本期消费</div>
-      <div class="money">￥8000.00</div>
+      <div class="money">￥{{ summary.totalPrice }}</div>
       <div class="btn">查看</div>
     </div>
-    <img :src="plusImg" />
-    <div class="flex col ai-c item">
+    <img :src="plusImg" v-if="typeof summary.lastPeriodPayable === 'number'" />
+    <div class="flex col ai-c item" v-if="typeof summary.lastPeriodPayable === 'number'">
       <div class="title flex ai-c">
         <span class="mr-4">上期未结</span>
         <el-popover placement="top" :width="310">
@@ -20,11 +20,11 @@ import { Script } from 'vm';
           </div>
         </el-popover>
       </div>
-      <div class="money">￥8000.00</div>
+      <div class="money">￥{{ summary.lastPeriodPayable }}</div>
       <div class="btn">查看</div>
     </div>
-    <img :src="minusImg" />
-    <div class="flex col ai-c item">
+    <img :src="minusImg" v-if="typeof summary.dissentAmount === 'number'" />
+    <div class="flex col ai-c item" v-if="typeof summary.dissentAmount === 'number'">
       <div class="title flex ai-c">
         <span class="mr-4">本期异议</span>
         <el-popover placement="top" :width="350">
@@ -37,11 +37,11 @@ import { Script } from 'vm';
           </div>
         </el-popover>
       </div>
-      <div class="money">￥100.00</div>
+      <div class="money">￥{{ summary.dissentAmount }}</div>
       <div class="btn">查看</div>
     </div>
-    <img :src="minusImg" />
-    <div class="flex col ai-c item">
+    <img :src="minusImg" v-if="typeof summary.unRetrievedAmount === 'number'" />
+    <div class="flex col ai-c item" v-if="typeof summary.unRetrievedAmount === 'number'">
       <div class="title flex ai-c">
         <span class="mr-4">未取回票据</span>
         <el-popover placement="top" :width="430">
@@ -54,12 +54,12 @@ import { Script } from 'vm';
           </div>
         </el-popover>
       </div>
-      <div class="money">￥100.00</div>
+      <div class="money">￥{{ summary.unRetrievedAmount }}</div>
       <div class="btn">查看</div>
     </div>
 
-    <img :src="minusImg" />
-    <div class="flex col ai-c item">
+    <img :src="minusImg" v-if="typeof summary.overPeriodRefundAmount === 'number'" />
+    <div class="flex col ai-c item" v-if="typeof summary.overPeriodRefundAmount === 'number'">
       <div class="title flex ai-c">
         <span class="mr-4">跨账期退改</span>
         <el-popover placement="top" :width="420">
@@ -72,16 +72,16 @@ import { Script } from 'vm';
           </div>
         </el-popover>
       </div>
-      <div class="money">￥100.00</div>
+      <div class="money">￥{{ summary.overPeriodRefundAmount }}</div>
       <div class="btn">查看</div>
     </div>
 
-    <img :src="equalImg" />
-    <div class="flex col ai-c item last">
+    <img :src="equalImg" v-if="typeof summary.payable === 'number'" />
+    <div class="flex col ai-c item last" v-if="typeof summary.payable === 'number'">
       <div class="title flex ai-c">
         <span class="mr-4">本期应结</span>
       </div>
-      <div class="money">￥100.00</div>
+      <div class="money">￥{{ summary.payable }}</div>
       <div class="btn">查看</div>
     </div>
   </div>
@@ -91,6 +91,21 @@ import { Script } from 'vm';
 import plusImg from '@/assets/images/bill/plus.png'
 import minusImg from '@/assets/images/bill/minus.png'
 import equalImg from '@/assets/images/bill/equal.png'
+import type { PeriodSumDTO } from '@/pages/bill/types'
+
+interface Props {
+  summary: Partial<PeriodSumDTO>
+}
+const props = withDefaults(defineProps<Props>(), {
+  summary: () => ({
+    totalPrice: 0, // 本期消费
+    lastPeriodPayable: 0, // 上期未结
+    dissentAmount: 0, // 异议金额
+    unRetrievedAmount: 0, // 未取回票据
+    overPeriodRefundAmount: 0, // 跨账期改退
+    payable: 0 // 本期应结
+  })
+})
 </script>
 
 <style lang="less" scoped>
