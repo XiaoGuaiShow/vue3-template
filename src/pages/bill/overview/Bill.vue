@@ -1,21 +1,36 @@
 <template>
-  <div class="inner-section">
+  <div class="inner-section" v-loading="loading">
     <div class="title fs-18 flex ai-c">
       账期
-      <div class="blue-tab ml-12">10/01-10/31</div>
+      <div
+        class="blue-tab ml-12"
+        v-for="(item, index) in billPeriodList"
+        :key="item.periodId"
+        :class="{ active: activeIndex === index }"
+        @click="tabClick(index)">
+        {{ item.periodStartDate + '-' + item.periodEndDate }}
+      </div>
     </div>
 
-    <div class="bill-card">
+    <div class="bill-card" v-loading="sLoading">
       <div>
         <div class="flex jc-sb ai-c">
-          <div class="left-block flex primary green grey">
+          <div class="left-block flex" :class="[statusColor(detail.settlementStatus)]">
             <div class="circle flex ai-c jc-c">
               <svg-icon class="icon" name="bill" size="48"></svg-icon>
             </div>
             <div class="ml-24 flex col jc-c">
-              <div class="fs-24 fw-600 left-block-title">已出账</div>
+              <div class="fs-24 fw-600 left-block-title">
+                {{
+                  detail.settlementStatus
+                    ? SETTLEMENT_STATUS.get(detail.settlementStatus)
+                    : '未出账'
+                }}
+              </div>
               <div class="flex mt-12 ai-c">
-                <div class="fs-18 fw-500 c-font-primary">最晚结算日: 2023/11/15</div>
+                <div class="fs-18 fw-500 c-font-primary">
+                  最晚结算日: {{ detail.latestPaymentDate }}
+                </div>
                 <div class="flex ai-c elliptic ml-12">
                   <img :src="timeImg" alt="" />
                   <div class="fs-12 h-12 lh-12 c-font-hint ml-2">距最晚结算日</div>
@@ -25,21 +40,36 @@
             </div>
           </div>
           <div>
-            <el-button type="primary" plain>查看账单明细</el-button>
-            <el-button type="primary" @click="showBillDialog = true">确认账单</el-button>
-            <el-button type="primary">查看发票</el-button>
+            <el-button type="primary" plain @click="goLink(1)" v-if="detail.settlementStatus">
+              查看账单明细
+            </el-button>
+            <el-button type="primary" plain @click="goLink(2)" v-else>查看消费明细</el-button>
+            <el-button
+              type="primary"
+              @click="showBillDialog = true"
+              v-if="detail.settlementStatus === 6">
+              确认账单
+            </el-button>
+            <el-button
+              type="primary"
+              v-if="typeof detail.settlementStatus === 'number' && detail.settlementStatus > 6">
+              查看发票
+            </el-button>
           </div>
         </div>
       </div>
 
       <div class="section mt-24">
         <div class="fs-20 fw-600 c-font-primary">账单汇总</div>
-        <SummaryExpression class="mt-12"></SummaryExpression>
+        <SummaryExpression class="mt-12" :summary="detail.periodSumDTO"></SummaryExpression>
       </div>
 
       <div class="section mt-24">
         <div class="fs-20 fw-600 c-font-primary h-20 lh-20">账单分类概览</div>
-        <div class="bill-item" v-for="(item, index) in feeClassList(billData)" :key="index">
+        <div
+          class="bill-item"
+          v-for="(item, index) in feeClassList(detail.feeClassSumDTOList)"
+          :key="index">
           <div
             class="bill-item-col"
             v-for="(item2, index2) in productTypeList(item.productDTOList)"
@@ -68,473 +98,563 @@
       </div>
     </div>
   </div>
-  <BillConfirmationDialog v-if="showBillDialog" @close="showBillDialog = false" />
+  <BillConfirmationDialog
+    v-if="showBillDialog"
+    :enterpriseId="billPeriodList[activeIndex].enterpriseId"
+    :periodId="billPeriodList[activeIndex].periodId"
+    @close="showBillDialog = false" />
 </template>
 
 <script lang="ts" setup>
 import timeImg from '@/assets/images/bill/time.png'
 import { ref } from 'vue'
-import { FEE_TYPE, PRODUCT_TYPE, FEE_CLASS } from '@/common/static'
+import { FEE_TYPE, PRODUCT_TYPE, FEE_CLASS, SETTLEMENT_STATUS } from '@/common/static'
 import { sortBy } from 'lodash-es'
-import type { FeeTypeItem, ProductTypeItem, FeeClassItem } from './types'
+import type {
+  FeeTypeItem,
+  ProductTypeItem,
+  FeeClassItem,
+  BillPeriodItem,
+  BasicParams,
+  BillPeriodDetail
+} from '../types'
 import SummaryExpression from '../components/SummaryExpression.vue'
 import BillConfirmationDialog from '../components/BillConfirmationDialog.vue'
+import { getBillPeriodList, getBillPeriodDetail } from '@/api/bill'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
-const billData = ref([
-  {
-    a: 1,
-    feeClass: 0,
-    productDTOList: [
-      {
-        productType: 0,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 5,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 51,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 1,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 11,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 6,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      }
+const loading = ref(true)
+const props = defineProps<{
+  basicParams: BasicParams
+}>()
+// 获取选中月份的账期列表
+const billPeriodList = ref<BillPeriodItem[]>([])
+const activeIndex = ref(0)
+watchEffect(() => {
+  loading.value = true
+  getBillPeriodList({
+    enterpriseId: props.basicParams.enterpriseIdList[0],
+    month: props.basicParams.month,
+    year: props.basicParams.year
+  }).then((res) => {
+    billPeriodList.value = res.data
+    activeIndex.value = res.data.length ? 0 : -1
+  })
+  setTimeout(() => {
+    billPeriodList.value = [
+      { enterpriseId: 12, periodId: 1, periodStartDate: '2024-01-01', periodEndDate: '2024-01-10' },
+      { enterpriseId: 12, periodId: 2, periodStartDate: '2024-01-11', periodEndDate: '2024-01-20' },
+      { enterpriseId: 12, periodId: 3, periodStartDate: '2024-01-21', periodEndDate: '2024-01-31' }
     ]
-  },
-  {
-    feeClass: 1,
-    productDTOList: [
-      {
-        productType: 0,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 5,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 51,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 1,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 11,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 6,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    feeClass: 2,
-    productDTOList: [
-      {
-        productType: 0,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 5,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 51,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 1,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 11,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 6,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    feeClass: 0,
-    productDTOList: [
-      {
-        productType: 7,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 51,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 5,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 9,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          }
-        ]
-      },
-      {
-        productType: 0,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 2,
-            totalPrice: '999.00'
-          },
-          {
-            feeType: 3,
-            totalPrice: '2121.00'
-          },
-          {
-            feeType: 1,
-            totalPrice: '5000.00'
-          }
-        ]
-      },
-      {
-        productType: 1,
-        productTotalPrice: '6000.00',
-        feeDetailDTOList: [
-          {
-            feeType: 3,
-            totalPrice: '300.00'
-          },
-          {
-            feeType: 2,
-            totalPrice: '200.00'
-          },
-          {
-            feeType: 1,
-            totalPrice: '100.00'
-          }
-        ]
-      }
-    ]
+    activeIndex.value = billPeriodList.value.length ? 0 : -1
+    loading.value = false
+  }, 1500)
+})
+const tabClick = (index: number) => {
+  activeIndex.value = index
+}
+
+const sLoading = ref(false)
+const detail: Ref<BillPeriodDetail> = ref({
+  id: 0,
+  feeClassSumDTOList: [],
+  latestPaymentDate: '',
+  periodRange: '',
+  settlementStatus: undefined,
+  settlementStatusDesc: '',
+  periodSumDTO: {}
+})
+watchEffect(() => {
+  sLoading.value = true
+  if (billPeriodList.value.length === 0) return
+  const params = {
+    enterpriseId: billPeriodList.value[activeIndex.value].enterpriseId,
+    periodId: billPeriodList.value[activeIndex.value].periodId
   }
-])
+  getBillPeriodDetail(params).then((res) => {
+    console.log(res)
+  })
+  setTimeout(() => {
+    detail.value = {
+      id: 1,
+      settlementStatus: 18,
+      settlementStatusDesc: '待付款',
+      periodSumDTO: {
+        totalPrice: 10000, // 本期消费
+        lastPeriodPayable: 0, // 上期未结
+        dissentAmount: 500, // 异议金额
+        unRetrievedAmount: 2500, // 未取回票据
+        overPeriodRefundAmount: 800, // 跨账期改退
+        payable: 4000 // 本期应退
+      },
+      feeClassSumDTOList: [
+        {
+          feeClass: 0,
+          productDTOList: [
+            {
+              productType: 0,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 5,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 51,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 1,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 11,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 6,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          feeClass: 1,
+          productDTOList: [
+            {
+              productType: 0,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 5,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 51,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 1,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 11,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 6,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          feeClass: 2,
+          productDTOList: [
+            {
+              productType: 0,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 5,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 51,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 1,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 11,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 6,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          feeClass: 0,
+          productDTOList: [
+            {
+              productType: 7,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 51,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 5,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 9,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                }
+              ]
+            },
+            {
+              productType: 0,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 2,
+                  totalPrice: '999.00'
+                },
+                {
+                  feeType: 3,
+                  totalPrice: '2121.00'
+                },
+                {
+                  feeType: 1,
+                  totalPrice: '5000.00'
+                }
+              ]
+            },
+            {
+              productType: 1,
+              productTotalPrice: '6000.00',
+              feeDetailDTOList: [
+                {
+                  feeType: 3,
+                  totalPrice: '300.00'
+                },
+                {
+                  feeType: 2,
+                  totalPrice: '200.00'
+                },
+                {
+                  feeType: 1,
+                  totalPrice: '100.00'
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+    sLoading.value = false
+  }, 1500)
+})
+
+const statusColor = computed(() => {
+  return (status: any) => {
+    if (status === 18) return 'green'
+    if (status >= 6 && status <= 15) return 'primary'
+    return 'grey'
+  }
+})
+
 const showBillDialog = ref(false)
 // feeType排序
 const sortFeeTypeList = [...FEE_TYPE.keys()]
@@ -566,6 +686,18 @@ const feeClassList = computed(() => {
     return newList
   }
 })
+
+const emit = defineEmits(['switchTab'])
+const goLink = (type: number) => {
+  if (type === 1) {
+    const periodId = billPeriodList.value[activeIndex.value].periodId
+    router.push({
+      path: `/bill/details/${periodId}`
+    })
+  } else if (type === 2) {
+    emit('switchTab', 'second')
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -587,15 +719,20 @@ const feeClassList = computed(() => {
   color: var(--font-primary);
 }
 .blue-tab {
-  background-color: var(--bg-select);
+  background: var(--bg-unselect);
+  color: var(--font-secondary);
   height: 36px;
   line-height: 20px;
   border-radius: 4px;
   padding: 8px;
-  color: var(--brand-blue);
   font-size: 20px;
   font-weight: 600;
   box-sizing: border-box;
+  cursor: pointer;
+  &.active {
+    background-color: var(--bg-select);
+    color: var(--brand-blue);
+  }
 }
 .bill-card {
   padding: 24px;

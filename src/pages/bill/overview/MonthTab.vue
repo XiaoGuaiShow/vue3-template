@@ -14,10 +14,19 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 const months = Array.from({ length: 12 }, (_, i) => i + 1)
-const activeMonth = ref(1)
+const currentMonth = new Date().getMonth() + 1
+const activeMonth = ref(currentMonth)
 const handleTabClick = (value: number) => {
   activeMonth.value = value
 }
+const emit = defineEmits(['monthChange'])
+watch(
+  () => activeMonth.value,
+  (value) => {
+    emit('monthChange', value)
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="less" scoped>

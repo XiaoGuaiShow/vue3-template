@@ -14,6 +14,9 @@
 .ml-2 {
   margin-left: 2px;
 }
+.ml-8 {
+  margin-left: 8px;
+}
 .ml-12 {
   margin-left: 12px;
 }
@@ -72,6 +75,9 @@
 .wrap {
   flex-wrap: wrap;
 }
+.nowrap {
+  flex-wrap: nowrap;
+}
 .ai-c {
   align-items: center;
 }
@@ -90,6 +96,9 @@
   white-space: nowrap;
   word-break: break-all;
 }
+shrink-0 {
+  flex-shrink: 0;
+}
 /* 字体颜色相关 */
 .c-font-primary {
   color: var(--font-primary);
@@ -99,4 +108,12 @@
 }
 .c-font-hint {
   color: var(--font-hint);
+}
+/* 省略 */
+.ellipsis-1 {
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  display: -webkit-box;
+  word-break: break-all;
 }

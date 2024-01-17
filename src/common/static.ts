@@ -14,7 +14,8 @@ export const PRODUCT_TYPE = new Map([
   [7, '国内用车'],
   [10, '国内外卖'],
   [9, '商务卡'],
-  [999, '滞纳金']
+  [999, '滞纳金'],
+  [21, '汽车票']
 ])
 
 export const FEE_CLASS = new Map([
@@ -24,4 +25,22 @@ export const FEE_CLASS = new Map([
   [3, '本期异议'],
   [4, '未取回票据'],
   [5, '跨账期退']
+])
+
+export const SETTLEMENT_STATUS = new Map([
+  [0, '待生成'],
+  [1, '生成中'],
+  [2, '生成失败'],
+  [3, '待发送'],
+  [6, '待确认'],
+  [9, '待开票'],
+  [10, '开票中'],
+  [12, '待回款'],
+  [15, '部分回款'],
+  [18, '已结算']
+])
+
+export const INVOICE_TYPE = new Map([
+  [1, '纸质发票(票根)'],
+  [2, '电子发票(专票)']
 ])
