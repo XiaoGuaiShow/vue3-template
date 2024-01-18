@@ -12,10 +12,12 @@
     <el-button type="primary" @click="invoiceReminderDialog = true">打开开票弹框</el-button>
     <GroupSelector v-model:visible="groupSelector" v-if="groupSelector" />
     <InvoiceReminderDialog v-model:open="invoiceReminderDialog" v-if="invoiceReminderDialog" />
+    <el-button @click="goLink">跳转</el-button>
   </div>
 </template>
 <script setup lang="ts">
 import { useGlobalStore } from '@/store'
+import { useRouter } from 'vue-router'
 // import { showGlobalLoading, download } from '@/api/example.ts'
 // 当store中的多个参数需要被使用到的时候，为了更简洁的使用这些变量，采用结构的方式一次性获取所有的变量名
 // ES传统方式解构(能获取到值，但是不具有响应性)
@@ -36,6 +38,10 @@ const addCount = () => {
   store.count++
   // 通过store.方法名来调用action中的方法
   store.changeState()
+}
+const router = useRouter()
+const goLink = () => {
+  router.push('settlement#/bill')
 }
 </script>
 <style lang="less" scoped>

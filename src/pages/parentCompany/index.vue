@@ -20,7 +20,7 @@
 <style lang="less" scoped>
 .parent-company {
   display: flex;
-  padding: 12px;
+  padding: 0 12px 12px;
   .left-container {
     width: 25%;
     margin-right: 12px;

@@ -44,3 +44,38 @@ export const INVOICE_TYPE = new Map([
   [1, '纸质发票(票根)'],
   [2, '电子发票(专票)']
 ])
+
+export const BILL_CATEGORY = new Map([
+  ['totalPrice', { label: '本期消费', field: 'totalPrice', type: 1 }],
+  ['lastPeriodPayable', { label: '上期未结', field: 'lastPeriodPayable', type: 2 }],
+  ['dissentAmount', { label: '本期异议', field: 'dissentAmount', type: 3 }],
+  ['unRetrievedAmount', { label: '未取回票据', field: 'unRetrievedAmount', type: 4 }],
+  ['overPeriodRefundAmount', { label: '跨帐期退', field: 'overPeriodRefundAmount', type: 5 }],
+  ['payable', { label: '本期应结', field: 'payable', type: 10 }]
+])
+
+export const ORDER_STATUS_TYPE = new Map([
+  [0, '预订'],
+  [1, '改签'],
+  [2, '退票']
+])
+
+export const SETTLEMENT_TYPE = new Map([
+  [0, '未知'],
+  [1, '预存'],
+  [2, '授信'],
+  [3, '银行承兑'],
+  [4, '企业码单位代付'],
+  [5, '单结']
+])
+
+export const SETTLEMENT_DIMENSION = new Map([
+  [0, '未知'],
+  [1, '支付'],
+  [2, '行程结束']
+])
+
+export const YES_OR_NO = new Map([
+  [0, '否'],
+  [1, '是']
+])

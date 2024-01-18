@@ -52,7 +52,8 @@
             </el-button>
             <el-button
               type="primary"
-              v-if="typeof detail.settlementStatus === 'number' && detail.settlementStatus > 6">
+              v-if="typeof detail.settlementStatus === 'number' && detail.settlementStatus > 6"
+              @click="goLink(3)">
               查看发票
             </el-button>
           </div>
@@ -691,11 +692,18 @@ const emit = defineEmits(['switchTab'])
 const goLink = (type: number) => {
   if (type === 1) {
     const periodId = billPeriodList.value[activeIndex.value].periodId
+    const enterpriseId = billPeriodList.value[activeIndex.value].enterpriseId
     router.push({
-      path: `/bill/details/${periodId}`
+      path: `/bill/details`,
+      query: { periodId, enterpriseId }
     })
   } else if (type === 2) {
     emit('switchTab', 'second')
+  } else if (type === 3) {
+    const periodId = billPeriodList.value[activeIndex.value].periodId
+    router.push({
+      path: `/invoice/history/${periodId}`
+    })
   }
 }
 </script>
