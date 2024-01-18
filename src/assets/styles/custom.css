@@ -90,6 +90,12 @@
 .col {
   flex-direction: column;
 }
+.ellipsis{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all;
+}
 shrink-0 {
   flex-shrink: 0;
 }

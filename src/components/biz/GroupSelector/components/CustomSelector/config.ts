@@ -2,7 +2,10 @@ export const treeConfig = {
   nodeKey: 'Id',
   props: {
     label: 'Name',
-    children: 'ChildDepartmentList'
+    children: 'ChildDepartmentList',
+    isLeaf: (data: any) => {
+      return data.Type === 'person'
+    }
   }
 }
 

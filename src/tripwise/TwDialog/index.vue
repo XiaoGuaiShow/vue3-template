@@ -8,7 +8,7 @@
       :close-on-press-escape="false">
       <slot name="header">
         <div class="dialog-header">
-          <span>{{ $attrs.title }}</span>
+          <span>{{ $attrs.name }}</span>
           <el-icon class="close-icon" @click="handleCancel">
             <Close />
           </el-icon>
