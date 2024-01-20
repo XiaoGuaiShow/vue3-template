@@ -2,12 +2,12 @@
   <div class="container">
     <div class="section">
       <div class="flex ai-c jc-sb">
-        <el-select v-model="value" placeholder="请选择">
+        <el-select v-model="activeContractId" placeholder="请选择">
           <el-option
             v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value" />
+            :key="item.id"
+            :label="item.paperCode"
+            :value="item.id" />
         </el-select>
         <div class="link">合同预览</div>
       </div>
@@ -17,35 +17,39 @@
         <div class="flex-box">
           <div class="text-form">
             <div class="label">结算方式</div>
-            <div class="value">授信</div>
+            <div class="value">
+              {{ SETTLEMENT_TYPE.get(details.contractSettlement.settlementType) }}
+            </div>
           </div>
           <div class="text-form">
             <div class="label">结算账期</div>
-            <div class="value">非自然月（上月24号-本月23号)</div>
+            <div class="value">{{ details.contractSettlement.settlementPeriodDesc }}</div>
           </div>
           <div class="text-form">
             <div class="label">授信额度</div>
-            <div class="value">100000</div>
+            <div class="value">{{ details.contractSettlement.quota }}</div>
           </div>
           <div class="text-form">
             <div class="label">结算单维度</div>
-            <div class="value">行程结束</div>
+            <div class="value">
+              {{ SETTLEMENT_DIMENSION.get(details.contractSettlement.dimension) || '--' }}
+            </div>
           </div>
           <div class="text-form">
             <div class="label">合同开始</div>
-            <div class="value">2023/12/31</div>
+            <div class="value">{{ details.contractSettlement.startDate || '--' }}</div>
           </div>
           <div class="text-form">
             <div class="label">合同结束</div>
-            <div class="value">2024/12/31</div>
+            <div class="value">{{ details.contractSettlement.endDate || '--' }}</div>
           </div>
           <div class="text-form">
             <div class="label">最晚回款日</div>
-            <div class="value">15 号（授信45天）</div>
+            <div class="value">{{ details.contractSettlement.latestPaymentDateDesc || '--' }}</div>
           </div>
           <div class="text-form">
             <div class="label">签约主体</div>
-            <div class="value">思客信息、思客国旅、大管家</div>
+            <div class="value">{{ details.contractSettlement.contractSignMain || '--' }}</div>
           </div>
         </div>
         <div class="flex">
@@ -54,19 +58,19 @@
             <div class="flex-box">
               <div class="text-form">
                 <div class="label">开票维度</div>
-                <div class="value">按预订人员所属发票抬头开票</div>
+                <div class="value">{{ details.dimension.dimensionName || '--' }}</div>
               </div>
             </div>
           </div>
           <div class="flex-1">
             <div class="block-title flex ai-c jc-sb">
               结算员信息
-              <div class="link">编辑</div>
+              <div class="link" @click="visible = true">编辑</div>
             </div>
             <div class="flex-box">
               <div class="text-form">
                 <div class="label">结算员</div>
-                <div class="value">张三</div>
+                <div class="value">{{ details.accountUser.memberName || '--' }}</div>
               </div>
             </div>
           </div>
@@ -75,14 +79,14 @@
     </div>
 
     <div class="section mt-12">
-      <el-tabs v-model="activeName" @tab-click="handleClick">
+      <el-tabs v-model="activeName">
         <el-tab-pane label="收费信息" name="first">
-          <div v-for="(item, index) in chargeInfos" :key="index">
+          <div v-for="item in chargeInfos" :key="item.key">
             <div class="block-title">{{ item.label }}</div>
             <div class="flex wrap inner-box mt-12">
-              <div class="text-form" v-for="(item2, index2) in item.children" :key="index2">
+              <div class="text-form" v-for="item2 in item.children" :key="item2.key">
                 <div class="label">{{ item2.label }}</div>
-                <div class="value">{{ item2.value || '--' }}</div>
+                <div class="value">{{ computedQuota(item.key, item2.key) }}</div>
               </div>
             </div>
           </div>
@@ -111,251 +115,396 @@
       </el-tabs>
     </div>
   </div>
+  <GroupSelector
+    v-if="visible"
+    :popSelectType="2"
+    @onOk="handleInnerDialogConfirm"
+    @update:visible="(e) => (visible = e)" />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { TabsPaneContext } from 'element-plus'
+import { getContractList, getContractDetails, saveSettlementUser } from '@/api/rules'
+import { SETTLEMENT_TYPE, SETTLEMENT_DIMENSION, YES_OR_NO, PRODUCT_TYPE } from '@/common/static'
+import GroupSelector from '@/components/biz/GroupSelector/index.vue'
+import { ElMessage } from 'element-plus'
 
-const value = ref('')
-const options = ref([
-  { value: 1, label: '合同编号123456' },
-  { value: 2, label: '差旅打印合同' }
-])
-
-const activeName = ref('first')
-const handleClick = (tab: TabsPaneContext, event: Event) => {
-  console.log(tab, event)
+const visible = ref(false)
+const settleMembers = ref<any[]>([])
+interface OptionItem {
+  id: string
+  paperCode: string
 }
-
-const chargeInfos = ref([
-  {
-    label: '国内酒店',
-    key: '酒店',
-    children: [
-      { label: '预订服务费(线上)', key: 'BookingServerPrice', value: '' },
-      { label: '预订服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '退订服务费(线上)', key: 'BookingServerPrice', value: '' },
-      { label: '退订服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '集团托管服务费', key: 'BookingServerPrice', value: '' },
-      { label: '集团托管服务费', key: 'BookingServerPrice', value: '' }
-    ]
-  },
-  {
-    label: '国际酒店',
-    key: '国际酒店',
-    children: [
-      { label: '预订服务费(线上)', key: 'BookingServerPrice', value: '' },
-      { label: '预订服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '退订服务费(线上)', key: 'BookingServerPrice', value: '' },
-      { label: '退订服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '集团托管服务费', key: 'BookingServerPrice', value: '1000' },
-      { label: '集团托管服务费', key: 'BookingServerPrice', value: '' }
-    ]
-  },
-  {
-    label: '国内机票',
-    key: '国内机票',
-    children: [
-      { label: '预订服务费(线上)', key: 'BookingServerPrice', value: '' },
-      { label: '预订服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '改签服务费(线上)', key: 'BookingServerPrice', value: '' },
-      { label: '改签服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '退票服务费', key: 'BookingServerPrice', value: '' },
-      { label: '退票服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '托管服务费', key: 'BookingServerPrice', value: '' },
-      { label: '行程单打印费', key: 'BookingServerPrice', value: '' }
-    ]
-  },
-  {
-    label: '国际机票',
-    key: '国际机票',
-    children: [
-      { label: '预订服务费(线上)', key: 'BookingServerPrice', value: '' },
-      { label: '预订服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '改签服务费(线上)', key: 'BookingServerPrice', value: '' },
-      { label: '改签服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '退票服务费', key: 'BookingServerPrice', value: '' },
-      { label: '退票服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '托管服务费', key: 'BookingServerPrice', value: '' },
-      { label: '行程单打印费', key: 'BookingServerPrice', value: '' }
-    ]
-  },
-  {
-    label: '火车票',
-    key: '火车票',
-    children: [
-      { label: '预订服务费(线上)', key: 'BookingServerPrice', value: '' },
-      { label: '预订服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '改签服务费(线上)', key: 'BookingServerPrice', value: '' },
-      { label: '改签服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '退票服务费', key: 'BookingServerPrice', value: '' },
-      { label: '退票服务费(线下)', key: 'BookingServerPrice', value: '' },
-      { label: '火车票代取费', key: 'BookingServerPrice', value: '' }
-    ]
-  },
-  {
-    label: '用车',
-    key: '用车',
-    children: [
-      { label: '预订服务费(线上)', key: 'BookingServerPrice', value: '' },
-      { label: '托管服务费', key: 'BookingServerPrice', value: '' }
-    ]
-  },
-  {
-    label: '外卖',
-    key: '外卖',
-    children: [{ label: '预订服务费(线上)', key: 'BookingServerPrice', value: '' }]
-  },
-  {
-    label: '商务卡',
-    key: '商务卡',
-    children: [{ label: '支付服务费', key: 'BookingServerPrice', value: '' }]
-  },
-  {
-    label: '公共',
-    key: '公共',
-    children: [
-      { label: '垫资费', key: 'BookingServerPrice', value: '' },
-      { label: '滞纳金', key: 'BookingServerPrice', value: '' }
-    ]
+const options: Ref<OptionItem[]> = ref([])
+const activeContractId = ref('')
+getContractList().then((res) => {
+  if (res.code === '0000') {
+    if (res.data?.length) {
+      options.value = res.data
+      activeContractId.value = res.data[0].id
+      getDetails(activeContractId.value)
+    }
   }
-])
+})
 
+const loading = ref(false)
+const details: any = reactive({
+  accountUser: {},
+  contractSettlement: {
+    settlementType: 0,
+    quota: 0,
+    settlementPeriodDesc: '',
+    dimension: '--',
+    startDate: '--',
+    endDate: '--'
+  },
+  dimension: {}
+})
 const giveInfos = ref([
   {
     label: '国内酒店',
-    key: '酒店',
+    key: 1,
     children: [
       {
         label: '集团托管',
-        key: 'BookingServerPrice',
-        value: '10000元（剩余10000元）'
+        key: 11,
+        value: ''
       },
       {
         label: '单体托管',
-        key: 'BookingServerPrice',
-        value: '8000元（剩余8000元）'
+        key: 12,
+        value: ''
       },
       {
         label: '满减券',
-        key: 'BookingServerPrice',
-        value: ' 8000元（剩余8000元）'
+        key: 13,
+        value: ''
       }
     ]
   },
   {
     label: '国内机票',
-    key: '国内机票',
+    key: 5,
     children: [
       {
         label: '航空意外险',
-        key: 'BookingServerPrice',
-        value: '100张（剩余100张）'
+        key: 51,
+        value: ''
       },
       {
         label: '航班延误险',
-        key: 'BookingServerPrice',
-        value: '100张（剩余100张）'
+        key: 52,
+        value: ''
       },
       {
         label: '协议托管',
-        key: 'BookingServerPrice',
-        value: ' 8000元（剩余8000元）'
+        key: 53,
+        value: ''
       },
       {
         label: '行程单打印',
-        key: 'BookingServerPrice',
-        value: '100张（剩余100张）'
+        key: 54,
+        value: ''
       },
       {
         label: '满减券',
-        key: 'BookingServerPrice',
-        value: '8000元（剩余8000元）'
+        key: 55,
+        value: ''
       }
     ]
   },
   {
     label: '火车票',
-    key: '火车票',
+    key: 6,
     children: [
       {
         label: '旅行意外险',
-        key: 'BookingServerPrice',
-        value: ' 800元（剩余800元）'
+        key: 61,
+        value: ''
       },
       {
         label: '免登录购票',
-        key: 'BookingServerPrice',
-        value: '100张（剩余100张）'
+        key: 62,
+        value: ''
       },
       {
         label: '免核验购票',
-        key: 'BookingServerPrice',
-        value: '100张（剩余100张）'
+        key: 63,
+        value: ''
       },
       {
         label: '极速出票',
-        key: 'BookingServerPrice',
-        value: ' 800元（剩余800元）'
+        key: 64,
+        value: ''
       },
       {
         label: '火车票代取',
-        key: 'BookingServerPrice',
-        value: '100张（剩余100张）'
+        key: 65,
+        value: ''
       }
     ]
   },
   {
     label: '用车',
-    key: '用车',
+    key: 7,
     children: [
       {
         label: '协议托管',
-        key: 'BookingServerPrice',
-        value: ' 8000元（剩余8000元）'
+        key: 71,
+        value: ''
       }
     ]
   },
   {
     label: '系统对接',
-    key: '系统对接',
+    key: 50,
     children: [
       {
         label: '开发费用',
-        key: 'BookingServerPrice',
-        value: '10000元（剩余10000元）'
+        key: 501,
+        value: ''
       },
       {
         label: '标准实施',
-        key: 'BookingServerPrice',
-        value: '8000元（剩余8000元）'
+        key: 502,
+        value: ''
       }
     ]
   },
   {
     label: '公共',
-    key: '公共',
+    key: 51,
     children: [
       {
         label: 'SaaS返还',
-        key: 'BookingServerPrice',
-        value: '10000元（剩余10000元）'
+        key: 511,
+        value: ''
       },
       {
         label: '使用月数',
-        key: 'BookingServerPrice',
-        value: '9个月（剩余9个月）'
+        show: true,
+        key: 'months',
+        value: ''
       },
-      { label: '适用范围', key: 'BookingServerPrice', value: '酒店、机票' }
+      { label: '适用范围', key: 'range', show: true, value: '' }
     ]
   },
   {
     label: '跨合同顺延',
-    key: '跨合同顺延',
-    children: [{ label: '是否允许', key: 'BookingServerPrice', value: '不允许' }]
+    key: 'custom_01',
+    show: true,
+    children: [{ label: '是否允许', key: 'isCrossContractExtension', show: true, value: '' }]
   }
 ])
+function getDetails(id: string) {
+  loading.value = true
+  getContractDetails(id).then((res) => {
+    if (res.code === '0000') {
+      if (res.data) {
+        details.accountUser = res.data.accountUser || {}
+        res.data.contractSettlement && (details.contractSettlement = res.data.contractSettlement)
+        details.dimension = res.data.dimension || {}
+        giveInfos.value = filterGiveResults(
+          giveInfos.value,
+          details.contractSettlement.giveMap,
+          details.contractSettlement
+        )
+        // 赋值选中结算员
+        settleMembers.value = [
+          {
+            CustomerId: res.data.accountUser.memberId,
+            Name: res.data.accountUser.memberName
+          }
+        ]
+      }
+    }
+    loading.value = false
+  })
+}
+
+const activeName = ref('first')
+
+const chargeInfos = ref([
+  {
+    label: '国内酒店',
+    key: 1,
+    children: [
+      { label: '预订服务费(线上)', key: 1, value: '' },
+      { label: '预订服务费(线下)', key: -1, value: '' },
+      { label: '退订服务费(线上)', key: 3, value: '' },
+      { label: '退订服务费(线下)', key: -3, value: '' },
+      { label: '集团托管服务费', key: 42, value: '' },
+      { label: '单体托管服务费', key: 41, value: '' }
+    ]
+  },
+  {
+    label: '国际酒店',
+    key: 11,
+    children: [
+      { label: '预订服务费(线上)', key: 1, value: '' },
+      { label: '预订服务费(线下)', key: -1, value: '' },
+      { label: '退订服务费(线上)', key: 3, value: '' },
+      { label: '退订服务费(线下)', key: -3, value: '' },
+      { label: '集团托管服务费', key: 42, value: '' },
+      { label: '单体托管服务费', key: 41, value: '' }
+    ]
+  },
+  {
+    label: '国内机票',
+    key: 5,
+    children: [
+      { label: '预订服务费(线上)', key: 1, value: '' },
+      { label: '预订服务费(线下)', key: -1, value: '' },
+      { label: '改签服务费(线上)', key: 2, value: '' },
+      { label: '改签服务费(线下)', key: -2, value: '' },
+      { label: '退订服务费(线上)', key: 3, value: '' },
+      { label: '退订服务费(线下)', key: -3, value: '' },
+      { label: '托管服务费', key: 4, value: '' },
+      { label: '行程单打印费', key: 5, value: '' }
+    ]
+  },
+  {
+    label: '国际机票',
+    key: 51,
+    children: [
+      { label: '预订服务费(线上)', key: 1, value: '' },
+      { label: '预订服务费(线下)', key: -1, value: '' },
+      { label: '改签服务费(线上)', key: 2, value: '' },
+      { label: '改签服务费(线下)', key: -2, value: '' },
+      { label: '退订服务费(线上)', key: 3, value: '' },
+      { label: '退订服务费(线下)', key: -3, value: '' },
+      { label: '托管服务费', key: 4, value: '' },
+      { label: '行程单打印费', key: 5, value: '' }
+    ]
+  },
+  {
+    label: '火车票',
+    key: 6,
+    children: [
+      { label: '预订服务费(线上)', key: 1, value: '' },
+      { label: '预订服务费(线下)', key: -1, value: '' },
+      { label: '改签服务费(线上)', key: 2, value: '' },
+      { label: '改签服务费(线下)', key: -2, value: '' },
+      { label: '退订服务费(线上)', key: 3, value: '' },
+      { label: '退订服务费(线下)', key: -3, value: '' },
+      { label: '火车票代取费', key: 9, value: '' }
+    ]
+  },
+  {
+    label: '用车',
+    key: 7,
+    children: [
+      { label: '预订服务费(线上)', key: 1, value: '' },
+      { label: '托管服务费', key: 4, value: '' }
+    ]
+  },
+  {
+    label: '外卖',
+    key: 10,
+    children: [{ label: '预订服务费(线上)', key: 1, value: '' }]
+  },
+  {
+    label: '商务卡',
+    key: 100,
+    children: [{ label: '支付服务费', key: 6, value: '' }]
+  },
+  {
+    label: '公共',
+    key: 101,
+    children: [
+      { label: '垫资费', key: 7, value: '' },
+      { label: '滞纳金', key: 8, value: '' }
+    ]
+  }
+])
+
+const computedQuota = computed(() => {
+  const chargeMap = details.contractSettlement.chargeMap
+  return (productType: number, itemId: number) => {
+    if (chargeMap) {
+      const values = chargeMap[productType]
+      if (values && values.length) {
+        const findItem = values.find((item: any) => item.item === itemId)
+        if (findItem) {
+          return findItem.quota
+        }
+      }
+    }
+    return '--'
+  }
+})
+
+function filterGiveResults(staticResults: any, giveMap: any, obj: any) {
+  if (giveMap) {
+    const productTypes = Object.keys(giveMap).map((it) => Number(it))
+    const results = staticResults
+      .filter((item: any) => {
+        return productTypes.includes(item.key) || item.show === true
+      })
+      .map((item: any) => {
+        const itemIds = (giveMap[item.key] || []).map((item2: any) => item2.item)
+        return {
+          ...item,
+          children: item.children
+            .filter((item2: any) => {
+              return itemIds.includes(item2.key) || item2.show === true
+            })
+            .map((item2: any) => {
+              const giveItem = (giveMap[item.key] || []).find(
+                (item3: any) => item3.item === item2.key
+              )
+              const res = {
+                ...item2,
+                value: (giveItem?.quota || '') + (giveItem?.unitDesc || '')
+              }
+              if (item2.key === 'isCrossContractExtension') {
+                res.value = YES_OR_NO.get(obj.isCrossContractExtension)
+              }
+              if (item2.key === 'months') {
+                res.value = obj.months + '个月'
+              }
+              if (item2.key === 'range') {
+                res.value = (obj.productTypes || [])
+                  .map((type: number) => PRODUCT_TYPE.get(type))
+                  .join('、')
+              }
+              return res
+            })
+        }
+      })
+    return results
+  }
+  return []
+}
+
+const handleInnerDialogConfirm = (data: any) => {
+  console.log(data)
+  if (data?.list?.length > 0) {
+    const user = data.list[0]
+    // const enterpriseId = JSON.parse(localStorage.getItem('EnterpriseId') || '{}').data
+    // const userInfo = JSON.parse(localStorage.getItem('EnterpriseId') || '{}').data
+    const params = {
+      // enterpriseId: enterpriseId,
+      // enterpriseName: '',
+      // memberId: 0,
+      // memberIdStr: '',
+      settleMembers: [
+        {
+          jobNo: user.SIId,
+          memberId: user.CustomerId,
+          memberName: user.Name
+        }
+      ]
+      // userName: ''
+    }
+    saveSettlementUser(params).then((res) => {
+      if (res.code === '0000') {
+        ElMessage.success('编辑成功')
+        getDetails(activeContractId.value)
+      }
+    })
+  }
+}
 </script>
 
 <style lang="less" scoped>

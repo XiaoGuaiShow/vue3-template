@@ -25,7 +25,7 @@ export default [
     }
   },
   {
-    path: '/bill/details/:id',
+    path: '/bill/details',
     name: 'BillDetail',
     component: () => import('@/pages/bill/details/index.vue'),
     meta: {

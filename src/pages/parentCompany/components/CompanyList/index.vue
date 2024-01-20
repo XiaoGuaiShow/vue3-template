@@ -5,10 +5,13 @@
     <div class="tree-container">
       <el-tree
         ref="treeRef"
-        node-key="id"
+        node-key="accountEnterpriseId"
         :data="TreeData"
         :props="defaultProps"
         default-expand-all
+        :highlight-current="true"
+        v-loading="loading"
+        :current-node-key="currentNodeKey"
         :filter-node-method="filterNode">
         <template #default="{ data }">
           <span
@@ -26,37 +29,47 @@
 <script setup lang="ts">
 import { accountAllList } from '@/api/modules/parentCompany.ts'
 import { Search } from '@element-plus/icons-vue'
-import { ElTree } from 'element-plus'
+import { ElTree, ElMessage } from 'element-plus'
 import mittBus from '@/utils/mitt.ts'
 
-// 获取公司列表
+const currentNodeKey = ref(0)
 interface Tree {
-  [key: string]: any
+  companyName: string
+  children?: Tree[]
 }
-
+// 获取公司列表
+const loading = ref(false)
 const TreeData = ref<Tree[]>([])
 const getDataList = async () => {
-  try {
-    const res: any = await accountAllList({})
-    const parentList = (res.data || []).filter((f: any) => f.companyType === 1)
-    const childList = (res.data || []).filter((f: any) => f.companyType === 2)
-    const parentObj = {
-      companyName: '母公司',
-      children: parentList,
-      title: true
-    }
-    const childObj = {
-      companyName: '子公司',
-      children: childList,
-      title: true
-    }
-    TreeData.value = [parentObj, childObj]
-    console.log('37========母公司', TreeData.value)
-  } catch (error) {}
+  loading.value = true
+  const res: any = await accountAllList({})
+  const parentList = (res.data || []).filter((f: any) => f.companyType === 1)
+  const childList = (res.data || []).filter((f: any) => f.companyType === 2)
+  const parentObj = {
+    companyName: '母公司',
+    children: parentList,
+    title: true
+  }
+  const childObj = {
+    companyName: '子公司',
+    children: childList,
+    title: true
+  }
+  TreeData.value = [parentObj, childObj]
+  loading.value = false
+  console.log('37========母公司', TreeData.value)
+  // 高亮当前登录企业
+  const enterpriseId = JSON.parse(localStorage.getItem('EnterpriseId') || '{}').data
+  const findItem = res.data.find((f: any) => +f.accountEnterpriseId === +enterpriseId)
+  if (findItem) {
+    currentNodeKey.value = findItem.accountEnterpriseId
+    mittBus.emit('mittGetCompanyInfo', findItem.id)
+  }
+  console.log(currentNodeKey.value)
 }
 getDataList()
 // 点击tree节点
-const handleClickCompany = (data: Tree) => {
+const handleClickCompany = (data: any) => {
   console.log('62========node,data', data.id)
   if (data.id) {
     mittBus.emit('mittGetCompanyInfo', data.id)
@@ -73,7 +86,7 @@ watch(filterText, (val: string) => {
   }
 })
 
-const filterNode = (value: string, TreeData: Tree) => {
+const filterNode = (value: string, TreeData: any) => {
   if (!value) return true
   return TreeData.companyName.includes(value)
 }
@@ -100,6 +113,9 @@ onUnmounted(() => {
   background: var(--bg-white);
   padding: 24px 12px;
   border-radius: 8px;
+  :deep(.el-tree-node__expand-icon.is-leaf) {
+    visibility: hidden;
+  }
   :deep(.el-tree-node__content) {
     .el-tree-node__label {
       color: var(--font-primary);

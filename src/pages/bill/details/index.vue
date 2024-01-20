@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <div class="section flex ai-c">
       <!-- 返回 -->
       <el-link
@@ -11,7 +11,7 @@
         返回
       </el-link>
       <div class="flex-1 ta-c fs-16 fw-600 c-font-primary">
-        苏州思客信息技术有限公司2023-10-01至2023-10-31结算单
+        {{ periodSumDTO.periodName }}
       </div>
       <div>
         <el-button type="primary" plain>导出账单</el-button>
@@ -20,27 +20,12 @@
     </div>
     <div class="section mt-12">
       <div class="fs-20 fw-600 c-font-primary">账单汇总</div>
-      <SummaryExpression class="mt-12"></SummaryExpression>
+      <SummaryExpression class="mt-12" :summary="periodSumDTO"></SummaryExpression>
     </div>
     <div class="section mt-12">
       <el-tabs v-model="activeName">
-        <el-tab-pane label="本期消费" name="first">
-          <OrderTable></OrderTable>
-        </el-tab-pane>
-        <el-tab-pane label="上期未结" name="second">
-          <OrderTable></OrderTable>
-        </el-tab-pane>
-        <el-tab-pane label="本期异议" name="third">
-          <OrderTable name="third"></OrderTable>
-        </el-tab-pane>
-        <el-tab-pane label="未取回票据" name="fourth">
-          <OrderTable name="fourth"></OrderTable>
-        </el-tab-pane>
-        <el-tab-pane label="跨帐期退" name="fifth">
-          <OrderTable></OrderTable>
-        </el-tab-pane>
-        <el-tab-pane label="本期应结" name="sixth">
-          <OrderTable></OrderTable>
+        <el-tab-pane v-for="item in tabs" :key="item.field" :label="item.label" :name="item.field">
+          <OrderTable :dataType="item.type" :enterpriseId="enterpriseId" :periodId="periodId" />
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -51,9 +36,68 @@
 import { ref } from 'vue'
 import OrderTable from './OrderTable.vue'
 import SummaryExpression from '../components/SummaryExpression.vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { getBillPeriodSummary } from '@/api/bill'
+import type { PeriodSumDTO } from '@/pages/bill/types'
+import { BILL_CATEGORY } from '@/common/static'
+// init
 const router = useRouter()
-const activeName = ref('first')
+const route = useRoute()
+const activeName = ref('')
+const query = route.query
+const periodId = ref(query.periodId ? Number(query.periodId) : undefined)
+const enterpriseId = ref(query.enterpriseId ? Number(query.enterpriseId) : undefined)
+interface TabItem {
+  label: string
+  field: string
+  type: number
+}
+const tabs: Ref<TabItem[]> = ref([])
+const loading = ref(false)
+
+// 获取账单汇总信息
+const periodSumDTO: Ref<Partial<PeriodSumDTO>> = ref({
+  periodName: ''
+})
+watchEffect(() => {
+  if (periodId.value && enterpriseId.value) {
+    loading.value = true
+    const params = {
+      enterpriseId: enterpriseId.value,
+      periodId: periodId.value
+    }
+    getBillPeriodSummary(params).then((res) => {
+      console.log(res)
+    })
+    setTimeout(() => {
+      periodSumDTO.value = {
+        totalPrice: 10000, // 本期消费
+        lastPeriodPayable: 12, // 上期未结
+        dissentAmount: 500, // 异议金额
+        unRetrievedAmount: 2500, // 未取回票据
+        overPeriodRefundAmount: 800, // 跨账期改退
+        payable: 4000, // 本期应退
+        periodName: '苏州思客信息技术有限公司2023-10-01至2023-10-31结算单1'
+      }
+      // 初始化tab页签，初始化默认页签
+      tabs.value = generateTabs(periodSumDTO.value)
+      activeName.value = tabs.value.length ? tabs.value[0].field : ''
+      loading.value = false
+    }, 1500)
+  }
+})
+
+function generateTabs(obj: PeriodSumDTO): TabItem[] {
+  const tabs: TabItem[] = []
+  const category = [...BILL_CATEGORY.values()]
+  console.log(category)
+  category.forEach((item) => {
+    if (obj[item.field] || obj[item.field] === 0) {
+      tabs.push(item)
+    }
+  })
+  return tabs
+}
 
 const goBack = () => {
   router.go(-1)

@@ -195,6 +195,7 @@ export interface PeriodSumDTO {
   unRetrievedAmount: number // 未取回票据
   overPeriodRefundAmount: number // 跨账期改退
   payable: number // 本期应结
+  periodName?: string // 账期名称
 }
 
 export interface BillPeriodDetail {
@@ -244,4 +245,14 @@ export interface InvoiceListResult extends Result {
     total: number
     results: InvoiceListItem[]
   }
+}
+
+export interface BillPeriodSummaryDetailParams extends PageVO3 {
+  dataType: number
+  deptId?: number | undefined
+  enterpriseId: number
+  periodId: number
+  productType?: number
+  travelingPerson?: string
+  dissentStatus?: number | undefined
 }

@@ -16,7 +16,8 @@ import type {
   BillPeriodDetailResult,
   BillPeriodSummary,
   InvoiceListParams,
-  InvoiceListResult
+  InvoiceListResult,
+  BillPeriodSummaryDetailParams
 } from '@/pages/bill/types'
 
 export const getExportRecordList = (data: PageVO1): Promise<ExportRecordResult> => {
@@ -135,8 +136,17 @@ export const getBillPeriodSummary = (params: {
 // 获取发票列表
 export const getInvoiceList = (data: InvoiceListParams): Promise<InvoiceListResult> => {
   return axiosInstance({
-    method: 'get',
+    method: 'post',
     url: 'platform-web/settlement/enterprise/period/invoice/records',
+    data
+  })
+}
+
+// 汇总明细接口
+export const getBillPeriodSummaryDetail = (data: BillPeriodSummaryDetailParams): Promise<any> => {
+  return axiosInstance({
+    method: 'post',
+    url: 'platform-web/bill-detail/enterprise/period/order/records',
     data
   })
 }
