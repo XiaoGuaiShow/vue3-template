@@ -2,11 +2,13 @@ import { ResponseOptions } from '@/api/axiosInstance.ts'
 
 // 统一数据格式
 export const formatResponse = (response: ResponseOptions) => {
-  const { code, msg, data, result, rolelist } = lowercaseKeysObject(response.data)
+  const { code, msg, message, data, result, rolelist, arealist } = lowercaseKeysObject(
+    response.data
+  )
   return {
     code,
-    msg,
-    data: data || result || rolelist
+    msg: msg || message,
+    data: data || result || rolelist || arealist
   }
 }
 

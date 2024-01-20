@@ -12,14 +12,12 @@
         :highlight-current="true"
         v-loading="loading"
         :current-node-key="currentNodeKey"
-        :filter-node-method="filterNode">
+        :filter-node-method="filterNode"
+        @node-click="handleClickCompany">
         <template #default="{ data }">
-          <span
-            class="custom-tree-node"
-            :class="data.title ? 'fontWeight' : 'fontNormal'"
-            @click="handleClickCompany(data)">
+          <div class="custom-tree-node" :class="data.title ? 'fontWeight' : 'fontNormal'">
             {{ data.companyName }}
-          </span>
+          </div>
         </template>
       </el-tree>
     </div>
@@ -29,8 +27,10 @@
 <script setup lang="ts">
 import { accountAllList } from '@/api/modules/parentCompany.ts'
 import { Search } from '@element-plus/icons-vue'
-import { ElTree, ElMessage } from 'element-plus'
+import { ElTree } from 'element-plus'
 import mittBus from '@/utils/mitt.ts'
+import { useZimuStore } from '@/store/modules/zimu'
+const zimuStore = useZimuStore()
 
 const currentNodeKey = ref(0)
 interface Tree {
@@ -57,22 +57,21 @@ const getDataList = async () => {
   }
   TreeData.value = [parentObj, childObj]
   loading.value = false
-  console.log('37========母公司', TreeData.value)
   // 高亮当前登录企业
   const enterpriseId = JSON.parse(localStorage.getItem('EnterpriseId') || '{}').data
   const findItem = res.data.find((f: any) => +f.accountEnterpriseId === +enterpriseId)
   if (findItem) {
     currentNodeKey.value = findItem.accountEnterpriseId
     mittBus.emit('mittGetCompanyInfo', findItem.id)
+    zimuStore.setEnterpriseInfo(findItem)
   }
-  console.log(currentNodeKey.value)
 }
 getDataList()
 // 点击tree节点
 const handleClickCompany = (data: any) => {
-  console.log('62========node,data', data.id)
   if (data.id) {
     mittBus.emit('mittGetCompanyInfo', data.id)
+    zimuStore.setEnterpriseInfo(data)
   }
 }
 
@@ -113,9 +112,6 @@ onUnmounted(() => {
   background: var(--bg-white);
   padding: 24px 12px;
   border-radius: 8px;
-  :deep(.el-tree-node__expand-icon.is-leaf) {
-    visibility: hidden;
-  }
   :deep(.el-tree-node__content) {
     .el-tree-node__label {
       color: var(--font-primary);

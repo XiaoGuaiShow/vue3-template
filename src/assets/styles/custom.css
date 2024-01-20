@@ -14,6 +14,9 @@
 .ml-2 {
   margin-left: 2px;
 }
+.ml-4{
+  margin-left: 4px;
+}
 .ml-8 {
   margin-left: 8px;
 }
@@ -31,6 +34,9 @@
 }
 .mt-16 {
   margin-top: 16px;
+}
+.mt-18 {
+  margin-top: 18px;
 }
 .mt-24 {
   margin-top: 24px;

@@ -30,20 +30,40 @@
           <el-input v-model.trim="addForm.bankNo" placeholder="请输入银行账号" clearable />
         </el-form-item>
         <p class="cut-line" v-if="props.showAddressAndScope"></p>
-        <el-form-item label="邮寄地址" prop="" v-if="props.showAddressAndScope">
+        <el-form-item class="mt-18" label="邮寄地址" prop="" v-if="props.showAddressAndScope">
           <span class="mail-address" @click="handleChooseAddress">新增/选择</span>
         </el-form-item>
-        <div class="address-info" v-if="addForm.address">
-          <span>{{ addForm.address }}</span>
-          <span class="c-8C8C8C m-l-10" @click="deleteAddress">
-            <el-icon><CircleClose /></el-icon>
-          </span>
+        <div class="address-info" v-if="mailAddress">
+          <span>{{ mailAddress }}</span>
+          <el-icon class="ml-4" size="16" color="#595959" @click="deleteAddress">
+            <CircleCloseFilled />
+          </el-icon>
         </div>
         <p class="cut-line" v-if="props.showAddressAndScope"></p>
-        <el-form-item label="试用范围" prop="" v-if="props.showAddressAndScope">
+        <el-form-item class="mt-18" label="试用范围" prop="" v-if="props.showAddressAndScope">
           <div class="try-scope">
             <div class="try-tips">维护开具当前发票单位的部门或人员</div>
-            <div class="mail-address">选择范围</div>
+            <div class="mail-address" @click="openGroupSelector">选择范围</div>
+            <div class="mt-12" v-if="addForm.dimensionType === 2">
+              <el-tag
+                class="mr-6 mb-12"
+                v-for="item in addForm.departments"
+                :key="item.deptId"
+                closable
+                @close="deleteItem(addForm.dimensionType, item.deptId)">
+                {{ item.deptName }}
+              </el-tag>
+            </div>
+            <div class="mt-12" v-if="addForm.dimensionType === 1">
+              <el-tag
+                class="mr-6 mb-12"
+                v-for="item in addForm.users"
+                :key="item.memberId"
+                closable
+                @close="deleteItem(addForm.dimensionType, item.memberId)">
+                {{ item.memberName }}
+              </el-tag>
+            </div>
           </div>
         </el-form-item>
       </el-form>
@@ -55,31 +75,62 @@
       </template>
     </el-dialog>
   </div>
+  <AddressListDialog
+    v-if="showAddressListDialog"
+    :activeId="addForm.mailAddressId"
+    @close="showAddressListDialog = false"
+    @on-confirm="confirmChooseAddress" />
+  <!-- 组织架构中选择 -->
+  <GroupSelector
+    v-if="commonVisible"
+    v-model:visible="commonVisible"
+    :popSelectType="popSelectType"
+    :before-list="beforeList"
+    @on-ok="handleSelectConfirm" />
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, defineProps, watch } from 'vue'
+import { ref, reactive, defineProps } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import { saveInvoiceUnit, getInvoiceDetail, getEnterpriseDimension } from '@/api/invoice'
+import { ElMessage } from 'element-plus'
+import { useZimuStore } from '@/store/modules/zimu'
+const zimuStore = useZimuStore()
 
-const props = defineProps({
-  visible: { type: Boolean },
+interface Props {
+  visible: boolean
+  showAddressAndScope?: boolean
+  invoiceId: string | number | undefined
+}
+const props = withDefaults(defineProps<Props>(), {
+  visible: false,
   //是否展示邮件地址和适用范围
-  showAddressAndScope: {
-    type: Boolean,
-    default: true
-  }
+  showAddressAndScope: true,
+  invoiceId: ''
 })
 const emit = defineEmits(['on-close', 'on-confirm'])
 
-const title = ref<string>('新增开票单位')
-watch(
-  () => props.visible,
-  (val) => {
-    if (val) {
-      console.log('visible', val)
+const beforeList = ref<any[]>([])
+const title = props.invoiceId ? '编辑开票单位' : '新增开票单位'
+if (props.invoiceId) {
+  getInvoiceDetail(props.invoiceId).then((res) => {
+    if (res.code === '0000') {
+      if (res.data) {
+        addForm.bankName = res.data.bankName
+        addForm.bankNo = res.data.bankNo
+        addForm.companyAddress = res.data.companyAddress
+        addForm.companyPhone = res.data.companyPhone
+        addForm.invoiceTax = res.data.invoiceTax
+        addForm.invoiceTitle = res.data.invoiceTitle
+        addForm.mailAddressId = res.data.mailAddressId
+        addForm.id = res.data.id
+        addForm.departments = res.data.departments || []
+        addForm.users = res.data.users || []
+        mailAddress.value = res.data.address
+      }
     }
-  }
-)
+  })
+}
 
 interface RuleForm {
   invoiceTitle: string
@@ -88,12 +139,16 @@ interface RuleForm {
   companyPhone: string
   bankName: string
   bankNo: string
-  address: string
   mailAddressId: string
-  // trialScope:string // 试用范围
+  accountId: number | string
+  id?: string | number
+  dimensionType: 1 | 2
+  departments: any[]
+  users: any[]
 }
 
 const addForm = reactive<RuleForm>({
+  accountId: zimuStore.currentEnterprise.id || 0,
   bankNo: '',
   companyAddress: '',
   companyPhone: '',
@@ -101,7 +156,9 @@ const addForm = reactive<RuleForm>({
   invoiceTax: '',
   invoiceTitle: '',
   mailAddressId: '',
-  address: ''
+  dimensionType: 1, // 1人员 2部门
+  departments: [], // 部门集合
+  users: [] // 人员集合
 })
 
 const ruleFormRef = ref<FormInstance>()
@@ -134,22 +191,75 @@ const addRule = reactive<FormRules<RuleForm>>({
   ]
 })
 
+const popSelectType = ref(1) // 1人员 4部门
+getEnterpriseDimension().then((res) => {
+  if (res.code === '0000') {
+    addForm.dimensionType = res.data.dimensionType || 1
+    if (addForm.dimensionType === 1) {
+      popSelectType.value = 1
+    } else if (addForm.dimensionType === 2) {
+      popSelectType.value = 4
+    }
+  }
+})
+const commonVisible = ref(false)
+const openGroupSelector = () => {
+  commonVisible.value = true
+}
+const handleSelectConfirm = (data: any) => {
+  if (data && data.list?.length) {
+    beforeList.value = [...data.list]
+    if (addForm.dimensionType === 1) {
+      addForm.users = data.list.map((item: any) => {
+        return {
+          deptId: item.ParentDepartmentId,
+          jobNo: item.WorkCode,
+          memberId: item.CustomerId,
+          memberName: item.Name
+        }
+      })
+    } else if (addForm.dimensionType === 2) {
+      addForm.departments = data.list.map((item: any) => {
+        return {
+          deptId: item.Id,
+          deptName: item.Name,
+          hasChild: 0
+        }
+      })
+    }
+  }
+}
+const deleteItem = (type: number, id: number) => {
+  if (type === 2) {
+    addForm.departments = addForm.departments.filter((item: any) => item.deptId !== id)
+  } else if (type === 1) {
+    addForm.users = addForm.users.filter((item: any) => item.memberId !== id)
+  }
+}
+
 // 确定
 let btnLoading = ref<boolean>(false)
 const handleConfirm = async () => {
-  if (!ruleFormRef) return
-  try {
-    await ruleFormRef.value?.validate()
-    btnLoading.value = true
-    console.log('142========提交参数', addForm)
-    setTimeout(() => {
-      btnLoading.value = false
-    }, 2000)
-  } catch (err) {
-    btnLoading.value = false
-  }
-
-  emit('on-confirm')
+  if (!ruleFormRef.value) return
+  ruleFormRef.value?.validate((valid) => {
+    if (valid) {
+      btnLoading.value = true
+      const params = props.invoiceId ? { ...addForm, id: props.invoiceId } : addForm
+      saveInvoiceUnit(params)
+        .then((res) => {
+          if (res.code === '0000') {
+            ElMessage.success('保存成功')
+            emit('on-close')
+            emit('on-confirm')
+          } else {
+            ElMessage.error(res.msg)
+          }
+        })
+        .finally(() => {
+          btnLoading.value = false
+        })
+    }
+  })
 }
 
 // 关闭
@@ -158,15 +268,20 @@ const beforeClose = () => {
 }
 
 // 选择邮寄地址
-const addressVisible = ref<boolean>(false)
+const mailAddress = ref('')
+const showAddressListDialog = ref<boolean>(false)
 const handleChooseAddress = () => {
-  addressVisible.value = true
+  showAddressListDialog.value = true
 }
-
+const confirmChooseAddress = (row: any) => {
+  showAddressListDialog.value = false
+  addForm.mailAddressId = row.id
+  mailAddress.value = row.provinceName + row.regionName + row.cityName + row.address
+}
 // 删除邮寄地址
 const deleteAddress = () => {
-  addForm.address = ''
   addForm.mailAddressId = ''
+  mailAddress.value = ''
 }
 </script>
 
@@ -204,11 +319,11 @@ const deleteAddress = () => {
       line-height: 12px;
       color: var(--font-hint);
       margin-bottom: 12px;
+      margin-top: 10px;
     }
   }
   .cut-line {
     border-top: 1px solid var(--line-rest);
-    margin-bottom: 24px;
   }
 }
 </style>

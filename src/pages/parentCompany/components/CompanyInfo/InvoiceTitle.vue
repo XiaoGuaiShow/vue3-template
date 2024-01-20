@@ -9,7 +9,11 @@
       title="选择开票单位">
       <div class="search-action">
         <span class="search-title">开票单位</span>
-        <el-input placeholder="请输入开票单位名称"></el-input>
+        <el-input
+          v-model="params.invoiceTitle"
+          placeholder="请输入开票单位名称"
+          clearable
+          @change="getTableList"></el-input>
         <div class="add-invoice-title" @click="handleAddInvoice">
           <el-icon><Plus /></el-icon>
           <span>新增开票单位</span>
@@ -18,36 +22,37 @@
       <el-table
         ref="multipleTableRef"
         :data="tableData"
-        :border="true"
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-        :header-cell-style="{
-          'background-color': '#E7EDF2',
-          'font-weight': 600,
-          color: '#141414'
-        }">
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="date" label="开票单位" show-overflow-tooltip />
-        <el-table-column prop="name" label="发票税号" show-overflow-tooltip />
-        <el-table-column prop="address" label="公司地址" show-overflow-tooltip />
-        <el-table-column prop="address" label="公司电话" show-overflow-tooltip />
-        <el-table-column prop="address" label="开户银行" show-overflow-tooltip />
-        <el-table-column prop="address" label="银行账号" show-overflow-tooltip />
-        <el-table-column prop="address" label="操作" align="center" width="100">
-          <template #default="scope">
+        stripe
+        border
+        v-loading="loading"
+        max-height="240"
+        @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="55" align="center" />
+        <el-table-column prop="invoiceTitle" label="开票单位" show-overflow-tooltip />
+        <el-table-column prop="invoiceTax" label="发票税号" show-overflow-tooltip />
+        <el-table-column prop="companyAddress" label="公司地址" show-overflow-tooltip />
+        <el-table-column prop="companyPhone" label="公司电话" show-overflow-tooltip />
+        <el-table-column prop="bankName" label="开户银行" show-overflow-tooltip />
+        <el-table-column prop="bankNo" label="银行账号" show-overflow-tooltip />
+        <el-table-column label="操作" align="center" width="120">
+          <template #default="{ row }">
             <div class="table-action">
-              <span @click="handleEditInvoice(scope.row)">编辑</span>
-              <span>删除</span>
+              <span class="link-btn" @click="handleEditInvoice(row)">编辑</span>
+              <span class="link-btn ml-12" @click="handleDelete(row)">删除</span>
             </div>
           </template>
         </el-table-column>
       </el-table>
-      <div class="table-page">
+      <div class="flex jc-sb ai-c mt-16">
+        <div class="fs-12 fw-600 c-font-primary"></div>
         <el-pagination
-          v-model:current-page="searchData.currentIndex"
-          v-model:page-size="searchData.pageSize"
-          layout="total,prev, pager, next, jumper"
-          :total="searchData.total"
+          v-model:current-page="pageVO.currentIndex"
+          v-model:page-size="pageVO.pageSize"
+          small
+          :page-sizes="[5, 10, 20, 50, 100]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+          @size-change="handleSizeChange"
           @current-change="handleCurrentChange" />
       </div>
       <template #footer>
@@ -59,53 +64,55 @@
   </div>
   <!-- 新增编辑开票单位 -->
   <AddEditInvoiceTitle
+    v-if="invoiceEditVisible"
     :visible="invoiceEditVisible"
-    @on-close="invoiceEditVisible = false"></AddEditInvoiceTitle>
+    :invoiceId="invoiceId"
+    @on-close="invoiceEditVisible = false"
+    @on-confirm="saveConfirm"></AddEditInvoiceTitle>
 </template>
 
 <script setup lang="ts">
 import { Plus } from '@element-plus/icons-vue'
 import { ElTable } from 'element-plus'
+import { deleteInvoiceUnit, getInvoiceList } from '@/api/invoice'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useZimuStore } from '@/store/modules/zimu'
+
+const zimuStore = useZimuStore()
 
 const props = defineProps({
   visible: { type: Boolean }
 })
 const emit = defineEmits(['on-close', 'on-confirm'])
-
-watch(
-  () => props.visible,
-  (val) => {
-    if (val) {
-      console.log('visible', val)
+const pageVO = reactive({
+  currentIndex: 1,
+  pageSize: 10
+})
+const loading = ref(false)
+const tableData = ref<any[]>([])
+const params = reactive({
+  accountId: zimuStore.currentEnterprise?.id,
+  invoiceTitle: ''
+})
+const total = ref(0)
+function getTableList() {
+  loading.value = true
+  getInvoiceList({
+    ...pageVO,
+    ...params
+  }).then((res: any) => {
+    if (res.code === '0000') {
+      if (res.data) {
+        tableData.value = res.data?.list || []
+        total.value = res.data.total
+      }
+    } else {
+      ElMessage.error(res.message)
     }
-  }
-)
-const tableData = [
-  {
-    id: 1,
-    date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    id: 2,
-    date: '2016-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    id: 3,
-    date: '2016-05-04',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    id: 4,
-    date: '2016-05-01',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  }
-]
+    loading.value = false
+  })
+}
+getTableList()
 
 // 多选
 const multipleSelection = ref<any[]>([])
@@ -129,30 +136,16 @@ const toggleSelection = (rows?: any[]) => {
   }
 }
 
-// 分页
-const searchData = reactive({
-  invoiceTitle: '',
-  keyword: '',
-  types: [1],
-  pageSize: 10,
-  currentIndex: 1,
-  total: 100
-})
-
 // 页码  测试打钩用
 const handleCurrentChange = (val: number) => {
-  searchData.currentIndex = val
-  if (val === 2) {
-    toggleSelection([tableData[0], tableData[1]])
-  } else if (val === 3) {
-    toggleSelection([tableData[2], tableData[3]])
-  } else if (val === 4) {
-    toggleSelection([tableData[0]])
-  } else {
-    toggleSelection()
-  }
+  pageVO.currentIndex = val
+  getTableList()
 }
-
+const handleSizeChange = (val: number) => {
+  pageVO.pageSize = val
+  pageVO.currentIndex = 1
+  getTableList()
+}
 // 确定
 const handleConfirm = () => {
   emit('on-confirm')
@@ -165,13 +158,35 @@ const beforeClose = () => {
 
 // 发票新增编辑
 const invoiceEditVisible = ref<boolean>(false)
-let invoiceRowInfo = ref<any>({})
+const invoiceId = ref('')
 const handleAddInvoice = () => {
+  invoiceId.value = ''
   invoiceEditVisible.value = true
 }
 const handleEditInvoice = (row: any) => {
+  invoiceId.value = row.id
   invoiceEditVisible.value = true
-  invoiceRowInfo.value = row
+}
+const saveConfirm = () => {
+  getTableList()
+}
+const handleDelete = (row: any) => {
+  ElMessageBox.confirm('是否删除该发票抬头?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
+  }).then(() => {
+    deleteInvoiceUnit(row.id).then((res) => {
+      if (res.code === '0000') {
+        ElMessage.success('删除成功')
+        if (tableData.value.length === 1) {
+          pageVO.currentIndex = 1
+        }
+        getTableList()
+      } else {
+        ElMessage.error(res.msg || '删除失败')
+      }
+    })
+  })
 }
 </script>
 
@@ -210,20 +225,6 @@ const handleEditInvoice = (row: any) => {
       }
     }
   }
-  .table-action {
-    display: flex;
-    align-items: center;
-    color: var(--brand-blue);
-    font-size: 12px;
-    span {
-      margin-right: 4px;
-      padding: 6px 4px;
-      cursor: pointer;
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-  }
   .table-page {
     margin-top: 16px;
     display: flex;
@@ -247,5 +248,9 @@ const handleEditInvoice = (row: any) => {
       }
     }
   }
+}
+.link-btn {
+  color: var(--brand-blue);
+  cursor: pointer;
 }
 </style>

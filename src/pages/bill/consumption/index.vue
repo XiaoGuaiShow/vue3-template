@@ -3,11 +3,12 @@
     <el-form :inline="true" :model="formInline">
       <el-form-item label="交易日期">
         <el-date-picker
-          v-model="formInline.dateRange"
+          v-model="dateRange"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
-          end-placeholder="结束日期" />
+          end-placeholder="结束日期"
+          @change="dateRangeChange" />
       </el-form-item>
       <el-form-item label="产品类型">
         <el-select
@@ -48,7 +49,7 @@
       </el-form-item>
     </el-form>
 
-    <el-table class="mt-6" :data="tableData" stripe border max-height="280">
+    <el-table class="mt-6" :data="tableData" stripe border max-height="280" v-loading="loading">
       <el-table-column prop="name" label="订单编号" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="link">{{ row.number }}</span>
@@ -85,12 +86,12 @@
         <span>合计 ¥9000.00</span>
       </div>
       <el-pagination
-        v-model:current-page="currentPage4"
-        v-model:page-size="pageSize4"
+        v-model:current-page="pageVO.pageIndex"
+        v-model:page-size="pageVO.pageSize"
         small
         :page-sizes="[5, 10, 20, 50, 100]"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400"
+        :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange" />
     </div>
@@ -100,12 +101,9 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
 import type { TableItem } from '../types'
-const formInline = reactive({
-  dateRange: '',
-  productType: 0,
-  status: '',
-  name: ''
-})
+import { getConsumptionData } from '@/api/bill'
+import { ElMessage } from 'element-plus'
+
 const onSubmit = () => {
   console.log('submit!')
 }
@@ -139,17 +137,58 @@ const tableData = ref([
     way: '授信账户'
   }
 ])
+const dateRange = ref<any>([])
+const loading = ref(true)
+const pageVO = reactive({
+  pageIndex: 1,
+  pageSize: 10
+})
+const total = ref(0)
+const formInline = reactive({
+  periodStartDate: '',
+  periodEndDate: '',
+  productType: ['全部'],
+  deptId: '',
+  travelingPerson: '',
+  enterpriseId: ''
+})
+
+const totalPrice = ref(0)
+function getTableData() {
+  loading.value = true
+  getConsumptionData({
+    ...formInline,
+    ...pageVO
+  })
+    .then((res) => {
+      if (res.code === '0000') {
+        if (res.data?.results) {
+          tableData.value = res.data.results
+          total.value = res.data.total
+          totalPrice.value = res.data.totalPrice
+        }
+      } else {
+        ElMessage.error(res.msg)
+      }
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+getTableData()
+
 const handleExport = (row: TableItem) => {
   console.log(row)
 }
 
-const currentPage4 = ref(4)
-const pageSize4 = ref(10)
 const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`)
+  pageVO.pageSize = val
+  pageVO.pageIndex = 1
+  getTableData()
 }
 const handleCurrentChange = (val: number) => {
-  console.log(`current page: ${val}`)
+  pageVO.pageIndex = val
+  getTableData()
 }
 
 const options = [
