@@ -16,6 +16,14 @@ export function useRoleList(defaultSelected: any[], extra: any[], selectedAll: a
     selectedAll,
     propsName
   )
+  const roleConfig = reactive({
+    name: propsName.name,
+    type: 'checkbox',
+    label,
+    data: filterList,
+    checkList: selectedList,
+    emitCheckboxChangeEvent: 'roleChange'
+  })
 
   function fetchData() {
     GetRoleList().then((res: any) => {
@@ -25,14 +33,7 @@ export function useRoleList(defaultSelected: any[], extra: any[], selectedAll: a
   }
 
   return {
-    roleConfig: {
-      name: propsName.name,
-      type: 'checkbox',
-      label,
-      data: filterList,
-      checkList: selectedList,
-      emitCheckboxChangeEvent: 'roleChange'
-    },
+    roleConfig,
     getRoleList: fetchData,
     handleRoleSearch: search,
     handleRoleChange: change,

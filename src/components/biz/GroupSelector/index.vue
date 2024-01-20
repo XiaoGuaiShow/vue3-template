@@ -268,7 +268,7 @@ const searchExtraData = (searchKey: string, name: string) => {
     role: handleRoleSearch,
     travel: handleTravelSearch,
     reasonCode: handleReasonCodeSearch
-  }
+  } as any
   map[name](searchKey)
 }
 
@@ -277,7 +277,7 @@ const deleteExtraData = (item: any) => {
     role: handleRoleDeleteByItem,
     travel: handleTravelDeleteByItem,
     reasonCode: handleReasonCodeDeleteByItem
-  }
+  } as any
   map[item.Type](item)
 }
 
