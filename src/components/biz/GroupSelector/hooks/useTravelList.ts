@@ -16,6 +16,14 @@ export function useTravelList(defaultSelected: any[], extra: any[], selectedAll:
     selectedAll,
     propsName
   )
+  const travelConfig = reactive({
+    name: propsName.name,
+    type: 'checkbox',
+    label,
+    data: filterList,
+    checkList: selectedList,
+    emitCheckboxChangeEvent: 'travelChange'
+  })
 
   function fetchData() {
     GetEnterpriseRoleSurvey().then((res: any) => {
@@ -27,14 +35,7 @@ export function useTravelList(defaultSelected: any[], extra: any[], selectedAll:
   }
 
   return {
-    travelConfig: {
-      name: propsName.name,
-      type: 'checkbox',
-      label,
-      data: filterList,
-      checkList: selectedList,
-      emitCheckboxChangeEvent: 'travelChange'
-    },
+    travelConfig,
     getTravelList: fetchData,
     handleTravelSearch: search,
     handleTravelChange: change,

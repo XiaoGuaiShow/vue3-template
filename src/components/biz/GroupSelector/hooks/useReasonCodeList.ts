@@ -16,6 +16,18 @@ export function useReasonCodeList(defaultSelected: any[], extra: any[], selected
     selectedAll,
     propsName
   )
+  const reasonCodeConfig = reactive({
+    name: propsName.name,
+    type: 'checkbox',
+    label,
+    data: filterList,
+    checkList: selectedList,
+    emitCheckboxChangeEvent: 'reasonCodeChange',
+    props: {
+      label: 'Name',
+      key: 'Id'
+    }
+  })
 
   function fetchData() {
     GetCostTypeList({
@@ -35,18 +47,7 @@ export function useReasonCodeList(defaultSelected: any[], extra: any[], selected
   }
 
   return {
-    reasonCodeConfig: {
-      name: propsName.name,
-      type: 'checkbox',
-      label,
-      data: filterList,
-      checkList: selectedList,
-      emitCheckboxChangeEvent: 'reasonCodeChange',
-      props: {
-        label: 'Name',
-        key: 'Id'
-      }
-    },
+    reasonCodeConfig,
     getReasonCodeList: fetchData,
     handleReasonCodeSearch: search,
     handleReasonCodeChange: change,

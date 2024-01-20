@@ -37,7 +37,7 @@ export function useDefaultList(
       selectedAll.splice(indexAll, 1)
     }
 
-    const indexToRemove = selectedList.findIndex((a: any) => String(a[propsName.idKey]) === idKey)
+    const indexToRemove = selectedList.findIndex((a: any) => String(a) === idKey)
     if (indexToRemove !== -1) {
       selectedList.splice(indexToRemove, 1)
     }
