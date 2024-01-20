@@ -670,6 +670,12 @@ function deleteSelected(item: any) {
     }
     setTreeChecked(id, false)
   }
+  let findIndex = selectedList.value.findIndex((x) => {
+    return String(x.Name) === String(item.Name)
+  })
+  if (findIndex !== -1) {
+    selectedList.value.splice(findIndex, 1)
+  }
 }
 
 async function handleSearch({ searchKey, tabType, name }: any) {
@@ -682,8 +688,18 @@ async function handleSearch({ searchKey, tabType, name }: any) {
       RequestType: searchType
     })
     const data = res.data as any
-    const personList = data.StuffList.map((item: any) => (item.Type = 'person'))
-    const departmentList = data.DepartmentList.map((item: any) => (item.Type = 'department'))
+    const personList = data.StuffList.map((item: any) => {
+      return {
+        ...item,
+        Type: 'person'
+      }
+    })
+    const departmentList = data.DepartmentList.map((item: any) => {
+      return {
+        ...item,
+        Type: 'department'
+      }
+    })
     searchStuffList.value = personList.concat(departmentList)
   }
 }
