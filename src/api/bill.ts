@@ -150,3 +150,12 @@ export const getBillPeriodSummaryDetail = (data: BillPeriodSummaryDetailParams):
     data
   })
 }
+
+// 消费数据
+export const getConsumptionData = (data: any): Promise<any> => {
+  return axiosInstance({
+    method: 'post',
+    url: 'platform-web/settlement/enterprise/order/records',
+    data
+  })
+}

@@ -79,11 +79,20 @@
       </template>
     </el-dialog>
     <!-- 组织架构中选择 -->
+    <GroupSelector
+      v-if="staffListVisable"
+      v-model:visible="staffListVisable"
+      :popSelectType="2"
+      :showSettlementMember="true"
+      :before-list="beforeList"
+      @on-ok="handleSelectConfirm" />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { FormInstance, FormRules } from 'element-plus'
+import { getReminder, saveReminder } from '@/api/modules/parentCompany.ts'
+import { ElMessage } from 'element-plus'
 const props = defineProps({
   visible: {
     type: Boolean,
@@ -107,6 +116,7 @@ const emit = defineEmits(['on-close', 'on-confirm'])
 watch(
   () => props.visible,
   (val) => {
+    console.log(1111, val)
     if (val) {
       if (props.enterpriseId) {
         getInfo() // 详情
@@ -177,40 +187,42 @@ const typeList = ref([
   }
 ])
 
-// const resetForm = () => {
-// 	ruleFormRef.value?.clearValidate()
-// 	ruleFormRef.value?.resetFields()
-// 	balanceForm.modelType = null
-// 	balanceForm.reminderBalance = 0
-// 	balanceForm.reminderInterval = 0
-// 	balanceForm.userInfos = []
-// }
+const handleSelectConfirm = (data: any) => {
+  if (data && data.list) {
+    balanceForm.userInfos = data.list || []
+  }
+}
+
+const resetForm = () => {
+  ruleFormRef.value?.clearValidate()
+  ruleFormRef.value?.resetFields()
+  balanceForm.modelType = null
+  balanceForm.reminderBalance = 0
+  balanceForm.reminderInterval = 0
+  balanceForm.userInfos = []
+}
 // 获取配置详情
 const getInfo = async () => {
-  // try {
-  // 	const res = await request({
-  // 		apiModule: platformApi.balanceReminderDetail,
-  // 		params: { enterpriseId: props.enterpriseId }
-  // 	})
-  // 	if (res.code == '0000') {
-  // 		if (!res.data) {
-  // 			resetForm()
-  // 		} else {
-  // 			const { modelType, reminderBalance, reminderInterval, userInfos } = res.data
-  // 			balanceForm.modelType = modelType
-  // 			balanceForm.reminderBalance = reminderBalance
-  // 			balanceForm.reminderInterval = reminderInterval
-  // 			balanceForm.userInfos = (userInfos || []).map((m) => ({
-  // 				...m,
-  // 				Name: m.name,
-  // 				Phone: m.phone,
-  // 				CustomerId: m.customerId
-  // 			}))
-  // 		}
-  // 	} else {
-  // 		ElMessage.error(res.message)
-  // 	}
-  // } catch (err) {}
+  getReminder({ enterpriseId: props.enterpriseId }).then((res: any) => {
+    if (res.code === '0000') {
+      if (res.data) {
+        const { modelType, reminderBalance, reminderInterval } = res.data
+        balanceForm.modelType = modelType
+        balanceForm.reminderBalance = reminderBalance
+        balanceForm.reminderInterval = reminderInterval
+        balanceForm.userInfos = (res.data?.userInfos || []).map((m: any) => ({
+          ...m,
+          Name: m.name,
+          Phone: m.phone,
+          CustomerId: m.customerId
+        }))
+      } else {
+        resetForm()
+      }
+    } else {
+      ElMessage.error(res.msg)
+    }
+  })
 }
 
 // 保存确认
@@ -241,24 +253,17 @@ const handleConfirm = async () => {
 // 保存数据
 let btnLoading = ref(false)
 const saveData = async (params: object) => {
-  console.log(params)
-
-  try {
-    btnLoading.value = true
-    // const res = await request({
-    // 	apiModule: platformApi.balanceReminderSave,
-    // 	data: params
-    // })
-    // if (res.code === '0000') {
-    // 	emit('on-confirm')
-    // 	beforeClose()
-    // } else {
-    // 	ElMessage.error(res.message)
-    // }
+  btnLoading.value = true
+  saveReminder(params).then((res: any) => {
+    if (res.code === '0000') {
+      ElMessage.success('保存成功')
+      emit('on-confirm')
+      beforeClose()
+    } else {
+      ElMessage.error(res.message)
+    }
     btnLoading.value = false
-  } catch (err) {
-    btnLoading.value = false
-  }
+  })
 }
 // 删除人
 const handleDeletePerson = (index: number) => {
@@ -267,7 +272,14 @@ const handleDeletePerson = (index: number) => {
 
 // 组织架构选择人员
 const staffListVisable = ref<boolean>(false)
+const beforeList = ref<any[]>([])
 const handleAddPerson = () => {
+  beforeList.value = (balanceForm.userInfos || []).map((m) => {
+    return {
+      ...m,
+      Type: 'person'
+    }
+  })
   staffListVisable.value = true
 }
 

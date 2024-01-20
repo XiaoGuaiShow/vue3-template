@@ -11,7 +11,7 @@
     <el-button type="primary" @click="groupSelector = true">打开组织选择</el-button>
     <el-button type="primary" @click="invoiceReminderDialog = true">打开开票弹框</el-button>
     <el-button type="primary" @click="jumpBillPage">jump</el-button>
-    <GroupSelector v-model:visible="groupSelector" :popSelectType="7" v-if="groupSelector" />
+    <GroupSelector v-model:visible="groupSelector" :popSelectType="5" v-if="groupSelector" />
     <InvoiceReminderDialog v-model:open="invoiceReminderDialog" v-if="invoiceReminderDialog" />
   </div>
 </template>

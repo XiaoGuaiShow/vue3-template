@@ -77,7 +77,7 @@ const goLink = (type: number) => {
   } else if (type === 4) {
     const childSurveys = []
     const hasChild = childSurveys.length > 0
-    router.push('/repayment?hasChild=' + Number(hasChild))
+    router.push('repayment?hasChild=' + Number(hasChild))
   } else if (type === 5) {
     router.push(`/invoice/history?status=1`)
   } else if (type === 6) {

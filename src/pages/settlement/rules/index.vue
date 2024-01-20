@@ -7,9 +7,10 @@
             v-for="item in options"
             :key="item.id"
             :label="item.paperCode"
-            :value="item.id" />
+            :value="item.id"
+            @change="optionChange" />
         </el-select>
-        <div class="link">合同预览</div>
+        <div class="link" @click="download">合同预览</div>
       </div>
 
       <div>
@@ -92,7 +93,7 @@
           </div>
         </el-tab-pane>
         <el-tab-pane label="赠送信息" name="second">
-          <div class="totle-box">
+          <!-- <div class="totle-box">
             <div class="total-box-item left">
               <div class="label">赠送总价值</div>
               <div class="number">￥800000.00</div>
@@ -101,7 +102,7 @@
               <div class="label">剩余价值</div>
               <div class="number">￥10000.00</div>
             </div>
-          </div>
+          </div> -->
           <div v-for="(item, index) in giveInfos" :key="index">
             <div class="block-title">{{ item.label }}</div>
             <div class="flex wrap inner-box mt-12">
@@ -134,14 +135,17 @@ const settleMembers = ref<any[]>([])
 interface OptionItem {
   id: string
   paperCode: string
+  annex: string
 }
 const options: Ref<OptionItem[]> = ref([])
 const activeContractId = ref('')
+const downloadUrl = ref('')
 getContractList().then((res) => {
   if (res.code === '0000') {
     if (res.data?.length) {
       options.value = res.data
       activeContractId.value = res.data[0].id
+      downloadUrl.value = res.data[0].annex
       getDetails(activeContractId.value)
     }
   }
@@ -503,6 +507,20 @@ const handleInnerDialogConfirm = (data: any) => {
         getDetails(activeContractId.value)
       }
     })
+  }
+}
+
+
+const download = () => {
+  if (downloadUrl.value) {
+    window.open(downloadUrl.value, '_blank')
+  }
+}
+
+const optionChange = (val: string) => {
+  const findItem = options.value.find((item) => item.id === val)
+  if (findItem) {
+    downloadUrl.value = findItem.annex
   }
 }
 </script>

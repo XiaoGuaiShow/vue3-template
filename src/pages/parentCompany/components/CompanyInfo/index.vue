@@ -2,7 +2,14 @@
   <div class="company-info" v-loading="loading">
     <div class="flex jc-sb ai-c">
       <div class="title-label">{{ companyInfo.companyName || '-' }}</div>
-      <el-switch v-model="companyStatus" inline-prompt active-text="启用" inactive-text="关闭" />
+      <el-switch
+        v-model="companyInfo.isValid"
+        inline-prompt
+        active-text="启用"
+        inactive-text="关闭"
+        :active-value="1"
+        :inactive-value="0"
+        :before-change="beforeChange" />
     </div>
     <!-- 合作信息 -->
     <div class="box-info">
@@ -72,11 +79,6 @@
       </div>
     </div>
   </div>
-  <!-- 编辑公司 -->
-  <CompanyDialog
-    :visible="commonVisible"
-    :enterpriseId="companyInfo.id"
-    @on-close="commonVisible = false"></CompanyDialog>
   <!-- 设置余额提醒 -->
   <BalanceRemind
     :visible="balanceVisible"
@@ -87,15 +89,27 @@
     @on-confirm="balanceRemindConfirm"></BalanceRemind>
   <!-- 发票单位编辑 -->
   <InvoiceTitle
+    v-if="invoiceVisible"
     :visible="invoiceVisible"
     @on-close="invoiceVisible = false"
     @on-confirm="invoiceTitleConfirm"></InvoiceTitle>
+  <!-- 组织架构中选择 -->
+  <GroupSelector
+    v-if="commonVisible"
+    v-model:visible="commonVisible"
+    :popSelectType="2"
+    :showSettlementMember="true"
+    @on-ok="handleSelectConfirm" />
 </template>
 
 <script setup lang="ts">
-import { accountDetail } from '@/api/modules/parentCompany.ts'
+import { accountDetail, accountValid } from '@/api/modules/parentCompany'
+import { saveSettlementUser } from '@/api/rules'
 import mittBus from '@/utils/mitt.ts'
 import type { CompanyInfo } from '../../types'
+import { ElMessageBox, ElMessage } from 'element-plus'
+import { useZimuStore } from '@/store/modules/zimu'
+const zimuStore = useZimuStore()
 
 // 企业id
 let companyId = ref<string>('')
@@ -124,17 +138,17 @@ const companyInfo = ref<CompanyInfo>({
   settlementOfficer: '',
   settlements: []
 })
-let loading = ref<boolean>(false)
+let loading = ref<boolean>(true)
 const getCompanyInfo = async (id: string) => {
+  loading.value = true
   try {
     loading.value = ref(true).value = true
     const res = await accountDetail({ id })
     const data = res.data as any
     companyInfo.value = data
-    loading.value = ref(true).value = false
-    console.log('124========公司信息', companyInfo)
+    loading.value = false
   } catch (error) {
-    loading.value = ref(true).value = false
+    loading.value = false
   }
 }
 
@@ -156,27 +170,60 @@ const typeFilter = (val: number) => {
 }
 
 // 公司状态
-const companyStatus = ref<boolean>(true)
+const beforeChange = async () => {
+  return new Promise((resolve, reject) => {
+    const stopMsg =
+      '停用之前创建的订单，若需要改签支付，仍会从该账户扣款，退款也会退至此公司。\n确定要停用该公司吗？'
+    const startMsg = '确认启用该子公司?'
+    ElMessageBox.confirm(companyInfo.value.isValid ? stopMsg : startMsg, '提示').then(() => {
+      accountValid({ id: companyInfo.value.id }).then((res: any) => {
+        if (res.code === '0000') {
+          ElMessage.success('操作成功')
+          resolve(true)
+        } else {
+          ElMessage.error(res.msg)
+          reject(false)
+        }
+      })
+    })
+  })
+}
 
 // 公司编辑
 let commonVisible = ref<boolean>(false)
 const handleSettlementEdit = () => {
   commonVisible.value = true
 }
+console.log(zimuStore)
+const handleSelectConfirm = (data: any) => {
+  console.log(data)
+  if (data && data.list) {
+    const params = {
+      settleMembers: [
+        {
+          jobNo: data.list[0].WorkCode,
+          memberId: data.list[0].CustomerId,
+          memberName: data.list[0].Name
+        }
+      ]
+    }
+    saveSettlementUser(params).then((res: any) => {
+      if (res.code === '0000') {
+        ElMessage.success('操作成功')
+        commonVisible.value = false
+        getCompanyInfo(companyId.value)
+      } else {
+        ElMessage.error(res.msg)
+      }
+    })
+  }
+}
 
 // 设置余额提醒
 const balanceVisible = ref<boolean>(false)
-const settlementOfficerInfos = ref<Array<any>>([])
+const settlementOfficerInfos = ref<any[]>([])
 
 const handleBalanceRemind = () => {
-  settlementOfficerInfos.value = (settlementOfficerInfos.value || []).map((m) => {
-    return {
-      ...m,
-      Name: m.name,
-      Phone: m.phone,
-      CustomerId: m.customerId
-    }
-  })
   balanceVisible.value = true
 }
 
@@ -184,7 +231,9 @@ const handleBalanceRemind = () => {
 const balanceRemindConfirm = () => {}
 
 // 跳转充值记录页面
-const goToRechargeRecords = () => {}
+const goToRechargeRecords = () => {
+  window.microApp.getData().pushState('/manage/#/goRecharge?enterpriseId=' + companyInfo.value.id)
+}
 
 // 发票单位编辑
 const invoiceVisible = ref<boolean>(false)
