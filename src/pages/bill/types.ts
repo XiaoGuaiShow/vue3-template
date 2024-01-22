@@ -70,7 +70,7 @@ export interface RechargeRequestParams {
 }
 
 export interface EnterpriseItem {
-  enterpriseId: number
+  enterpriseId: string
   enterpriseName: string
   type: -1 | 0 | 1
 }

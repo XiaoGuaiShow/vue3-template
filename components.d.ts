@@ -57,6 +57,7 @@ declare module 'vue' {
     ElTree: typeof import('element-plus/es')['ElTree']
     GroupSelector: typeof import('./src/components/biz/GroupSelector/index.vue')['default']
     InvoiceAddress: typeof import('./src/pages/parentCompany/components/InvoiceAddress/index.vue')['default']
+    InvoiceHistoryPage: typeof import('./src/pages/invoice/components/InvoiceHistoryPage.vue')['default']
     InvoiceReminderDialog: typeof import('./src/components/biz/InvoiceReminderDialog/index.vue')['default']
     InvoiceTable: typeof import('./src/pages/invoice/components/InvoiceTable.vue')['default']
     InvoiceTitle: typeof import('./src/pages/parentCompany/components/CompanyInfo/InvoiceTitle.vue')['default']

@@ -86,7 +86,7 @@ import { useYearAndCompany } from '../hooks/overview'
 import invoiceImg from '@/assets/images/bill/invoice.png'
 import moneyImg from '@/assets/images/bill/money.png'
 import bpayImg from '@/assets/images/bill/bpay.png'
-import type { EnterpriseItem } from '@/api/types/index'
+import type { EnterpriseItem } from '@/pages/bill/types'
 import { getOverviewDatas } from '@/api/bill'
 import { useBillStore } from '@/store/modules/bill'
 

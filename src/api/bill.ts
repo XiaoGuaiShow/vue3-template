@@ -43,10 +43,13 @@ export const getRechargeList = (data: RechargeRequestParams) => {
   } as RequestConfig)
 }
 // 获取集团公司列表
-export const getCompanyList = (): Promise<EnterpriseResult> => {
+export const getCompanyList = (needSum = true): Promise<EnterpriseResult> => {
   return axiosInstance({
     method: 'get',
-    url: 'platform-web/settlement/year-settlement/enterprises'
+    url: 'platform-web/settlement/year-settlement/enterprises',
+    params: {
+      needSum
+    }
   })
 }
 

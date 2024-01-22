@@ -1,3 +1,4 @@
+import { getInvoiceList } from './bill'
 import axiosInstance from './axiosInstance.ts'
 
 // 获取发票列表
@@ -54,6 +55,14 @@ export const saveSelectedCompanyInvoice = (data: any): Promise<any> => {
   return axiosInstance({
     method: 'post',
     url: 'platform/account/save/invoice',
+    data
+  })
+}
+// 发票历史
+export const getInvoiceHistoryList = (data: any): Promise<any> => {
+  return axiosInstance({
+    method: 'post',
+    url: 'platform-web/settlement/enterprise/period/invoices',
     data
   })
 }

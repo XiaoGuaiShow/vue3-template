@@ -1,7 +1,7 @@
 // 结算相关
 export default [
   {
-    path: '/settlement/rules',
+    path: '/rules',
     name: 'SettlementRules',
     component: () => import('@/pages/settlement/rules/index.vue'),
     meta: {
