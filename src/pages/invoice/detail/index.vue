@@ -43,6 +43,24 @@
 
 <script lang="ts" setup>
 import InvoiceTable from '@/pages/invoice/components/InvoiceTable.vue'
+import { getInvoiceHistoryDetail } from '@/api/invoice'
+import { useRoute } from 'vue-router'
+
+const routeInfo = useRoute()
+const pageDetail: any = ref({})
+console.log(routeInfo)
+if (routeInfo.query?.periodId && routeInfo.query?.enterpriseId) {
+  getInvoiceHistoryDetail({
+    periodId: routeInfo.query?.periodId as string,
+    enterpriseId: routeInfo.query?.enterpriseId as string
+  }).then((res) => {
+    if (res.code === '0000') {
+      if (res.data) {
+        pageDetail.value = res.data
+      }
+    }
+  })
+}
 </script>
 
 <style lang="less" scoped>

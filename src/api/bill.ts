@@ -116,6 +116,8 @@ export const getBillPeriodList = (data: BillPeriodListParams): Promise<BillPerio
 export const getBillPeriodDetail = (params: {
   enterpriseId: number
   periodId: number
+  year: number
+  month: number
 }): Promise<BillPeriodDetailResult> => {
   return axiosInstance({
     method: 'get',
@@ -159,6 +161,15 @@ export const getConsumptionData = (data: any): Promise<any> => {
   return axiosInstance({
     method: 'post',
     url: 'platform-web/settlement/enterprise/order/records',
+    data
+  })
+}
+
+// 账单列表
+export const getBillList = (data: any): Promise<any> => {
+  return axiosInstance({
+    method: 'post',
+    url: 'platform-web/settlement/enterprise/period/bills',
     data
   })
 }

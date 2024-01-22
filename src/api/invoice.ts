@@ -66,3 +66,11 @@ export const getInvoiceHistoryList = (data: any): Promise<any> => {
     data
   })
 }
+// 发票历史详情
+export const getInvoiceHistoryDetail = (params: any): Promise<any> => {
+  return axiosInstance({
+    method: 'get',
+    url: 'platform-web/settlement/enterprise/period/invoice/sum',
+    params
+  })
+}

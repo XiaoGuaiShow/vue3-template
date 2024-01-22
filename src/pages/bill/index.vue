@@ -3,7 +3,9 @@
     <div class="section">
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="账单总览" name="first">
-          <DataCard @change="handleChange" @link-change="goLink"></DataCard>
+          <Suspense>
+            <DataCard @change="handleChange" @link-change="goLink"></DataCard>
+          </Suspense>
         </el-tab-pane>
         <el-tab-pane label="消费数据" name="second">
           <ConsumptionTable></ConsumptionTable>
