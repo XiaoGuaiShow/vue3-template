@@ -194,7 +194,6 @@ let commonVisible = ref<boolean>(false)
 const handleSettlementEdit = () => {
   commonVisible.value = true
 }
-console.log(zimuStore)
 const handleSelectConfirm = (data: any) => {
   console.log(data)
   if (data && data.list) {
@@ -242,7 +241,9 @@ const handleInvoiceEdit = () => {
 }
 
 // 发票编辑成功
-const invoiceTitleConfirm = () => {}
+const invoiceTitleConfirm = () => {
+  getCompanyInfo(companyId.value)
+}
 </script>
 
 <style lang="less" scoped>

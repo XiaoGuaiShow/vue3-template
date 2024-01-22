@@ -39,3 +39,21 @@ export const getEnterpriseDimension = (): Promise<any> => {
     url: 'platform/enterpriseDimensionRelation/getEnterpriseDimension'
   })
 }
+// 获取公司已勾选列表
+export const getSelectedCompanyInvoice = (accountId: any): Promise<any> => {
+  return axiosInstance({
+    method: 'get',
+    url: 'platform/account/configuration/invoice',
+    params: {
+      accountId
+    }
+  })
+}
+// 保存公司开票单位
+export const saveSelectedCompanyInvoice = (data: any): Promise<any> => {
+  return axiosInstance({
+    method: 'post',
+    url: 'platform/account/save/invoice',
+    data
+  })
+}

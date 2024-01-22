@@ -22,12 +22,14 @@
       <el-table
         ref="multipleTableRef"
         :data="tableData"
+        row-key="id"
         stripe
         border
         v-loading="loading"
         max-height="240"
-        @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" align="center" />
+        @select="handleSelectionChange"
+        @select-all="handleSelectionAllChange">
+        <el-table-column type="selection" width="55" align="center" reserve-selection />
         <el-table-column prop="invoiceTitle" label="开票单位" show-overflow-tooltip />
         <el-table-column prop="invoiceTax" label="发票税号" show-overflow-tooltip />
         <el-table-column prop="companyAddress" label="公司地址" show-overflow-tooltip />
@@ -73,9 +75,13 @@
 
 <script setup lang="ts">
 import { Plus } from '@element-plus/icons-vue'
-import { ElTable } from 'element-plus'
-import { deleteInvoiceUnit, getInvoiceList } from '@/api/invoice'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  deleteInvoiceUnit,
+  getInvoiceList,
+  getSelectedCompanyInvoice,
+  saveSelectedCompanyInvoice
+} from '@/api/invoice'
+import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
 import { useZimuStore } from '@/store/modules/zimu'
 
 const zimuStore = useZimuStore()
@@ -94,7 +100,9 @@ const params = reactive({
   accountId: zimuStore.currentEnterprise?.id,
   invoiceTitle: ''
 })
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const total = ref(0)
+const selectedIds = ref<string[]>([])
 function getTableList() {
   loading.value = true
   getInvoiceList({
@@ -105,6 +113,13 @@ function getTableList() {
       if (res.data) {
         tableData.value = res.data?.list || []
         total.value = res.data.total
+        nextTick(() => {
+          tableData.value.forEach((row) => {
+            if (selectedIds.value.includes(row.id)) {
+              multipleTableRef.value!.toggleRowSelection(row, true)
+            }
+          })
+        })
       }
     } else {
       ElMessage.error(res.message)
@@ -112,27 +127,38 @@ function getTableList() {
     loading.value = false
   })
 }
-getTableList()
 
-// 多选
-const multipleSelection = ref<any[]>([])
-const handleSelectionChange = (val: any[]) => {
-  multipleSelection.value = val
-  console.log('79========多选', multipleSelection.value)
+getCompanyInvoices().then((resp) => {
+  if (resp.code === '0000') {
+    selectedIds.value = resp.data || []
+    getTableList()
+  }
+})
+
+// 获取公司已勾选列表
+function getCompanyInvoices() {
+  return getSelectedCompanyInvoice(zimuStore.currentEnterprise?.id)
 }
 
-// 自动勾选
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
-const toggleSelection = (rows?: any[]) => {
-  if (rows) {
-    rows.forEach((row) => {
-      // TODO: improvement typing when refactor table
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      multipleTableRef.value!.toggleRowSelection(row, undefined)
-    })
+// 单选
+const handleSelectionChange = (selection: any, row: any) => {
+  if (selectedIds.value.includes(row.id)) {
+    selectedIds.value = selectedIds.value.filter((item) => item !== row.id)
   } else {
-    multipleTableRef.value!.clearSelection()
+    selectedIds.value.push(row.id)
+  }
+}
+// 全选
+const handleSelectionAllChange = (selection: any) => {
+  console.log(selection)
+  if (selection.length) {
+    // 全选
+    const ids = selection.map((item: any) => item.id)
+    selectedIds.value = [...new Set([...selectedIds.value, ...ids])]
+  } else {
+    // 取消全选
+    const tableIds = tableData.value.map((item: any) => item.id)
+    selectedIds.value = selectedIds.value.filter((item) => !tableIds.includes(item))
   }
 }
 
@@ -147,8 +173,29 @@ const handleSizeChange = (val: number) => {
   getTableList()
 }
 // 确定
+const btnLoading = ref(false)
 const handleConfirm = () => {
-  emit('on-confirm')
+  if (selectedIds.value.length === 0) {
+    ElMessage.error('请选择开票单位')
+  }
+  btnLoading.value = true
+  const params = {
+    accountId: zimuStore.currentEnterprise?.id || 0,
+    invoiceIds: selectedIds.value
+  }
+  saveSelectedCompanyInvoice(params)
+    .then((res) => {
+      if (res.code === '0000') {
+        ElMessage.success('操作成功')
+        beforeClose()
+        emit('on-confirm')
+      } else {
+        ElMessage.error(res.msg)
+      }
+    })
+    .finally(() => {
+      btnLoading.value = false
+    })
 }
 
 // 关闭

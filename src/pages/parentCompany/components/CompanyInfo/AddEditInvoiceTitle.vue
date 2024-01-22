@@ -116,6 +116,7 @@ if (props.invoiceId) {
   getInvoiceDetail(props.invoiceId).then((res) => {
     if (res.code === '0000') {
       if (res.data) {
+        addForm.accountId = res.data.accountId || 0
         addForm.bankName = res.data.bankName
         addForm.bankNo = res.data.bankNo
         addForm.companyAddress = res.data.companyAddress
@@ -140,7 +141,7 @@ interface RuleForm {
   bankName: string
   bankNo: string
   mailAddressId: string
-  accountId: number | string
+  accountId?: number | string
   id?: string | number
   dimensionType: 1 | 2
   departments: any[]
@@ -148,7 +149,7 @@ interface RuleForm {
 }
 
 const addForm = reactive<RuleForm>({
-  accountId: zimuStore.currentEnterprise.id || 0,
+  accountId: 0,
   bankNo: '',
   companyAddress: '',
   companyPhone: '',
