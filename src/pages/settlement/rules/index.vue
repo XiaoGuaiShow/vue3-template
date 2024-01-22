@@ -510,7 +510,6 @@ const handleInnerDialogConfirm = (data: any) => {
   }
 }
 
-
 const download = () => {
   if (downloadUrl.value) {
     window.open(downloadUrl.value, '_blank')
