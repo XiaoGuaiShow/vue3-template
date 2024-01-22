@@ -5,14 +5,14 @@ export function useDefaultList(
   propsName: any
 ) {
   const list = reactive<any[]>([])
-  const selectedList = reactive<any[]>([])
+  const checkList = reactive<any[]>([])
   const filterList = reactive<any[]>([])
 
   // 默认值
   if (defaultSelected?.length > 0 && extra?.length > 0) {
     defaultSelected.forEach((item: any) => {
       if (String(item.Type) === propsName.name && extra.includes(propsName.name)) {
-        selectedList.splice(selectedList.length, 0, item[propsName.idKey])
+        checkList.splice(checkList.length, 0, item[propsName.idKey])
       }
     })
   }
@@ -37,9 +37,9 @@ export function useDefaultList(
       selectedAll.splice(indexAll, 1)
     }
 
-    const indexToRemove = selectedList.findIndex((a: any) => String(a) === idKey)
+    const indexToRemove = checkList.findIndex((a: any) => String(a) === idKey)
     if (indexToRemove !== -1) {
-      selectedList.splice(indexToRemove, 1)
+      checkList.splice(indexToRemove, 1)
     }
   }
   function change({ event, data }: any) {
@@ -53,7 +53,7 @@ export function useDefaultList(
         WorkCode: '',
         Type: propsName.name
       })
-      selectedList.splice(selectedList.length, 0, data[propsName.idKey])
+      checkList.splice(checkList.length, 0, data[propsName.idKey])
     } else {
       deleteByItem(data)
     }
@@ -65,7 +65,7 @@ export function useDefaultList(
   }
 
   return {
-    selectedList,
+    checkList,
     filterList,
     setData,
     search,

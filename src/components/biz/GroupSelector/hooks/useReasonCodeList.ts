@@ -10,7 +10,7 @@ const propsName = {
 }
 
 export function useReasonCodeList(defaultSelected: any[], extra: any[], selectedAll: any[]) {
-  const { selectedList, filterList, setData, search, change, deleteByItem } = useDefaultList(
+  const { checkList, filterList, setData, search, change, deleteByItem } = useDefaultList(
     defaultSelected,
     extra,
     selectedAll,
@@ -20,8 +20,6 @@ export function useReasonCodeList(defaultSelected: any[], extra: any[], selected
     name: propsName.name,
     type: 'checkbox',
     label,
-    data: filterList,
-    checkList: selectedList,
     emitCheckboxChangeEvent: 'reasonCodeChange',
     props: {
       label: 'Name',
@@ -48,6 +46,8 @@ export function useReasonCodeList(defaultSelected: any[], extra: any[], selected
 
   return {
     reasonCodeConfig,
+    reasonCodeFilterList: filterList,
+    reasonCodeCheckList: checkList,
     getReasonCodeList: fetchData,
     handleReasonCodeSearch: search,
     handleReasonCodeChange: change,

@@ -165,11 +165,20 @@ const MATCH_DATA = computed(() => {
 })
 const { extra = [] } = MATCH_DATA.value
 
-const { roleConfig, getRoleList, handleRoleSearch, handleRoleChange, handleRoleDeleteByItem } =
-  useRoleList(props.selected, extra, selectedList.value)
+const {
+  roleConfig,
+  roleCheckList,
+  roleFilterList,
+  getRoleList,
+  handleRoleSearch,
+  handleRoleChange,
+  handleRoleDeleteByItem
+} = useRoleList(props.selected, extra, selectedList.value)
 
 const {
   travelConfig,
+  travelCheckList,
+  travelFilterList,
   getTravelList,
   handleTravelSearch,
   handleTravelChange,
@@ -178,6 +187,8 @@ const {
 
 const {
   reasonCodeConfig,
+  reasonCodeCheckList,
+  reasonCodeFilterList,
   getReasonCodeList,
   handleReasonCodeSearch,
   handleReasonCodeChange,
@@ -199,13 +210,25 @@ const items = computed(() => {
   }
   if (extra) {
     if (extra.includes('role')) {
-      data.push(roleConfig)
+      data.push({
+        ...roleConfig,
+        data: roleFilterList,
+        checkList: roleCheckList
+      })
     }
     if (extra.includes('travel')) {
-      data.push(travelConfig)
+      data.push({
+        ...travelConfig,
+        data: travelFilterList,
+        checkList: travelCheckList
+      })
     }
     if (extra.includes('reasonCode')) {
-      data.push(reasonCodeConfig)
+      data.push({
+        ...reasonCodeConfig,
+        data: reasonCodeFilterList,
+        checkList: reasonCodeCheckList
+      })
     }
   }
   return data

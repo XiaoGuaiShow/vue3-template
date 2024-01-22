@@ -10,7 +10,7 @@ const propsName = {
 }
 
 export function useRoleList(defaultSelected: any[], extra: any[], selectedAll: any[]) {
-  const { selectedList, filterList, setData, search, change, deleteByItem } = useDefaultList(
+  const { checkList, filterList, setData, search, change, deleteByItem } = useDefaultList(
     defaultSelected,
     extra,
     selectedAll,
@@ -20,8 +20,6 @@ export function useRoleList(defaultSelected: any[], extra: any[], selectedAll: a
     name: propsName.name,
     type: 'checkbox',
     label,
-    data: filterList,
-    checkList: selectedList,
     emitCheckboxChangeEvent: 'roleChange'
   })
 
@@ -34,6 +32,8 @@ export function useRoleList(defaultSelected: any[], extra: any[], selectedAll: a
 
   return {
     roleConfig,
+    roleFilterList: filterList,
+    roleCheckList: checkList,
     getRoleList: fetchData,
     handleRoleSearch: search,
     handleRoleChange: change,

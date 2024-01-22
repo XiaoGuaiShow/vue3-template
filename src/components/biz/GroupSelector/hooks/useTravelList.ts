@@ -10,7 +10,7 @@ const propsName = {
 }
 
 export function useTravelList(defaultSelected: any[], extra: any[], selectedAll: any[]) {
-  const { selectedList, filterList, setData, search, change, deleteByItem } = useDefaultList(
+  const { checkList, filterList, setData, search, change, deleteByItem } = useDefaultList(
     defaultSelected,
     extra,
     selectedAll,
@@ -20,8 +20,6 @@ export function useTravelList(defaultSelected: any[], extra: any[], selectedAll:
     name: propsName.name,
     type: 'checkbox',
     label,
-    data: filterList,
-    checkList: selectedList,
     emitCheckboxChangeEvent: 'travelChange'
   })
 
@@ -36,6 +34,8 @@ export function useTravelList(defaultSelected: any[], extra: any[], selectedAll:
 
   return {
     travelConfig,
+    travelFilterList: filterList,
+    travelCheckList: checkList,
     getTravelList: fetchData,
     handleTravelSearch: search,
     handleTravelChange: change,
