@@ -11,6 +11,7 @@
     "dev:outuat": "vite --mode outuat",
     "dev:prod": "vite --mode prod",
     "build": "vite build --mode fat",
+    "build:fat": "vite build --mode fat",
     "build:uat": "vite build --mode uat",
     "build:outuat": "vite build --mode outuat",
     "build:prod": "vite build --mode prod",
