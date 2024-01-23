@@ -143,6 +143,7 @@ watchEffect(() => {
     .then((res) => {
       billPeriodList.value = res.data || []
       activeIndex.value = res.data.length ? 0 : -1
+      getBillDeatil()
     })
     .finally(() => {
       loading.value = false
@@ -162,7 +163,7 @@ const detail: Ref<BillPeriodDetail> = ref({
   settlementStatusDesc: '',
   periodSum: {}
 })
-watchEffect(() => {
+function getBillDeatil() {
   sLoading.value = true
   if (billPeriodList.value.length === 0) return
   const params = {
@@ -180,7 +181,7 @@ watchEffect(() => {
     .finally(() => {
       sLoading.value = false
     })
-})
+}
 
 const statusColor = computed(() => {
   return (status: any) => {

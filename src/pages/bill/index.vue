@@ -16,7 +16,7 @@
         <el-tab-pane label="导出记录" name="fourth">
           <ExportRecord></ExportRecord>
         </el-tab-pane>
-        <el-tab-pane label="导出模板" name="fifth">Task</el-tab-pane>
+        <!-- <el-tab-pane label="导出模板" name="fifth">Task</el-tab-pane> -->
       </el-tabs>
     </div>
     <template v-if="activeName === 'first'">
