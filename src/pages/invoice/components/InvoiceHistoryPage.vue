@@ -25,32 +25,31 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             :value-format="'YYYY-MM-DD'"
-            :default-value="defaultRange"
             @change="dateChange" />
         </el-form-item>
         <el-form-item label="开票状态">
-          <el-select v-model="params.invoiceStatus" placeholder="请选择">
+          <el-select v-model="params.invoiceStatus" placeholder="请选择" clearable>
             <el-option label="已开票" :value="1" />
             <el-option label="未开票" :value="0" />
           </el-select>
         </el-form-item>
         <el-form-item label="结算单名称">
-          <el-input v-model="params.periodName" placeholder="请输入名称"></el-input>
+          <el-input v-model="params.periodName" placeholder="请输入名称" clearable></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
       </el-form>
 
-      <el-table class="mt-6" :data="tableData" stripe border max-height="280">
-        <el-table-column prop="name" label="结算单名称" show-overflow-tooltip>
+      <el-table class="mt-6" :data="tableData" stripe border max-height="280" v-loading="loading">
+        <el-table-column prop="periodName" label="结算单名称" show-overflow-tooltip>
           <template #default="{ row }">
-            <div class="link">{{ row.name }}</div>
+            <div class="link">{{ row.periodName + row.periodCycle + '结算单' }}</div>
           </template>
         </el-table-column>
-        <el-table-column prop="range" label="结算周期" width="215" align="center" />
-        <el-table-column prop="invoiced" label="已开票" width="148" align="center" />
-        <el-table-column prop="uninvoiced" label="未开票" width="138" align="center" />
+        <el-table-column prop="periodCycle" label="结算周期" width="215" align="center" />
+        <el-table-column prop="invoiceAmount" label="已开票" width="148" align="center" />
+        <el-table-column prop="unInvoiceAmount" label="未开票" width="138" align="center" />
         <el-table-column label="操作" width="100" align="center">
           <template #default="scope">
             <div class="link" @click="goLink(scope.row)">查看明细</div>
@@ -86,27 +85,25 @@ import { getInvoiceHistoryList } from '@/api/invoice'
 import { ElMessage } from 'element-plus'
 import dayjs from 'dayjs'
 
-const { enterpriseId, enterpriseOptions } = await useYearAndCompany()
+const { enterpriseId, enterpriseOptions } = await useYearAndCompany(false)
 const loading = ref(false)
 const total = ref(0)
 const pageVO = {
   pageIndex: 1,
   pageSize: 10
 }
-const params = {
+const dateRange = ref<any>('')
+const nowDate = dayjs(new Date()).format('YYYY-MM-DD')
+const lastThreeMonth = dayjs(nowDate).subtract(3, 'month').format('YYYY-MM-DD')
+dateRange.value = [lastThreeMonth, nowDate]
+const params: any = reactive({
   enterpriseId: enterpriseId.value || 0,
   invoiceStatus: '全部',
-  periodStartDate: '', // 开始日期
-  periodEndDate: '', // 结束日期
+  periodStartDate: lastThreeMonth, // 开始日期
+  periodEndDate: nowDate, // 结束日期
   year: '',
   periodName: ''
-}
-const dateRange = ref<any>('')
-const defaultRange = ref<any>('')
-const nowDate = new Date()
-// 默认最近三个月
-defaultRange.value = [dayjs(nowDate).subtract(3, 'month'), nowDate]
-dateRange.value = [dayjs(nowDate).subtract(3, 'month'), nowDate]
+})
 const dateChange = (date: any) => {
   if (date && date.length === 2) {
     params.periodStartDate = dayjs(date[0]).format('YYYY-MM-DD')
@@ -158,27 +155,27 @@ const handleCurrentChange = (val: number) => {
 }
 
 const router = useRouter()
-const formInline = reactive({
-  user: '',
-  region: '',
-  date: '',
-  status: 0
-})
 // 获取路由参数信息，给搜索条件-开票状态赋值
 const routeInfo = useRoute()
 if (routeInfo?.query?.status) {
-  formInline.status = Number(routeInfo.query.status as string)
+  params.invoiceStatus = Number(routeInfo.query.status as string)
 } else {
-  formInline.status = 0
+  params.invoiceStatus = '全部'
 }
 
 const onSubmit = () => {
-  console.log('submit!')
+  pageVO.pageIndex = 1
+  getTableList()
 }
 
 const goLink = (row: TableItem) => {
-  console.log(row)
-  router.push(`/invoice/history/${row.id}`)
+  router.push({
+    path: `/invoice/history/detail`,
+    query: {
+      periodId: row.periodId,
+      enterpriseId: row.enterpriseId
+    }
+  })
 }
 </script>
 

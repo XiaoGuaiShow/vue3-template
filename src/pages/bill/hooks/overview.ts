@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { getCompanyList } from '@/api/bill'
 import type { EnterpriseItem, EnterpriseOptionItem } from '@/pages/bill/types'
 
-export const useYearAndCompany = async () => {
+export const useYearAndCompany = async (needSum = true) => {
   const year = ref(new Date().getFullYear()) // 年份
   const yearList = generateYears(2024)
   const enterpriseId = ref('') // 公司id
@@ -10,13 +10,7 @@ export const useYearAndCompany = async () => {
   const isSummary = ref(false) // 是否是汇总页
   const enterpriseOptions = ref<EnterpriseOptionItem[]>([])
   try {
-    const { code } = await getCompanyList()
-    const data: EnterpriseItem[] = [
-      { enterpriseId: '1213122', enterpriseName: '苏州思客', type: 0 },
-      { enterpriseId: '5555555', enterpriseName: '集团汇总', type: -1 },
-      { enterpriseId: '6666666', enterpriseName: '思客国旅', type: 1 },
-      { enterpriseId: '7777777', enterpriseName: '上海思客', type: 1 }
-    ]
+    const { data } = await getCompanyList(needSum)
     enterpriseList.value = data
     const option1 = []
     const option2 = []

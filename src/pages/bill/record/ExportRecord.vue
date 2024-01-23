@@ -57,7 +57,7 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
 import { getExportRecordList, deleteExportRecordItem } from '@/api/bill'
-import type { ExportRecordListItem } from '@/api/types/index'
+import type { ExportRecordListItem } from '@/pages/bill/types'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const pageVo = reactive({

@@ -9,7 +9,7 @@ export default [
     }
   },
   {
-    path: '/invoice/history/:id',
+    path: '/invoice/history/detail',
     name: 'HistoryDetail',
     component: () => import('@/pages/invoice/detail/index.vue'),
     meta: {

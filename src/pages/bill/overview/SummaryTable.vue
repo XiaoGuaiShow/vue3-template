@@ -146,25 +146,24 @@ const sumTotalPaymentAmount = ref(0) // 已结
 const sumUnPaymentAmount = ref(0) // 未结
 const getTableData = () => {
   // 请求表格数据
-  // loading.value = true
-  // getSummaryTableList({
-  //   ...props.basicParams,
-  //   ...formInline,
-  //   ...pageVO
-  // }).then((res) => {
-  //   console.log(res)
-  //   tableData.value = res.data.results.billDetailList
-  //   total.value = res.data.total
-  //   loading.value = false
-  // sumTotalPrice.value = res.data.sumTotalPrice
-  // sumTotalPaymentAmount.value = res.data.sumTotalPaymentAmount
-  // sumUnPaymentAmount.value = res.data.sumUnPaymentAmount
-  // })
+  loading.value = true
+  getSummaryTableList({
+    ...props.basicParams,
+    ...formInline,
+    ...pageVO
+  }).then((res) => {
+    console.log(res)
+    tableData.value = res.data.results.billDetailList
+    total.value = res.data.total
+    loading.value = false
+    sumTotalPrice.value = res.data.sumTotalPrice
+    sumTotalPaymentAmount.value = res.data.sumTotalPaymentAmount
+    sumUnPaymentAmount.value = res.data.sumUnPaymentAmount
+  })
 }
 watch(
   () => props.basicParams,
   (newVal) => {
-    console.log(2222222222222, newVal)
     getTableData()
   },
   { immediate: true, deep: true }

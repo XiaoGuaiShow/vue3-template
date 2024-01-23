@@ -171,11 +171,7 @@
         </template>
       </el-table-column>
       <template v-if="dataType !== 3">
-        <el-table-column prop="price" label="单价(元)" width="138">
-          <template #default="{ row }">
-            {{ handlePrice(row) }}
-          </template>
-        </el-table-column>
+        <el-table-column prop="price" label="单价(元)" width="138"></el-table-column>
         <el-table-column prop="serverPrice" label="服务费(元)" width="138" />
       </template>
     </el-table>
@@ -354,19 +350,6 @@ const handleTime = (startTime: string, endTime: string) => {
     return `${startMonthDay} ${startHour}至${endHour}`
   }
 }
-
-// 计算单价
-const handlePrice = computed(() => {
-  return (row: any) => {
-    if (row.productType === 5) {
-      return row.price + row.fuelTax + row.airportTax + row.tax + row.insurancePrice
-    } else if (row.productType == 6) {
-      return row.price + row.grabTicketPrice + row.speedTicketPrice
-    } else {
-      return row.price
-    }
-  }
-})
 
 // 产品类型下拉
 const productTypeOptions = ref(generateProductTypeOptions())

@@ -166,6 +166,7 @@ export interface BillPeriodItem {
   periodId: number
   periodStartDate: string // 账期开始日期
   periodEndDate: string // 账期结束日期
+  periodRange: string
 }
 
 export interface BillPeriodListResult extends Result {
@@ -180,15 +181,15 @@ export interface FeeTypeItem {
 export interface ProductTypeItem {
   productType: number
   productTotalPrice: string
-  feeDetailDTOList: FeeTypeItem[]
+  feeDetailList: FeeTypeItem[]
 }
 
 export interface FeeClassItem {
   feeClass: number
-  productDTOList: ProductTypeItem[]
+  productList: ProductTypeItem[]
 }
 
-export interface PeriodSumDTO {
+export interface periodSum {
   totalPrice: number // 本期消费
   lastPeriodPayable: number // 上期未结
   dissentAmount: number // 异议金额
@@ -199,11 +200,11 @@ export interface PeriodSumDTO {
 }
 
 export interface BillPeriodDetail {
-  feeClassSumDTOList: FeeClassItem[]
+  feeClassSumList: FeeClassItem[]
   id: number // 账期id
   latestPaymentDate: string // 最晚还款日
   periodRange: string // 账期周期
-  periodSumDTO: Partial<PeriodSumDTO>
+  periodSum: Partial<periodSum>
   settlementStatus: number | undefined | null | '' // 结算状态
   settlementStatusDesc: string
 }
@@ -213,7 +214,7 @@ export interface BillPeriodDetailResult extends Result {
 }
 
 export interface BillPeriodSummary extends Result {
-  data: PeriodSumDTO
+  data: periodSum
 }
 
 export type InvoiceListParams = PageVO3 & SettledAmountDetailsParams

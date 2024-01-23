@@ -90,7 +90,8 @@ import type { EnterpriseItem } from '@/pages/bill/types'
 import { getOverviewDatas } from '@/api/bill'
 import { useBillStore } from '@/store/modules/bill'
 
-const { year, yearList, enterpriseId, enterpriseList, enterpriseOptions } = useYearAndCompany()
+const { year, yearList, enterpriseId, enterpriseList, enterpriseOptions } =
+  await useYearAndCompany()
 const isSummary = computed(() => {
   const findItem = (enterpriseList.value as EnterpriseItem[]).find(
     (item) => item.enterpriseId === enterpriseId.value
