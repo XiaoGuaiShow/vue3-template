@@ -4,7 +4,7 @@
       <div class="title">发票历史</div>
       <el-form :inline="true" :model="params" class="mt-24">
         <el-form-item>
-          <el-select v-model="enterpriseId" placeholder="请选择">
+          <el-select v-model="params.enterpriseId" placeholder="请选择" clearable>
             <el-option-group
               v-for="group in enterpriseOptions"
               :key="group.label"
@@ -170,7 +170,7 @@ const onSubmit = () => {
 
 const goLink = (row: TableItem) => {
   router.push({
-    path: `/invoice/history/detail`,
+    path: `/invoice-history-detail`,
     query: {
       periodId: row.periodId,
       enterpriseId: row.enterpriseId

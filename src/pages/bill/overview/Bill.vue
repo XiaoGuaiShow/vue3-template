@@ -166,11 +166,12 @@ const detail: Ref<BillPeriodDetail> = ref({
 function getBillDeatil() {
   sLoading.value = true
   if (billPeriodList.value.length === 0) return
+  const activePeriod = billPeriodList.value[activeIndex.value]
   const params = {
-    enterpriseId: billPeriodList.value[activeIndex.value].enterpriseId,
-    periodId: billPeriodList.value[activeIndex.value].periodId,
-    month: props.basicParams.month,
-    year: props.basicParams.year
+    enterpriseId: activePeriod.enterpriseId,
+    periodId: activePeriod.periodId,
+    periodStartDate: activePeriod.periodStartDate,
+    periodEndDate: activePeriod.periodEndDate
   }
   getBillPeriodDetail(params)
     .then((res) => {

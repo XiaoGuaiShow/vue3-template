@@ -52,6 +52,12 @@ export const getCompanyList = (needSum = true): Promise<EnterpriseResult> => {
     }
   })
 }
+export const getBelongCompanyList = (): Promise<any> => {
+  return axiosInstance({
+    method: 'get',
+    url: 'platform/account/list'
+  })
+}
 
 // 单账期导出
 export const exportPeriodItem = (params: {
@@ -116,8 +122,8 @@ export const getBillPeriodList = (data: BillPeriodListParams): Promise<BillPerio
 export const getBillPeriodDetail = (params: {
   enterpriseId: number
   periodId: number
-  year: number
-  month: number
+  periodStartDate: string
+  periodEndDate: string
 }): Promise<BillPeriodDetailResult> => {
   return axiosInstance({
     method: 'get',

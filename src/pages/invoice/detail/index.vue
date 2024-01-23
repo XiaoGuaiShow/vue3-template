@@ -45,7 +45,6 @@
 import InvoiceTable from '@/pages/invoice/components/InvoiceTable.vue'
 import { getInvoiceHistoryDetail } from '@/api/invoice'
 import { useRoute } from 'vue-router'
-
 const routeInfo = useRoute()
 const pageDetail: any = ref({})
 console.log(routeInfo)

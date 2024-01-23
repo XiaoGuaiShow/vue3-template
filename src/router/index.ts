@@ -4,12 +4,14 @@ import InvoiceRouter from './modules/invoice.ts'
 import SettlementRouter from './modules/settlement.ts'
 import ParentCompanyRouter from './modules/parentCompany.ts'
 import billRouter from './modules/bill.ts'
+import InvoiceSettingsRouter from './modules/invoiceSettings.ts'
 
 const routes = [
   ...InvoiceRouter,
   ...SettlementRouter,
   ...ParentCompanyRouter,
   ...billRouter,
+  ...InvoiceSettingsRouter,
   {
     path: '/',
     redirect: '/home'

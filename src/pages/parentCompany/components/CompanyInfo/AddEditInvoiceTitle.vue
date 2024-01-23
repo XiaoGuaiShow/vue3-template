@@ -29,6 +29,15 @@
         <el-form-item label="银行账号" prop="bankNo">
           <el-input v-model.trim="addForm.bankNo" placeholder="请输入银行账号" clearable />
         </el-form-item>
+        <el-form-item label="所属公司" prop="accountId">
+          <el-select v-model="addForm.accountId" style="width: 100%">
+            <el-option
+              v-for="item in companyList"
+              :key="item.id"
+              :value="item.id"
+              :label="item.companyName"></el-option>
+          </el-select>
+        </el-form-item>
         <p class="cut-line" v-if="props.showAddressAndScope"></p>
         <el-form-item class="mt-18" label="邮寄地址" prop="" v-if="props.showAddressAndScope">
           <span class="mail-address" @click="handleChooseAddress">新增/选择</span>
@@ -44,9 +53,9 @@
           <div class="try-scope">
             <div class="try-tips">维护开具当前发票单位的部门或人员</div>
             <div class="mail-address" @click="openGroupSelector">选择范围</div>
-            <div class="mt-12" v-if="addForm.dimensionType === 2">
+            <div class="mt-12 flex wrap" v-if="addForm.dimensionType === 2">
               <el-tag
-                class="mr-6 mb-12"
+                class="mr-6 mb-12 mb-6"
                 v-for="item in addForm.departments"
                 :key="item.deptId"
                 closable
@@ -54,9 +63,9 @@
                 {{ item.deptName }}
               </el-tag>
             </div>
-            <div class="mt-12" v-if="addForm.dimensionType === 1">
+            <div class="mt-12 flex wrap" v-if="addForm.dimensionType === 1">
               <el-tag
-                class="mr-6 mb-12"
+                class="mr-6 mb-12 mb-6"
                 v-for="item in addForm.users"
                 :key="item.memberId"
                 closable
@@ -93,14 +102,13 @@
 import { ref, reactive, defineProps } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { saveInvoiceUnit, getInvoiceDetail, getEnterpriseDimension } from '@/api/invoice'
+import { getBelongCompanyList } from '@/api/bill'
 import { ElMessage } from 'element-plus'
-import { useZimuStore } from '@/store/modules/zimu'
-const zimuStore = useZimuStore()
 
 interface Props {
   visible: boolean
   showAddressAndScope?: boolean
-  invoiceId: string | number | undefined
+  invoiceId?: string | number | undefined
 }
 const props = withDefaults(defineProps<Props>(), {
   visible: false,
@@ -109,6 +117,16 @@ const props = withDefaults(defineProps<Props>(), {
   invoiceId: ''
 })
 const emit = defineEmits(['on-close', 'on-confirm'])
+
+const companyList = ref<any[]>([])
+const getAllCompanyList = () => {
+  getBelongCompanyList().then((res) => {
+    if (res.code === '0000') {
+      companyList.value = res.data || []
+    }
+  })
+}
+getAllCompanyList()
 
 const beforeList = ref<any[]>([])
 const title = props.invoiceId ? '编辑开票单位' : '新增开票单位'
@@ -174,21 +192,20 @@ const addRule = reactive<FormRules<RuleForm>>({
     { min: 0, max: 30, message: '发票税号最大长度为30个字', trigger: 'blur' }
   ],
   companyAddress: [
-    {
-      min: 0,
-      max: 100,
-      message: '公司地址长度最大长度为100个字',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入公司地址', trigger: 'blur' },
+    { min: 0, max: 100, message: '公司地址长度最大长度为100个字', trigger: 'blur' }
   ],
-  companyPhone: [{ min: 0, max: 20, message: '公司电话最大长度为20个字', trigger: 'blur' }],
+  companyPhone: [
+    { required: true, message: '请输入公司电话', trigger: 'blur' },
+    { min: 0, max: 20, message: '公司电话最大长度为20个字', trigger: 'blur' }
+  ],
+  bankName: [
+    { required: true, message: '请输入开户银行', trigger: 'blur' },
+    { min: 0, max: 50, message: '开户银行最大长度为50个字', trigger: 'blur' }
+  ],
   bankNo: [
-    {
-      min: 0,
-      max: 50,
-      message: '银行账号长度最大长度为50个字',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入银行账号', trigger: 'blur' },
+    { min: 0, max: 50, message: '银行账号长度最大长度为50个字', trigger: 'blur' }
   ]
 })
 

@@ -19,7 +19,7 @@
         <el-table-column label="选择" width="60" align="center" class-name="single-radio">
           <template #default="scope">
             <el-radio
-              :label="scope.row.id"
+              :label="scope.row.id.toString()"
               v-model="tableRadio"
               @change="() => selectRadio(scope.row)">
               <i></i>
@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, toRefs, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getMailingAddressList } from '@/api/address'
@@ -85,7 +85,6 @@ onMounted(() => {
   dialogVisible.value = true
 })
 const handleClose = () => {
-  console.log('动画结束后执行')
   emits('close')
 }
 
