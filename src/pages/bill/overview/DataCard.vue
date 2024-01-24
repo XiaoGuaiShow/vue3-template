@@ -102,7 +102,7 @@ const isSummary = computed(() => {
 const idList = enterpriseList.value
   .filter((item) => item.type !== -1)
   .map((item) => item.enterpriseId)
-const { setEnterpriseList, setEnterpriseId } = useBillStore()
+const { setEnterpriseList, setEnterpriseId, setActiveYear } = useBillStore()
 setEnterpriseList(enterpriseList.value.filter((item) => item.type !== -1))
 
 const emits = defineEmits(['change', 'linkChange'])
@@ -112,6 +112,7 @@ watch(
     emits('change', newVal)
     // 设置当前选中的企业id
     setEnterpriseId(enterpriseId.value)
+    setActiveYear(year.value)
   },
   {
     immediate: true

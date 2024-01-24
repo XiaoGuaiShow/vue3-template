@@ -60,6 +60,7 @@ declare module 'vue' {
     InvoiceReminderDialog: typeof import('./src/components/biz/InvoiceReminderDialog/index.vue')['default']
     InvoiceTable: typeof import('./src/pages/invoice/components/InvoiceTable.vue')['default']
     InvoiceTitle: typeof import('./src/pages/parentCompany/components/CompanyInfo/InvoiceTitle.vue')['default']
+    MailingInformation: typeof import('./src/pages/bill/components/MailingInformation.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     RuleSetting: typeof import('./src/pages/parentCompany/components/RuleSetting/index.vue')['default']

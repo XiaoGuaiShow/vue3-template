@@ -1,10 +1,11 @@
 import { ref } from 'vue'
 import { getCompanyList } from '@/api/bill'
 import type { EnterpriseItem, EnterpriseOptionItem } from '@/pages/bill/types'
+import mittBus from '@/utils/mitt.ts'
 
 export const useYearAndCompany = async (needSum = true) => {
   const year = ref(new Date().getFullYear()) // 年份
-  const yearList = generateYears(2024)
+  const yearList = generateYears(2023)
   const enterpriseId = ref('') // 公司id
   const enterpriseList: Ref<EnterpriseItem[]> = ref([]) // 公司列表
   const isSummary = ref(false) // 是否是汇总页
@@ -47,6 +48,11 @@ export const useYearAndCompany = async (needSum = true) => {
   } catch (err: any) {
     console.log(err)
   }
+
+  mittBus.on('changePage', (data: any) => {
+    console.log('接受到的数据', data)
+    enterpriseId.value = data.enterpriseId
+  })
 
   return {
     year,

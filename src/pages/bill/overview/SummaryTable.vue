@@ -12,7 +12,11 @@
         </el-select>
       </el-form-item>
       <el-form-item label="结算单名称">
-        <el-input v-model="formInline.periodName" placeholder="请输入名称" clearable></el-input>
+        <el-input
+          v-model="formInline.periodName"
+          placeholder="请输入名称"
+          clearable
+          style="width: 200px"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">查询</el-button>
@@ -23,16 +27,12 @@
     <el-table class="mt-6" :data="tableData" stripe border max-height="280" v-loading="loading">
       <el-table-column prop="periodName" label="结算单名称" show-overflow-tooltip>
         <template #default="{ row }">
-          <span class="link" @click="goLink(row.periodId)">{{ row.periodName }}</span>
+          <span class="link" @click="goLink(row)">
+            {{ row.periodName + row.periodCycle + '结算单' }}
+          </span>
         </template>
       </el-table-column>
-      <el-table-column prop="range" label="结算周期" width="215" align="center">
-        <template #default="{ row }">
-          <span>{{ row.periodStartDate }}</span>
-          <span v-if="row.periodStartDate && row.periodEndDate">至</span>
-          <span>{{ row.periodEndDate }}</span>
-        </template>
-      </el-table-column>
+      <el-table-column prop="periodCycle" label="结算周期" width="215" align="center" />
       <el-table-column prop="totalPrice" label="应结(元)" width="148" align="center" />
       <el-table-column prop="totalPaymentAmount" label="已结算(元)" width="138" align="center">
         <template #default="{ row }">
@@ -99,7 +99,7 @@ import {
   exportPeriodAll
 } from '@/api/bill'
 import { SETTLEMENT_STATUS } from '@/common/static'
-import { useRouter } from 'vue-router'
+import mittBus from '@/utils/mitt.ts'
 
 const props = defineProps<{
   basicParams: BasicParams
@@ -117,20 +117,7 @@ const onSubmit = () => {
   pageVO.pageIndex = 1
   getTableData()
 }
-const tableData = ref<SummaryTableItem[]>([
-  {
-    enterpriseId: 12312121,
-    periodId: 45,
-    periodStartDate: '2023-09-16',
-    periodEndDate: '2023-09-30',
-    totalPaymentAmount: 10000,
-    totalPrice: 32000,
-    unPaymentAmount: 22000,
-    settlementStatus: 1,
-    periodLatestPaymentDate: '2023-09-20',
-    periodName: '苏州A有限公司2023-09-16至2023-09-30结算单'
-  }
-])
+const tableData = ref<SummaryTableItem[]>([])
 const handleSizeChange = (val: number) => {
   pageVO.pageIndex = 1
   pageVO.pageSize = val
@@ -147,32 +134,43 @@ const sumUnPaymentAmount = ref(0) // 未结
 const getTableData = () => {
   // 请求表格数据
   loading.value = true
-  getSummaryTableList({
+  const newParams = {
     ...props.basicParams,
     ...formInline,
     ...pageVO
-  }).then((res) => {
-    console.log(res)
-    tableData.value = res.data.results.billDetailList
-    total.value = res.data.total
-    loading.value = false
-    sumTotalPrice.value = res.data.sumTotalPrice
-    sumTotalPaymentAmount.value = res.data.sumTotalPaymentAmount
-    sumUnPaymentAmount.value = res.data.sumUnPaymentAmount
-  })
+  }
+  if (newParams.settlementStatus === -1) {
+    Reflect.deleteProperty(newParams, 'settlementStatus')
+  }
+  getSummaryTableList(newParams)
+    .then((res) => {
+      if (res.code === '0000') {
+        if (res.data) {
+          tableData.value = res.data.results || []
+          total.value = res.data.total
+          sumTotalPrice.value = res.data.sumTotalPrice
+          sumTotalPaymentAmount.value = res.data.sumTotalPaymentAmount
+          sumUnPaymentAmount.value = res.data.sumUnPaymentAmount
+        }
+      }
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 watch(
   () => props.basicParams,
-  (newVal) => {
+  () => {
     getTableData()
   },
   { immediate: true, deep: true }
 )
 
-// 点击结算单跳转
-const router = useRouter()
-const goLink = (id: number) => {
-  router.push(`/bill/details/${id}`)
+const goLink = (row: any) => {
+  mittBus.emit('changePage', {
+    periodId: row.periodId,
+    enterpriseId: row.enterpriseId
+  })
 }
 
 // 已结算金额鼠标悬浮表格
@@ -192,29 +190,21 @@ const handleBeforeEnter = (enterpriseId: number, periodId: number) => {
     periodId
   }
   tLoading.value = true
-  setTimeout(() => {
-    amountTable.value = [
-      { paymentAmount: 1000, paymentDate: '2023-12-12' },
-      { paymentAmount: 4000, paymentDate: '2024-12-12' },
-      { paymentAmount: 5000, paymentDate: '2022-12-12' }
-    ]
-    amountMap.set(periodId, amountTable.value)
-    tLoading.value = false
-  }, 1000)
-  getSettledAmountDetails(params).then((res) => {
-    if (res.code === '0000') {
-      amountTable.value = res.data
-      amountMap.set(periodId, amountTable.value)
-    }
-    tLoading.value = false
-  })
+  getSettledAmountDetails(params)
+    .then((res) => {
+      if (res.code === '0000') {
+        amountTable.value = res.data
+        amountMap.set(periodId, amountTable.value)
+      }
+    })
+    .finally(() => {
+      tLoading.value = false
+    })
 }
 
 // 导出
 const handleExport = (row: TableItem) => {
-  exportPeriodItem({ periodId: row.periodId, enterpriseId: row.enterpriseId }).then((res) => {
-    console.log(res)
-  })
+  exportPeriodItem({ periodId: row.periodId, enterpriseId: row.enterpriseId })
 }
 const handleExportAll = () => {
   const params = {
@@ -225,9 +215,7 @@ const handleExportAll = () => {
   if (params.settlementStatus === -1) {
     Reflect.deleteProperty(params, 'settlementStatus')
   }
-  exportPeriodAll(params).then((res) => {
-    console.log(res)
-  })
+  exportPeriodAll(params)
 }
 </script>
 

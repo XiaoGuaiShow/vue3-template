@@ -99,3 +99,27 @@ export const downloadInvoice = (params: any): Promise<any> => {
     skipTypeCheck: true
   } as any)
 }
+// 获取开票历史明细中的发票抬头
+export const getInvoiceTitleList = (params: any): Promise<any> => {
+  return axiosInstance({
+    method: 'get',
+    url: 'platform-web/settlement/enterprise/period/invoice/titles',
+    params
+  })
+}
+// 确认并提交开票申请
+export const confirmInvoiceApplication = (data: any): Promise<any> => {
+  return axiosInstance({
+    method: 'post',
+    url: 'platform-web/settlement/enterprise/period/confirm',
+    data
+  })
+}
+// 确认并提交开票申请
+export const modifyInvoiceItem = (data: any): Promise<any> => {
+  return axiosInstance({
+    method: 'post',
+    url: 'platform-web/settlement/enterprise/period/invoice/record/update',
+    data
+  })
+}

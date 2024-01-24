@@ -65,6 +65,8 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config: RequestConfig) => {
     const defaultParams = getDefaultParams()
+    console.log('jjjjjj', defaultParams)
+    console.log('jjjjjj', config)
     if (config.showGlobalLoading) {
       requestsCount++
       loadingInstance = ElLoading.service({
@@ -85,6 +87,9 @@ axiosInstance.interceptors.request.use(
       config.data = Object.assign({}, defaultParams, config.data)
     } else {
       config.headers = Object.assign({}, defaultParams, config.headers)
+    }
+    if (config?.params?.enterpriseId) {
+      config.headers['enterpriseIds'] = config.params.enterpriseId
     }
 
     return config

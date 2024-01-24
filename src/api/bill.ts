@@ -67,8 +67,10 @@ export const exportPeriodItem = (params: {
   return axiosInstance({
     method: 'get',
     url: 'platform-web/settlement/enterprise/period/export',
-    params
-  })
+    params,
+    isDownload: true,
+    skipTypeCheck: true
+  } as any)
 }
 
 // 获取年度总览数据展示
@@ -84,7 +86,7 @@ export const getOverviewDatas = (data: SumData): Promise<SumResult> => {
 export const getSummaryTableList = (data: SummaryTableParams): Promise<SummaryTableResult> => {
   return axiosInstance({
     method: 'post',
-    url: 'finance-bill/platform/settlement/group/month/bills',
+    url: 'platform-web/settlement/group/month/bills',
     data
   })
 }
@@ -94,8 +96,10 @@ export const exportPeriodAll = (data: SummaryTableParams): Promise<any> => {
   return axiosInstance({
     method: 'post',
     url: 'platform-web/settlement/group/export',
-    data
-  })
+    data,
+    isDownload: true,
+    skipTypeCheck: true
+  } as any)
 }
 
 // 已结算金额鼠标悬浮的金额明细

@@ -6,44 +6,46 @@
         <SummaryExpression class="mt-12" :summary="summaryData"></SummaryExpression>
       </div>
       <div class="fs-16 fw-600 c-font-primary mt-24">开票概览</div>
-      <InvoiceTable from="confirmationDialog" :periodId="periodId"></InvoiceTable>
+      <InvoiceTable
+        from="confirmationDialog"
+        :periodId="periodId"
+        :enterpriseId="enterpriseId"></InvoiceTable>
     </div>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确认并提交开票申请</el-button>
+        <el-button type="primary" @click="handleConfirm" :loading="btnLoading">
+          确认并提交开票申请
+        </el-button>
       </span>
     </template>
   </el-dialog>
-  <AddEditInvoiceTitle
-    :visible="innerVisible"
-    :showAddressAndScope="false"
-    @on-close="innerVisible = false"></AddEditInvoiceTitle>
 </template>
 
 <script lang="ts" setup>
-import { ref, toRefs, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import SummaryExpression from '../components/SummaryExpression.vue'
 import InvoiceTable from '@/pages/invoice/components/InvoiceTable.vue'
 import { getBillPeriodSummary } from '@/api/bill'
-import type { PeriodSumDTO } from '@/pages/bill/types'
+import { confirmInvoiceApplication } from '@/api/invoice'
+import type { PeriodSum } from '@/pages/bill/types'
+import { ElMessage } from 'element-plus'
 
 const props = defineProps<{
   enterpriseId: number
   periodId: number
 }>()
-const summaryData: Ref<Partial<PeriodSumDTO>> = ref({})
+const summaryData: Ref<Partial<PeriodSum>> = ref({})
 watchEffect(() => {
   getBillPeriodSummary({
     enterpriseId: props.enterpriseId,
     periodId: props.periodId
   }).then((res) => {
-    console.log(res)
     summaryData.value = res.data
   })
 })
 
-const emits = defineEmits(['close'])
+const emits = defineEmits(['close', 'confirm'])
 
 const dialogVisible = ref(false)
 onMounted(() => {
@@ -54,9 +56,24 @@ const handleClose = () => {
   emits('close')
 }
 
-const originCompany = ref('苏州思客信息有限公司')
-const adjustCompany = ref('')
-const innerVisible = ref(false)
+const btnLoading = ref(false)
+const handleConfirm = () => {
+  btnLoading.value = true
+  confirmInvoiceApplication({
+    enterpriseId: props.enterpriseId,
+    periodId: props.periodId
+  })
+    .then((res) => {
+      if (res.code === '0000') {
+        ElMessage.success('确认成功')
+        emits('confirm')
+        emits('close')
+      }
+    })
+    .finally(() => {
+      dialogVisible.value = false
+    })
+}
 </script>
 <style scoped lang="less">
 .section {

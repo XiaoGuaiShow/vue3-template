@@ -36,17 +36,17 @@
 import { ref } from 'vue'
 import OrderTable from './OrderTable.vue'
 import SummaryExpression from '../components/SummaryExpression.vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { getBillPeriodSummary } from '@/api/bill'
-import type { PeriodSumDTO } from '@/pages/bill/types'
+import type { PeriodSum } from '@/pages/bill/types'
 import { BILL_CATEGORY } from '@/common/static'
+import { useBillStore } from '@/store/modules/bill'
+const billStore = useBillStore()
 // init
 const router = useRouter()
-const route = useRoute()
 const activeName = ref('')
-const query = route.query
-const periodId = ref(query.periodId ? Number(query.periodId) : undefined)
-const enterpriseId = ref(query.enterpriseId ? Number(query.enterpriseId) : undefined)
+const periodId = computed(() => billStore.billDetail.periodId)
+const enterpriseId = computed(() => billStore.billDetail.enterpriseId)
 interface TabItem {
   label: string
   field: string
@@ -56,7 +56,7 @@ const tabs: Ref<TabItem[]> = ref([])
 const loading = ref(false)
 
 // 获取账单汇总信息
-const periodSumDTO: Ref<Partial<PeriodSumDTO>> = ref({
+const periodSumDTO: Ref<Partial<PeriodSum>> = ref({
   periodName: ''
 })
 watchEffect(() => {
@@ -66,28 +66,32 @@ watchEffect(() => {
       enterpriseId: enterpriseId.value,
       periodId: periodId.value
     }
-    getBillPeriodSummary(params).then((res) => {
-      console.log(res)
-    })
-    setTimeout(() => {
-      periodSumDTO.value = {
-        totalPrice: 10000, // 本期消费
-        lastPeriodPayable: 12, // 上期未结
-        dissentAmount: 500, // 异议金额
-        unRetrievedAmount: 2500, // 未取回票据
-        overPeriodRefundAmount: 800, // 跨账期改退
-        payable: 4000, // 本期应退
-        periodName: '苏州思客信息技术有限公司2023-10-01至2023-10-31结算单1'
-      }
-      // 初始化tab页签，初始化默认页签
-      tabs.value = generateTabs(periodSumDTO.value)
-      activeName.value = tabs.value.length ? tabs.value[0].field : ''
-      loading.value = false
-    }, 1500)
+    getBillPeriodSummary(params)
+      .then((res) => {
+        if (res.code === '0000') {
+          if (res.data) {
+            periodSumDTO.value = {
+              totalPrice: 10000, // 本期消费
+              lastPeriodPayable: 12, // 上期未结
+              dissentAmount: 500, // 异议金额
+              unRetrievedAmount: 2500, // 未取回票据
+              overPeriodRefundAmount: 800, // 跨账期改退
+              payable: 4000, // 本期应退
+              periodName: '苏州思客信息技术有限公司2023-10-01至2023-10-31结算单1'
+            }
+            // 初始化tab页签，初始化默认页签
+            tabs.value = generateTabs(periodSumDTO.value)
+            activeName.value = tabs.value.length ? tabs.value[0].field : ''
+          }
+        }
+      })
+      .finally(() => {
+        loading.value = false
+      })
   }
 })
 
-function generateTabs(obj: PeriodSumDTO): TabItem[] {
+function generateTabs(obj: Partial<PeriodSum>): TabItem[] {
   const tabs: TabItem[] = []
   const category = [...BILL_CATEGORY.values()]
   console.log(category)

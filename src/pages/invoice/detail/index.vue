@@ -56,10 +56,12 @@ const pageDetail: any = reactive({
   printInvoiceAmount: 0,
   takeoutInvoiceAmount: 0
 })
-if (billStore.invoiceHistory.periodId && billStore.invoiceHistory.enterpriseId) {
+const periodId = billStore.invoiceHistory.periodId
+const enterpriseId = billStore.invoiceHistory.enterpriseId
+if (periodId && enterpriseId) {
   getInvoiceHistoryDetail({
-    periodId: billStore.invoiceHistory.periodId as string,
-    enterpriseId: billStore.invoiceHistory.enterpriseId as string
+    periodId,
+    enterpriseId
   }).then((res) => {
     if (res.code === '0000') {
       if (res.data) {

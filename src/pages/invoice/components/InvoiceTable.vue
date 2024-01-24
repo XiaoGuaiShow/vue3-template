@@ -1,11 +1,7 @@
 <template>
   <div class="mt-24 flex jc-sb ai-c">
-    <el-select v-model="enterpriseId" placeholder="请选择">
-      <el-option
-        v-for="item in enterpriseList"
-        :key="item.enterpriseId"
-        :label="item.enterpriseName"
-        :value="item.enterpriseId" />
+    <el-select v-model="params.invoiceTitle" placeholder="请选择" clearable>
+      <el-option v-for="(item, index) in enterpriseList" :key="index" :label="item" :value="item" />
     </el-select>
     <div class="link" v-if="from === 'invoiceDetail'" @click="handleDownload()">批量下载</div>
   </div>
@@ -15,9 +11,13 @@
     :data="tableData"
     stripe
     border
-    max-height="480"
+    :max-height="from === 'invoiceDetail' ? 480 : 240"
     v-loading="loading">
-    <el-table-column type="index" label="开票编号" width="80" align="center" />
+    <el-table-column type="index" label="开票编号" width="80" align="center">
+      <template #default="{ $index }">
+        {{ (pageVO.pageIndex - 1) * pageVO.pageSize + ($index + 1) }}
+      </template>
+    </el-table-column>
     <el-table-column prop="seller" label="销售主体" show-overflow-tooltip>
       <template #default="{ row }">
         <span>{{ row.seller || '--' }}</span>
@@ -32,16 +32,16 @@
         <span>{{ row.invoiceTitle || '--' }}</span>
       </template>
     </el-table-column>
-    <el-table-column prop="buyer" label="开票单位" v-if="from === 'confirmationDialog'">
+    <el-table-column prop="invoiceTitle" label="开票单位" v-if="from === 'confirmationDialog'">
       <template #default="{ row }">
         <el-popover :width="420">
           <template #reference>
-            <span class="c-brand-blue ellipsis-1">{{ row.buyer }}</span>
+            <span class="c-brand-blue ellipsis-1">{{ row.invoiceTitle }}</span>
           </template>
           <div class="popover-form">
             <div class="flex">
               <div class="label">开票单位</div>
-              <div>{{ row.buyer }}</div>
+              <div>{{ row.invoiceTitle }}</div>
             </div>
             <div class="flex">
               <div class="label">发票税号</div>
@@ -101,28 +101,31 @@
           <span class="ellipsis-1" v-if="from === 'invoiceDetail'">{{ row.mailAddress }}</span>
           <el-popover :width="420" v-else>
             <template #reference>
-              <span class="c-brand-blue ellipsis-1">
+              <span class="c-brand-blue ellipsis-1 w-full">
                 {{ row.mailAddress }}
               </span>
             </template>
             <div class="popover-form">
               <div class="flex">
                 <div class="label">收件人</div>
-                <div>苏州思科信息技术有限公司</div>
+                <div>{{ row.mailUserName }}</div>
               </div>
               <div class="flex">
                 <div class="label">联系电话</div>
-                <div>871092819JLKNEEW</div>
+                <div>{{ row.mailUserPhone }}</div>
               </div>
               <div class="flex">
                 <div class="label">邮寄地址</div>
-                <div>
-                  江苏省苏州市吴中区七星街道协鑫广场20L苏州思客科技（集团）有限公司2001，2002，2003单元
-                </div>
+                <div>{{ row.mailAddress }}</div>
               </div>
             </div>
           </el-popover>
-          <span class="link ml-8 no-wrap" v-if="from === 'confirmationDialog'">更改</span>
+          <span
+            class="link ml-8 no-wrap"
+            v-if="from === 'confirmationDialog'"
+            @click="openDialog(row)">
+            更改
+          </span>
         </div>
       </template>
     </el-table-column>
@@ -145,7 +148,12 @@
     </el-table-column>
     <el-table-column label="备注" align="center" width="126" v-if="from === 'confirmationDialog'">
       <template #default="{ row }">
-        <el-input v-model="row.remark" placeholder="填写（选填）"></el-input>
+        <el-input
+          v-model="row.remark"
+          placeholder="填写（选填）"
+          v-if="row.invoiceType !== 6"
+          @blur="handleModify(row)"></el-input>
+        <span v-else>--</span>
       </template>
     </el-table-column>
   </el-table>
@@ -163,20 +171,27 @@
       :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange" />
+    <MailingInformation
+      :enterpriseId="enterpriseId"
+      :invoiceId="rowInvoiceId"
+      :rowData="rowData"
+      v-if="showMailingInformation"
+      @close="showMailingInformation = false"
+      @confirm="getTableList" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useBillStore } from '@/store/modules/bill'
 import { getInvoiceList } from '@/api/bill'
-import { getAllInvoiceList, downloadInvoice } from '@/api/invoice'
+import { getInvoiceTitleList, downloadInvoice, modifyInvoiceItem } from '@/api/invoice'
 import type { InvoiceListItem } from '@/pages/bill/types'
 import { PRODUCT_TYPE, INVOICE_TYPE, INVOICE_STATUS } from '@/common/static'
+import MailingInformation from '@/pages/bill/components/MailingInformation.vue'
+import { ElMessage } from 'element-plus'
 
-const billStore = useBillStore()
 const props = withDefaults(
-  defineProps<{ from: string; periodId: string; enterpriseId: string }>(),
+  defineProps<{ from: string; periodId: string | number; enterpriseId: string | number }>(),
   {
     from: 'invoiceDetail',
     periodId: '',
@@ -184,21 +199,38 @@ const props = withDefaults(
   }
 )
 const { from } = toRefs(props)
-const enterpriseId = ref(0)
 const enterpriseList: Ref<any[]> = ref([])
-if (props.from === 'confirmationDialog') {
-  enterpriseList.value = billStore.enterpriseList
-  enterpriseId.value = billStore.enterpriseId
+const showMailingInformation = ref(false)
+const rowInvoiceId = ref('')
+const rowData = ref<any>()
+const openDialog = (row: any) => {
+  rowData.value = row
+  rowInvoiceId.value = row.invoiceId
+  showMailingInformation.value = true
 }
-
-getAllInvoiceList({
-  currentIndex: 1,
-  pageSize: 9999
+getInvoiceTitleList({
+  periodId: props.periodId,
+  enterpriseId: props.enterpriseId
 }).then((res) => {
   if (res.code === '0000') {
-    enterpriseList.value = res.data.validList
+    enterpriseList.value = res.data || []
   }
 })
+
+const handleModify = (row: any) => {
+  modifyInvoiceItem({
+    mailAddress: row.mailAddress,
+    mailUserName: row.mailUserName,
+    mailUserPhone: row.mailUserPhone,
+    enterpriseId: props.enterpriseId,
+    id: row.invoiceId,
+    remark: row.remark
+  }).then((res) => {
+    if (res.code === '0000') {
+      ElMessage.success('保存成功')
+    }
+  })
+}
 
 const pageVO = reactive({
   pageSize: 10,
@@ -243,6 +275,27 @@ const handleCurrentChange = (val: number) => {
   pageVO.pageIndex = val
 }
 
+function getTableList() {
+  loading.value = true
+  getInvoiceList({
+    ...params,
+    pageIndex: pageVO.pageIndex,
+    pageSize: pageVO.pageSize
+  })
+    .then((res) => {
+      if (res.code === '0000') {
+        if (res.data) {
+          tableData.value = res.data.results || []
+          total.value = res.data.total || 0
+          sumInvoiceAmount.value = res.data.sumInvoiceAmount || 0
+        }
+      }
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
 const handleDownload = (invoiceId?: string) => {
   const params = {
     periodId: props.periodId,
@@ -251,10 +304,7 @@ const handleDownload = (invoiceId?: string) => {
   if (!invoiceId) {
     Reflect.deleteProperty(params, 'invoiceId')
   }
-  downloadInvoice(params).then((res) => {
-    if (res.code === '0000') {
-    }
-  })
+  downloadInvoice(params)
 }
 </script>
 

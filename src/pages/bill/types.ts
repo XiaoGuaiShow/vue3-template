@@ -131,12 +131,10 @@ export interface SummaryTableItem {
 export interface SummaryTableResult extends Result {
   data: PageVO3 & {
     total: number // 总页数
-    results: {
-      billDetailList: SummaryTableItem[]
-      sumTotalPaymentAmount: number // 已结金额
-      sumTotalPrice: number // 总应结金额
-      sumUnPaymentAmount: number // 未结金额
-    }
+    results: SummaryTableItem[]
+    sumTotalPaymentAmount: number
+    sumTotalPrice: number
+    sumUnPaymentAmount: number
   }
 }
 
@@ -189,7 +187,7 @@ export interface FeeClassItem {
   productList: ProductTypeItem[]
 }
 
-export interface periodSum {
+export interface PeriodSum {
   totalPrice: number // 本期消费
   lastPeriodPayable: number // 上期未结
   dissentAmount: number // 异议金额
@@ -204,7 +202,7 @@ export interface BillPeriodDetail {
   id: number // 账期id
   latestPaymentDate: string // 最晚还款日
   periodRange: string // 账期周期
-  periodSum: Partial<periodSum>
+  periodSum: Partial<PeriodSum>
   settlementStatus: number | undefined | null | '' // 结算状态
   settlementStatusDesc: string
 }
@@ -214,7 +212,7 @@ export interface BillPeriodDetailResult extends Result {
 }
 
 export interface BillPeriodSummary extends Result {
-  data: periodSum
+  data: PeriodSum
 }
 
 export type InvoiceListParams = PageVO3 & SettledAmountDetailsParams

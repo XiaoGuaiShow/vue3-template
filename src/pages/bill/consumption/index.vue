@@ -249,10 +249,15 @@ function getTableData() {
     })
 }
 watch(
-  () => billStore.enterpriseId,
+  () => [billStore.enterpriseId, billStore.activeYear],
   (newVal) => {
-    if (newVal && newVal !== '0') {
-      formInline.enterpriseId = newVal
+    console.log('kkkkkkkk', newVal)
+    const [enterpriseId, year] = newVal
+    if (enterpriseId && enterpriseId !== '0') {
+      formInline.enterpriseId = enterpriseId
+      dateRange.value = [`${year}-01-01`, `${year}-12-31`]
+      formInline.periodStartDate = `${year}-01-01`
+      formInline.periodEndDate = `${year}-12-31`
       getTableData()
     }
   },

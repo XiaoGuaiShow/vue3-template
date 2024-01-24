@@ -103,7 +103,8 @@
     v-if="showBillDialog"
     :enterpriseId="billPeriodList[activeIndex].enterpriseId"
     :periodId="billPeriodList[activeIndex].periodId"
-    @close="showBillDialog = false" />
+    @close="showBillDialog = false"
+    @confirm="handleConfirm" />
 </template>
 
 <script lang="ts" setup>
@@ -122,6 +123,8 @@ import type {
 import SummaryExpression from '../components/SummaryExpression.vue'
 import BillConfirmationDialog from '../components/BillConfirmationDialog.vue'
 import { getBillPeriodList, getBillPeriodDetail } from '@/api/bill'
+import mittBus from '@/utils/mitt'
+import { useBillStore } from '@/store/modules/bill'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
@@ -134,9 +137,11 @@ const billPeriodList = ref<BillPeriodItem[]>([])
 const activeIndex = ref(0)
 // 查询该月有多少账期
 watchEffect(() => {
+  const enterpriseId = props.basicParams.enterpriseIdList[0]
+  if (!enterpriseId) return
   loading.value = true
   getBillPeriodList({
-    enterpriseId: props.basicParams.enterpriseIdList[0],
+    enterpriseId,
     month: props.basicParams.month,
     year: props.basicParams.year
   })
@@ -152,6 +157,13 @@ watchEffect(() => {
 const tabClick = (index: number) => {
   activeIndex.value = index
 }
+mittBus.on('changePage', (data: any) => {
+  const findIndex = billPeriodList.value.findIndex((item) => item.periodId === data.periodId)
+  console.log('接受到的数据', data, findIndex)
+  if (findIndex > -1) {
+    activeIndex.value = findIndex
+  }
+})
 
 const sLoading = ref(false)
 const detail: Ref<BillPeriodDetail> = ref({
@@ -182,6 +194,10 @@ function getBillDeatil() {
     .finally(() => {
       sLoading.value = false
     })
+}
+
+const handleConfirm = () => {
+  getBillDeatil()
 }
 
 const statusColor = computed(() => {
@@ -225,14 +241,13 @@ const feeClassList = computed(() => {
 })
 
 const emit = defineEmits(['switchTab'])
+const billStore = useBillStore()
 const goLink = (type: number) => {
+  const periodId = billPeriodList.value[activeIndex.value].periodId
+  const enterpriseId = billPeriodList.value[activeIndex.value].enterpriseId
   if (type === 1) {
-    const periodId = billPeriodList.value[activeIndex.value].periodId
-    const enterpriseId = billPeriodList.value[activeIndex.value].enterpriseId
-    router.push({
-      path: `/bill/details`,
-      query: { periodId, enterpriseId }
-    })
+    billStore.setBillDetail(periodId, enterpriseId)
+    router.push(`/bill/details`)
   } else if (type === 2) {
     emit('switchTab', 'second')
   } else if (type === 3) {
