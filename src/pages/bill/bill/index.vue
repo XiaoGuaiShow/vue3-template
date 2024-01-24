@@ -26,14 +26,14 @@
     </el-form>
 
     <el-table class="mt-6" :data="tableData" stripe border max-height="280" v-loading="loading">
-      <el-table-column prop="name" label="结算单名称" show-overflow-tooltip>
+      <el-table-column prop="periodName" label="结算单名称" show-overflow-tooltip>
         <template #default="{ row }">
-          <span class="link">{{ row.name }}</span>
+          <span class="link">{{ row.periodName + row.periodCycle + '结算单' }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="range" label="结算周期" width="200" align="center" />
-      <el-table-column prop="needInvoiced" label="应结(元)" width="100" align="center" />
-      <el-table-column prop="invoiced" label="已结算(元)" width="100" align="center">
+      <el-table-column prop="periodCycle" label="结算周期" width="200" align="center" />
+      <el-table-column prop="totalPrice" label="应结(元)" width="100" align="center" />
+      <el-table-column prop="totalPaymentAmount" label="已结算(元)" width="100" align="center">
         <template #default="{ row }">
           <el-popover
             placement="top"
@@ -51,15 +51,19 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column prop="uninvoiced" label="未结算(元)" width="100" align="center" />
+      <el-table-column prop="unPaymentAmount" label="未结算(元)" width="100" align="center" />
       <el-table-column prop="invoiced" label="发票信息" width="100" align="center">
         <template #default="{ row }">
           <span class="link">发票构成</span>
         </template>
       </el-table-column>
-      <el-table-column prop="lastDay" label="快递单号" width="100" align="center" />
-      <el-table-column prop="status" label="结算单状态" width="100" align="center" />
-      <el-table-column prop="lastDay" label="最晚结算日" width="100" align="center" />
+      <el-table-column prop="trackingNumber" label="快递单号" width="100" align="center" />
+      <el-table-column prop="settlementStatus" label="结算单状态" width="100" align="center" />
+      <el-table-column
+        prop="periodLatestPaymentDate"
+        label="最晚结算日"
+        width="100"
+        align="center" />
     </el-table>
 
     <div class="flex jc-sb ai-c mt-16">
@@ -82,7 +86,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, watchEffect } from 'vue'
+import { ref, reactive } from 'vue'
 import { getBillList, getSettledAmountDetails } from '@/api/bill'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
@@ -155,11 +159,13 @@ function getTableList() {
 watch(
   () => billStore.enterpriseId,
   (val) => {
-    console.log('uuuuuuuuuuuuu', val)
     if (val && val !== '0') {
       params.enterpriseId = val
       getTableList()
     }
+  },
+  {
+    immediate: true
   }
 )
 const handleSizeChange = (val: number) => {

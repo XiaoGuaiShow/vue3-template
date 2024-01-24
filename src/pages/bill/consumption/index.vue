@@ -8,11 +8,12 @@
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          :clearable="false"
           @change="dateRangeChange" />
       </el-form-item>
       <el-form-item label="产品类型">
         <el-select
-          v-model="formInline.productType"
+          v-model="formInline.productTypes"
           multiple
           collapse-tags
           collapse-tags-tooltip
@@ -27,7 +28,7 @@
       </el-form-item>
       <el-form-item label="所属部门">
         <el-select
-          v-model="formInline.deptId"
+          v-model="formInline.deptNames"
           multiple
           collapse-tags
           collapse-tags-tooltip
@@ -188,7 +189,7 @@ const commonVisible = ref(false)
 const selectedList = ref<any[]>([])
 const handleSelectConfirm = (data: any) => {
   if (data && data.list) {
-    formInline.deptId = data.list.map((item: any) => item.Id)
+    formInline.deptNames = data.list.map((item: any) => item.Name)
     selectedList.value = data.list
   }
 }
@@ -200,18 +201,20 @@ const onSubmit = () => {
   pageVO.pageIndex = 1
   getTableData()
 }
-const dateRange = ref<any>([])
+
 const loading = ref(true)
 const pageVO = reactive({
   pageIndex: 1,
   pageSize: 10
 })
 const total = ref(0)
+const currentYear = new Date().getFullYear()
+const dateRange = ref<any>([`${currentYear}-01-01`, `${currentYear}-12-31`])
 const formInline = reactive({
-  periodStartDate: '',
-  periodEndDate: '',
-  productType: [],
-  deptId: [],
+  periodStartDate: `${currentYear}-01-01`,
+  periodEndDate: `${currentYear}-12-31`,
+  productTypes: [],
+  deptNames: [],
   travelingPerson: '',
   enterpriseId: ''
 })
@@ -252,6 +255,9 @@ watch(
       formInline.enterpriseId = newVal
       getTableData()
     }
+  },
+  {
+    immediate: true
   }
 )
 const dateRangeChange = (date: any) => {

@@ -41,8 +41,10 @@ export const SETTLEMENT_STATUS = new Map([
 ])
 
 export const INVOICE_TYPE = new Map([
-  [1, '纸质发票(票根)'],
-  [2, '电子发票(专票)']
+  [1, '普票'],
+  [2, '专票'],
+  [5, '行程单'],
+  [6, '票根']
 ])
 
 export const BILL_CATEGORY = new Map([
@@ -78,4 +80,11 @@ export const SETTLEMENT_DIMENSION = new Map([
 export const YES_OR_NO = new Map([
   [0, '否'],
   [1, '是']
+])
+
+export const INVOICE_STATUS = new Map([
+  [0, '未开具'],
+  [1, '已开具'],
+  [2, '开具失败'],
+  [3, '无需开具']
 ])

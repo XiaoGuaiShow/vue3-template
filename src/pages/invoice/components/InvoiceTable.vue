@@ -7,23 +7,29 @@
         :label="item.enterpriseName"
         :value="item.enterpriseId" />
     </el-select>
-    <div class="link" v-if="from === 'invoiceDetail'">批量下载</div>
+    <div class="link" v-if="from === 'invoiceDetail'" @click="handleDownload()">批量下载</div>
   </div>
 
-  <el-table class="mt-12 my-table" :data="tableData" stripe border max-height="250">
-    <el-table-column prop="invoiceSerialNo" label="开票编号" width="80" />
+  <el-table
+    class="mt-12 my-table"
+    :data="tableData"
+    stripe
+    border
+    max-height="480"
+    v-loading="loading">
+    <el-table-column type="index" label="开票编号" width="80" align="center" />
     <el-table-column prop="seller" label="销售主体" show-overflow-tooltip>
       <template #default="{ row }">
-        <div>{{ row.seller || '--' }}</div>
+        <span>{{ row.seller || '--' }}</span>
       </template>
     </el-table-column>
     <el-table-column
       v-if="from === 'invoiceDetail'"
-      prop="name"
+      prop="invoiceTitle"
       label="开票单位"
       show-overflow-tooltip>
       <template #default="{ row }">
-        <span>{{ row.name || '--' }}</span>
+        <span>{{ row.invoiceTitle || '--' }}</span>
       </template>
     </el-table-column>
     <el-table-column prop="buyer" label="开票单位" v-if="from === 'confirmationDialog'">
@@ -86,17 +92,17 @@
       align="center"
       v-if="from === 'invoiceDetail'">
       <template #default="{ row }">
-        <div class="color-success">{{ row.invoiceStatus }}</div>
+        <div class="color-success">{{ INVOICE_STATUS.get(row.invoiceStatus) || '-' }}</div>
       </template>
     </el-table-column>
-    <el-table-column prop="email" label="邮寄信息" align="center" width="180">
+    <el-table-column prop="mailAddress" label="邮寄信息" align="center" width="180">
       <template #default="{ row }">
         <div class="flex nowrap">
-          <span class="ellipsis-1" v-if="row.emailType === '电子'">{{ row.email }}</span>
+          <span class="ellipsis-1" v-if="from === 'invoiceDetail'">{{ row.mailAddress }}</span>
           <el-popover :width="420" v-else>
             <template #reference>
               <span class="c-brand-blue ellipsis-1">
-                {{ row.email }}
+                {{ row.mailAddress }}
               </span>
             </template>
             <div class="popover-form">
@@ -116,18 +122,25 @@
               </div>
             </div>
           </el-popover>
-          <span class="link ml-8 no-wrap">更改</span>
+          <span class="link ml-8 no-wrap" v-if="from === 'confirmationDialog'">更改</span>
         </div>
       </template>
     </el-table-column>
-    <el-table-column prop="sf" label="快递单号" align="center" v-if="from === 'invoiceDetail'">
+    <el-table-column
+      prop="trackingNumber"
+      label="快递单号"
+      align="center"
+      v-if="from === 'invoiceDetail'">
       <template #default="{ row }">
-        <div>{{ row.sf || '--' }}</div>
+        <div>{{ row.trackingNumber || '--' }}</div>
       </template>
     </el-table-column>
-    <el-table-column label="操作" align="center" width="74" v-if="from === 'invoiceDetail'">
-      <template #default>
-        <div class="link">下载</div>
+    <el-table-column label="操作" align="center" width="80" v-if="from === 'invoiceDetail'">
+      <template #default="{ row }">
+        <span class="link" v-if="row.invoiceType !== 6" @click="handleDownload(row.invoiceId)">
+          下载
+        </span>
+        <span v-else>--</span>
       </template>
     </el-table-column>
     <el-table-column label="备注" align="center" width="126" v-if="from === 'confirmationDialog'">
@@ -139,7 +152,7 @@
 
   <div class="flex jc-sb ai-c mt-16">
     <div class="left-text">
-      <span class="mr-16">合计 ¥6,000.00</span>
+      <span class="mr-16">合计 ¥{{ sumInvoiceAmount }}</span>
     </div>
     <el-pagination
       v-model:current-page="pageVO.pageIndex"
@@ -157,63 +170,70 @@
 import { ref } from 'vue'
 import { useBillStore } from '@/store/modules/bill'
 import { getInvoiceList } from '@/api/bill'
+import { getAllInvoiceList, downloadInvoice } from '@/api/invoice'
 import type { InvoiceListItem } from '@/pages/bill/types'
-import { PRODUCT_TYPE, INVOICE_TYPE } from '@/common/static'
+import { PRODUCT_TYPE, INVOICE_TYPE, INVOICE_STATUS } from '@/common/static'
 
 const billStore = useBillStore()
-console.log('billstore', billStore)
-const props = withDefaults(defineProps<{ from: string; periodId: number }>(), {
-  from: 'invoiceDetail',
-  periodId: 0
-})
+const props = withDefaults(
+  defineProps<{ from: string; periodId: string; enterpriseId: string }>(),
+  {
+    from: 'invoiceDetail',
+    periodId: '',
+    enterpriseId: ''
+  }
+)
 const { from } = toRefs(props)
-const enterpriseId = ref<number>(0)
+const enterpriseId = ref(0)
 const enterpriseList: Ref<any[]> = ref([])
 if (props.from === 'confirmationDialog') {
   enterpriseList.value = billStore.enterpriseList
   enterpriseId.value = billStore.enterpriseId
 }
 
-const pageVO = {
+getAllInvoiceList({
+  currentIndex: 1,
+  pageSize: 9999
+}).then((res) => {
+  if (res.code === '0000') {
+    enterpriseList.value = res.data.validList
+  }
+})
+
+const pageVO = reactive({
   pageSize: 10,
   pageIndex: 1
-}
-const params = {
-  enterpriseId: enterpriseId.value,
+})
+const params = reactive({
+  invoiceTitle: '',
+  enterpriseId: props.enterpriseId,
   periodId: props.periodId
-}
+})
 const total = ref(0)
 const loading = ref(false)
 const tableData: Ref<Partial<InvoiceListItem>[]> = ref([])
+const sumInvoiceAmount = ref(0)
+
 watchEffect(() => {
   loading.value = true
   getInvoiceList({
     ...params,
-    ...pageVO
-  }).then((res) => {
-    console.log(res)
+    pageIndex: pageVO.pageIndex,
+    pageSize: pageVO.pageSize
   })
-  setTimeout(() => {
-    loading.value = false
-    tableData.value = [
-      {
-        id: 2,
-        invoiceSerialNo: '1',
-        seller: '001',
-        buyer: '苏州思客信息技术有限公司',
-        taxNo: 'efqwefq323132121',
-        companyAddress: '江苏省',
-        companyPhone: '0512-3191313122',
-        companyBank: '中国银行',
-        companyBankNo: '121312132312',
-        productType: 1,
-        invoiceType: 1,
-        item: '经纪代理服务*服务费',
-        invoiceAmount: 20000,
-        remark: ''
+    .then((res) => {
+      console.log(res)
+      if (res.code === '0000') {
+        if (res.data) {
+          tableData.value = res.data.results || []
+          total.value = res.data.total || 0
+          sumInvoiceAmount.value = res.data.sumInvoiceAmount || 0
+        }
       }
-    ]
-  }, 1500)
+    })
+    .finally(() => {
+      loading.value = false
+    })
 })
 const handleSizeChange = (val: number) => {
   pageVO.pageSize = val
@@ -221,6 +241,20 @@ const handleSizeChange = (val: number) => {
 }
 const handleCurrentChange = (val: number) => {
   pageVO.pageIndex = val
+}
+
+const handleDownload = (invoiceId?: string) => {
+  const params = {
+    periodId: props.periodId,
+    invoiceId
+  }
+  if (!invoiceId) {
+    Reflect.deleteProperty(params, 'invoiceId')
+  }
+  downloadInvoice(params).then((res) => {
+    if (res.code === '0000') {
+    }
+  })
 }
 </script>
 

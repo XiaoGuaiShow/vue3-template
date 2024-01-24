@@ -89,3 +89,13 @@ export const validInvoice = (data: any): Promise<any> => {
     data
   })
 }
+// 票据下载-批量下载
+export const downloadInvoice = (params: any): Promise<any> => {
+  return axiosInstance({
+    method: 'get',
+    url: 'platform-web/settlement/enterprise/period/invoice/download',
+    params,
+    isDownload: true,
+    skipTypeCheck: true
+  } as any)
+}

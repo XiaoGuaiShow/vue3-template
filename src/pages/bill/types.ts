@@ -141,8 +141,8 @@ export interface SummaryTableResult extends Result {
 }
 
 export interface SettledAmountDetailsParams {
-  enterpriseId: number
-  periodId: number
+  enterpriseId: string | number
+  periodId: string | number
 }
 
 export interface AmountItem {
@@ -245,6 +245,7 @@ export interface InvoiceListResult extends Result {
   data: {
     total: number
     results: InvoiceListItem[]
+    sumInvoiceAmount: number
   }
 }
 

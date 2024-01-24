@@ -84,6 +84,7 @@ import { useYearAndCompany } from '@/pages/bill/hooks/overview'
 import { getInvoiceHistoryList } from '@/api/invoice'
 import { ElMessage } from 'element-plus'
 import dayjs from 'dayjs'
+import { useBillStore } from '@/store/modules/bill'
 
 const { enterpriseId, enterpriseOptions } = await useYearAndCompany(false)
 const loading = ref(false)
@@ -168,14 +169,10 @@ const onSubmit = () => {
   getTableList()
 }
 
+const billStore = useBillStore()
 const goLink = (row: TableItem) => {
-  router.push({
-    path: `/invoice-history-detail`,
-    query: {
-      periodId: row.periodId,
-      enterpriseId: row.enterpriseId
-    }
-  })
+  billStore.setInvoiceHistory(row.periodId, row.enterpriseId)
+  router.push('invoice-history-detail')
 }
 </script>
 
