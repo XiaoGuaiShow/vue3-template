@@ -88,9 +88,9 @@ axiosInstance.interceptors.request.use(
     } else {
       config.headers = Object.assign({}, defaultParams, config.headers)
     }
-    if (config?.params?.enterpriseId) {
-      config.headers['enterpriseIds'] = config.params.enterpriseId
-    }
+    // if (config?.params?.enterpriseId) {
+    //   config.headers['enterpriseIds'] = config.params.enterpriseId
+    // }
 
     return config
   },
