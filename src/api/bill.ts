@@ -77,7 +77,7 @@ export const exportPeriodItem = (params: {
 export const getOverviewDatas = (data: SumData): Promise<SumResult> => {
   return axiosInstance({
     method: 'post',
-    url: 'finance-bill/platform/settlement/group/sum',
+    url: 'platform-web/settlement/group/sum',
     data
   })
 }
@@ -117,7 +117,7 @@ export const getSettledAmountDetails = (
 export const getBillPeriodList = (data: BillPeriodListParams): Promise<BillPeriodListResult> => {
   return axiosInstance({
     method: 'post',
-    url: 'finance-bill/platform/settlement/enterprise/month/periods',
+    url: 'platform-web/settlement/enterprise/month/periods',
     data
   })
 }

@@ -8,13 +8,13 @@
           </Suspense>
         </el-tab-pane>
         <el-tab-pane label="消费数据" name="second">
-          <ConsumptionTable></ConsumptionTable>
+          <ConsumptionTable v-if="activeName === 'second'"></ConsumptionTable>
         </el-tab-pane>
         <el-tab-pane label="账单列表" name="third">
-          <BillList :status="status"></BillList>
+          <BillList :status="status" v-if="activeName === 'third'"></BillList>
         </el-tab-pane>
         <el-tab-pane label="导出记录" name="fourth">
-          <ExportRecord></ExportRecord>
+          <ExportRecord v-if="activeName === 'fourth'"></ExportRecord>
         </el-tab-pane>
         <!-- <el-tab-pane label="导出模板" name="fifth">Task</el-tab-pane> -->
       </el-tabs>
