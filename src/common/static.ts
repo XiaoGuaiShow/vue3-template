@@ -60,7 +60,7 @@ export const ORDER_STATUS_TYPE = new Map([
   [2, '退票']
 ])
 
-export const SETTLEMENT_TYPE = new Map([
+export const RULE_SETTLEMENT_TYPE = new Map([
   [0, '未知'],
   [1, '预存'],
   [2, '授信'],
@@ -85,4 +85,13 @@ export const INVOICE_STATUS = new Map([
   [1, '已开具'],
   [2, '开具失败'],
   [3, '无需开具']
+])
+
+export const SETTLEMENT_TYPE = new Map([
+  [0, '未知'],
+  [1, '授信'],
+  [2, '单结'],
+  [4, '企业钱包(充值)'],
+  [6, '支付宝_单位代付'],
+  [7, '银票']
 ])
