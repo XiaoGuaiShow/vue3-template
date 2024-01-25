@@ -11,7 +11,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const root: string = process.cwd()
   const { VITE_PORT } = loadEnv(mode, root)
   return {
-    base: `http://localhost:7038/settlement/`,
+    base: `http://localhost:7038/`,
     plugins: [
       vue(),
       function () {
