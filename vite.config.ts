@@ -50,7 +50,10 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       host: '0.0.0.0',
       port: parseInt(VITE_PORT),
       open: true,
-      cors: true
+      cors: true,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
     }
   }
 })

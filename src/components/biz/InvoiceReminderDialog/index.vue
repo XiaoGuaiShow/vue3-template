@@ -1,6 +1,6 @@
 <template>
   <TwDialog
-    title="提示"
+    name="提示"
     width="800px"
     @on-ok="onOk"
     @on-cancel="onCancel"
