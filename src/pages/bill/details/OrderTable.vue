@@ -46,7 +46,8 @@
       :span-method="objectSpanMethod"
       stripe
       border
-      max-height="680">
+      max-height="680"
+      v-loading="loading">
       <el-table-column
         type="selection"
         width="55"
@@ -241,80 +242,27 @@ function getTableData() {
   if (params.productType === -1) {
     Reflect.deleteProperty(params, 'productType')
   }
-  setTimeout(() => {
-    const resp = {
-      code: '0000',
-      data: {
-        total: 15,
-        results: [
-          {
-            orderSerialNo: 'DJI10210210231221',
-            memberName: '张三',
-            departmentName: '产品发展部',
-            departureDate: '2021-02-10 13:30:00',
-            arrivalDate: '2021-02-10 13:35:00',
-            productInfo: '天津→上海',
-            productName: 'CA2917',
-            productType: 1,
-            p1: '',
-            p2: '',
-            p3: '',
-            billPrices: [
-              {
-                orderStatusType: 0,
-                travelingPerson: '李四',
-                price: 100,
-                fuelTax: 10,
-                airportTax: 20,
-                tax: 7,
-                insurancePrice: 30,
-                grabTicketPrice: 5,
-                speedTicketPrice: 10,
-                serverPrice: 88
-              },
-              {
-                orderStatusType: 1,
-                travelingPerson: '王家明',
-                price: 200,
-                fuelTax: 10,
-                airportTax: 20,
-                tax: 7,
-                insurancePrice: 30,
-                grabTicketPrice: 5,
-                speedTicketPrice: 10,
-                serverPrice: 88
-              },
-              {
-                orderStatusType: 2,
-                travelingPerson: '王五',
-                price: 300,
-                fuelTax: 10,
-                airportTax: 20,
-                tax: 7,
-                insurancePrice: 30,
-                grabTicketPrice: 5,
-                speedTicketPrice: 10,
-                serverPrice: 88
-              }
-            ]
-          }
-        ]
+  getBillPeriodSummaryDetail(params)
+    .then((res) => {
+      if (res.code === '0000') {
+        if (res.data) {
+          const newTableList: any[] = []
+          const results = res.data.results || []
+          results.forEach((item: any) => {
+            item.billPrices.forEach((item2: any) => {
+              newTableList.push({ ...item, ...item2 })
+            })
+          })
+          tableData.value = newTableList
+          orderMap.value = calculate()
+        } else {
+          tableData.value = []
+        }
       }
-    }
-    const newTableList: any[] = []
-    resp.data.results.forEach((item) => {
-      item.billPrices.forEach((item2) => {
-        newTableList.push({ ...item, ...item2 })
-      })
     })
-    console.log(newTableList)
-    tableData.value = newTableList
-    loading.value = false
-    orderMap.value = calculate()
-  }, 1000)
-  getBillPeriodSummaryDetail(params).then((res) => {
-    console.log(res)
-  })
+    .finally(() => {
+      loading.value = false
+    })
 }
 getTableData()
 

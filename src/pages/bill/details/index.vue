@@ -25,7 +25,11 @@
     <div class="section mt-12">
       <el-tabs v-model="activeName">
         <el-tab-pane v-for="item in tabs" :key="item.field" :label="item.label" :name="item.field">
-          <OrderTable :dataType="item.type" :enterpriseId="enterpriseId" :periodId="periodId" />
+          <OrderTable
+            :dataType="item.type"
+            :enterpriseId="enterpriseId"
+            :periodId="periodId"
+            v-if="activeName === item.field" />
         </el-tab-pane>
       </el-tabs>
     </div>
