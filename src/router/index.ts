@@ -11,7 +11,7 @@ const routes = [
   ...SettlementRouter,
   ...ParentCompanyRouter,
   ...billRouter,
-  ...InvoiceSettingsRouter,
+  ...InvoiceSettingsRouter
   // {
   //   path: '/',
   //   redirect: '/home'
@@ -32,7 +32,7 @@ const router = createRouter({
 })
 
 // 路由前置后卫
-router.beforeEach((to,from,next) => {
+router.beforeEach((to, from, next) => {
   // 开启进度条
   start()
 
@@ -40,7 +40,7 @@ router.beforeEach((to,from,next) => {
     document.title = to.meta.title || '结算自动化'
   }
 
-  next();
+  next()
 
   if (window.microApp) {
     window.microApp.dispatch({ currentRoute: to.fullPath })
@@ -52,4 +52,4 @@ router.afterEach(() => {
   close()
 })
 
-export default router;
+export default router

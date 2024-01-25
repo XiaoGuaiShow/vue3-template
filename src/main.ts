@@ -24,13 +24,13 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 if (window.microApp) {
   // 监听基座下发的数据变化
-window.microApp.addDataListener((data) => {
-  // 当基座下发跳转指令时进行跳转
-  if (data.path) {
-    console.log(data);
-    router.push(data.path)
-  }
-})
+  window.microApp.addDataListener((data) => {
+    // 当基座下发跳转指令时进行跳转
+    if (data.path) {
+      console.log(data)
+      router.push(data.path)
+    }
+  })
 }
 
 // // 监听卸载操作
@@ -39,4 +39,3 @@ window.microApp.addDataListener((data) => {
 //   // 卸载所有数据监听函数
 //   window.microApp?.clearDataListener()
 // })
-
