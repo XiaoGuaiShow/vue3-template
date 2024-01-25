@@ -161,7 +161,7 @@ watch(
   (val) => {
     if (val && val !== '0') {
       params.enterpriseId = val
-      getTableList()
+      // getTableList()
     }
   },
   {

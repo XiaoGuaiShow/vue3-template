@@ -1,9 +1,7 @@
 <template>
   <el-config-provider :locale="locale">
-    <router-view v-slot="{ Component, route }">
-      <transition name="animation" mode="out-in">
-        <component :is="Component" :key="route.path" />
-      </transition>
+    <router-view>
+      
     </router-view>
   </el-config-provider>
 </template>
@@ -31,7 +29,7 @@ export default defineComponent({
 
 html,
 body,
-#app {
+#settlement-app {
   width: 100%;
   height: 100%;
   margin: 0;

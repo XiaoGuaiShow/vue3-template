@@ -65,8 +65,6 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config: RequestConfig) => {
     const defaultParams = getDefaultParams()
-    console.log('jjjjjj', defaultParams)
-    console.log('jjjjjj', config)
     if (config.showGlobalLoading) {
       requestsCount++
       loadingInstance = ElLoading.service({
