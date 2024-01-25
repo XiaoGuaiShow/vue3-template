@@ -80,7 +80,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       open: true,
       cors: true,
       headers: {
-        'Access-Control-Allow-Origin': '*' //记得配置跨域
+        'Access-Control-Allow-Origin': '*'
       }
     }
   }

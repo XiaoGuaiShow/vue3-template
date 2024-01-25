@@ -20,12 +20,16 @@
     </div>
     <div class="section mt-12">
       <div class="fs-20 fw-600 c-font-primary">账单汇总</div>
-      <SummaryExpression class="mt-12" :summary="periodSumDTO"></SummaryExpression>
+      <SummaryExpression class="mt-12" :summary="periodSumDTO" :type="2"></SummaryExpression>
     </div>
     <div class="section mt-12">
       <el-tabs v-model="activeName">
         <el-tab-pane v-for="item in tabs" :key="item.field" :label="item.label" :name="item.field">
-          <OrderTable :dataType="item.type" :enterpriseId="enterpriseId" :periodId="periodId" />
+          <OrderTable
+            :dataType="item.type"
+            :enterpriseId="enterpriseId"
+            :periodId="periodId"
+            v-if="activeName === item.field" />
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -36,11 +40,13 @@
 import { ref } from 'vue'
 import OrderTable from './OrderTable.vue'
 import SummaryExpression from '../components/SummaryExpression.vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { getBillPeriodSummary } from '@/api/bill'
 import type { PeriodSum } from '@/pages/bill/types'
 import { BILL_CATEGORY } from '@/common/static'
 import { useBillStore } from '@/store/modules/bill'
+import mittBus from '@/utils/mitt'
+
 const billStore = useBillStore()
 // init
 const router = useRouter()
@@ -59,6 +65,7 @@ const loading = ref(false)
 const periodSumDTO: Ref<Partial<PeriodSum>> = ref({
   periodName: ''
 })
+const route = useRoute()
 watchEffect(() => {
   if (periodId.value && enterpriseId.value) {
     loading.value = true
@@ -70,18 +77,26 @@ watchEffect(() => {
       .then((res) => {
         if (res.code === '0000') {
           if (res.data) {
-            periodSumDTO.value = {
-              totalPrice: 10000, // 本期消费
-              lastPeriodPayable: 12, // 上期未结
-              dissentAmount: 500, // 异议金额
-              unRetrievedAmount: 2500, // 未取回票据
-              overPeriodRefundAmount: 800, // 跨账期改退
-              payable: 4000, // 本期应退
-              periodName: '苏州思客信息技术有限公司2023-10-01至2023-10-31结算单1'
-            }
+            periodSumDTO.value = res.data
             // 初始化tab页签，初始化默认页签
             tabs.value = generateTabs(periodSumDTO.value)
-            activeName.value = tabs.value.length ? tabs.value[0].field : ''
+            if (route?.query?.tabName) {
+              activeName.value = route.query.tabName as string
+            } else {
+              activeName.value = tabs.value.length ? tabs.value[0].field : ''
+            }
+          } else {
+            periodSumDTO.value = {
+              totalPrice: 0, // 本期消费
+              lastPeriodPayable: 0, // 上期未结
+              dissentAmount: 0, // 异议金额
+              unRetrievedAmount: 0, // 未取回票据
+              overPeriodRefundAmount: 0, // 跨账期改退
+              payable: 0, // 本期应退
+              periodName: '',
+              enterpriseId: enterpriseId.value,
+              periodId: periodId.value
+            }
           }
         }
       })
@@ -91,7 +106,11 @@ watchEffect(() => {
   }
 })
 
-function generateTabs(obj: Partial<PeriodSum>): TabItem[] {
+mittBus.on('changeTab', (tabName: any) => {
+  activeName.value = tabName
+})
+
+function generateTabs(obj: any): TabItem[] {
   const tabs: TabItem[] = []
   const category = [...BILL_CATEGORY.values()]
   console.log(category)

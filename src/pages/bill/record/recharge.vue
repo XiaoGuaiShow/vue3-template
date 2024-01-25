@@ -92,7 +92,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getApiUrl } from '@/utils/auth'
 import dayjs from 'dayjs'
-import type { RechargeRequestParams } from '@/api/types/index'
+import type { RechargeRequestParams } from '@/pages/bill/types'
 
 const router = useRouter()
 
@@ -195,7 +195,6 @@ const handleSizeChange = (val: number) => {
   fetchData()
 }
 const goLink = () => {
-  console.log(111)
   router.go(-1)
 }
 </script>

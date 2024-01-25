@@ -28,13 +28,15 @@
                 }}
               </div>
               <div class="flex mt-12 ai-c">
-                <div class="fs-18 fw-500 c-font-primary">
-                  最晚结算日: {{ detail.latestPaymentDate }}
+                <div class="fs-18 fw-500 c-font-primary" v-if="detail.periodLatestPaymentDate">
+                  最晚结算日: {{ detail.periodLatestPaymentDate }}
                 </div>
-                <div class="flex ai-c elliptic ml-12">
+                <div
+                  class="flex ai-c elliptic ml-12"
+                  v-if="detail.countDown && detail.countDown > 0">
                   <img :src="timeImg" alt="" />
                   <div class="fs-12 h-12 lh-12 c-font-hint ml-2">距最晚结算日</div>
-                  <div class="fs-16 h-16 lh-16 c-brand-blue">12天</div>
+                  <div class="fs-16 h-16 lh-16 c-brand-blue">{{ detail.countDown }}天</div>
                 </div>
               </div>
             </div>
@@ -159,7 +161,6 @@ const tabClick = (index: number) => {
 }
 mittBus.on('changePage', (data: any) => {
   const findIndex = billPeriodList.value.findIndex((item) => item.periodId === data.periodId)
-  console.log('接受到的数据', data, findIndex)
   if (findIndex > -1) {
     activeIndex.value = findIndex
   }
@@ -167,12 +168,11 @@ mittBus.on('changePage', (data: any) => {
 
 const sLoading = ref(false)
 const detail: Ref<BillPeriodDetail> = ref({
-  id: 0,
+  countDown: 0,
+  periodLatestPaymentDate: '',
   feeClassSumList: [],
-  latestPaymentDate: '',
   periodRange: '',
   settlementStatus: undefined,
-  settlementStatusDesc: '',
   periodSum: {}
 })
 function getBillDeatil() {
@@ -189,6 +189,17 @@ function getBillDeatil() {
     .then((res) => {
       if (res.code === '0000') {
         detail.value = res.data
+      }
+    })
+    .catch((err) => {
+      console.log('eeeeeeeeeeeee', err)
+      detail.value = {
+        countDown: 0,
+        periodLatestPaymentDate: '',
+        feeClassSumList: [],
+        periodRange: '',
+        settlementStatus: undefined,
+        periodSum: {}
       }
     })
     .finally(() => {

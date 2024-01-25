@@ -2,22 +2,40 @@
   <div class="mt-24">
     <el-form :inline="true" :model="formInline">
       <el-form-item label="异议状态" v-if="dataType === 3">
-        <el-select v-model="formInline.deptId" placeholder="请选择" clearable>
+        <el-select v-model="formInline.dissentStatus" placeholder="请选择">
           <el-option label="全部" :value="-1" />
-          <el-option label="产品部门" :value="2" />
+          <el-option label="待处理" :value="0" />
+          <el-option label="已处理" :value="1" />
+          <el-option label="自动处理" :value="9" />
         </el-select>
       </el-form-item>
       <el-form-item label="所属部门">
-        <el-select v-model="formInline.deptId" placeholder="请选择" clearable>
-          <el-option label="测试部" :value="1" />
-          <el-option label="产品部门" :value="2" />
+        <el-select
+          v-model="formInline.deptNames"
+          multiple
+          collapse-tags
+          collapse-tags-tooltip
+          placeholder="请选择"
+          style="width: 240px"
+          @click="commonVisible = true"
+          @change="deptChange">
+          <el-option
+            v-for="item in selectedList"
+            :key="item.Id"
+            :label="item.Name"
+            :value="item.Id" />
         </el-select>
       </el-form-item>
       <el-form-item label="产品类型">
-        <el-select v-model="formInline.productType" placeholder="请选择">
-          <el-option label="全部" :value="-1" />
+        <el-select
+          v-model="formInline.productTypes"
+          multiple
+          collapse-tags
+          collapse-tags-tooltip
+          placeholder="请选择"
+          style="width: 240px">
           <el-option
-            v-for="item in productTypeOptions"
+            v-for="item in options"
             :key="item.value"
             :label="item.label"
             :value="item.value" />
@@ -33,12 +51,12 @@
         <el-button type="primary" @click="handleSearch">查询</el-button>
       </el-form-item>
     </el-form>
-    <div class="flex ai-c mb-18" v-if="dataType !== 3 && dataType !== 4">
+    <!-- <div class="flex ai-c mb-18" v-if="dataType !== 3 && dataType !== 4">
       <el-checkbox v-model="checkedAll" label="全选（跨分页）" size="large" />
       <el-button type="primary" @click="openAdjustDialog('开票单位')">批量调整开票单位</el-button>
       <el-button type="primary" @click="openAdjustDialog('成本中心')">批量调整成本中心</el-button>
       <el-button type="primary" @click="openAdjustDialog('项目中心')">批量调整项目中心</el-button>
-    </div>
+    </div> -->
 
     <el-table
       class="mt-6"
@@ -46,7 +64,8 @@
       :span-method="objectSpanMethod"
       stripe
       border
-      max-height="680">
+      max-height="680"
+      v-loading="loading">
       <el-table-column
         type="selection"
         width="55"
@@ -105,7 +124,7 @@
           <div class="flex">
             <el-dropdown trigger="click">
               <span class="flex ai-c">
-                苏州科技公司
+                {{ row.invoiceTitle }}
                 <el-icon class="el-icon--right">
                   <arrow-down />
                 </el-icon>
@@ -178,7 +197,7 @@
 
     <div class="flex jc-sb ai-c mt-16">
       <div class="fs-12 fw-600 c-font-primary">
-        <span>合计 ¥9000.00</span>
+        <span>合计 ¥{{ sumTotalPrice }}</span>
       </div>
       <el-pagination
         v-model:current-page="pageVO.pageIndex"
@@ -195,6 +214,12 @@
     v-if="showAdjustDialog"
     :dialogTitle="dialogTitle"
     @close="showAdjustDialog = false"></AdjustDialog>
+  <!-- 组织架构中选择 -->
+  <GroupSelector
+    v-if="commonVisible"
+    v-model:visible="commonVisible"
+    :popSelectType="4"
+    @on-ok="handleSelectConfirm" />
 </template>
 
 <script lang="ts" setup>
@@ -210,12 +235,23 @@ const props = defineProps<{
   periodId: number
 }>()
 const { dataType, enterpriseId, periodId } = toRefs(props)
+const commonVisible = ref(false)
+const selectedList = ref<any[]>([])
+const handleSelectConfirm = (data: any) => {
+  if (data && data.list) {
+    formInline.deptNames = data.list.map((item: any) => item.Name)
+    selectedList.value = data.list
+  }
+}
+const deptChange = (val: number[]) => {
+  selectedList.value = selectedList.value.filter((item) => val.includes(item.Id))
+}
 const formInline = reactive({
-  deptId: undefined,
-  productType: -1,
-  travelingPerson: '',
-  orderSerialNo: undefined,
-  dissentStatus: undefined
+  dissentStatus: -1,
+  deptNames: [],
+  productTypes: [],
+  travelingPerson: ''
+  // orderSerialNo: undefined
 })
 const pageVO = reactive({
   pageIndex: 1,
@@ -229,6 +265,7 @@ const staticParams = reactive({
 const tableData: Ref<any[]> = ref([])
 const loading = ref(false)
 const total = ref(0)
+const sumTotalPrice = ref(0)
 const orderMap = ref(new Map())
 // 查询表格
 function getTableData() {
@@ -238,83 +275,32 @@ function getTableData() {
     ...pageVO,
     ...staticParams
   }
-  if (params.productType === -1) {
-    Reflect.deleteProperty(params, 'productType')
+  if (params.dissentStatus === -1) {
+    Reflect.deleteProperty(params, 'dissentStatus')
   }
-  setTimeout(() => {
-    const resp = {
-      code: '0000',
-      data: {
-        total: 15,
-        results: [
-          {
-            orderSerialNo: 'DJI10210210231221',
-            memberName: '张三',
-            departmentName: '产品发展部',
-            departureDate: '2021-02-10 13:30:00',
-            arrivalDate: '2021-02-10 13:35:00',
-            productInfo: '天津→上海',
-            productName: 'CA2917',
-            productType: 1,
-            p1: '',
-            p2: '',
-            p3: '',
-            billPrices: [
-              {
-                orderStatusType: 0,
-                travelingPerson: '李四',
-                price: 100,
-                fuelTax: 10,
-                airportTax: 20,
-                tax: 7,
-                insurancePrice: 30,
-                grabTicketPrice: 5,
-                speedTicketPrice: 10,
-                serverPrice: 88
-              },
-              {
-                orderStatusType: 1,
-                travelingPerson: '王家明',
-                price: 200,
-                fuelTax: 10,
-                airportTax: 20,
-                tax: 7,
-                insurancePrice: 30,
-                grabTicketPrice: 5,
-                speedTicketPrice: 10,
-                serverPrice: 88
-              },
-              {
-                orderStatusType: 2,
-                travelingPerson: '王五',
-                price: 300,
-                fuelTax: 10,
-                airportTax: 20,
-                tax: 7,
-                insurancePrice: 30,
-                grabTicketPrice: 5,
-                speedTicketPrice: 10,
-                serverPrice: 88
-              }
-            ]
-          }
-        ]
+  getBillPeriodSummaryDetail(params)
+    .then((res) => {
+      if (res.code === '0000') {
+        if (res.data) {
+          total.value = res.data.total
+          sumTotalPrice.value = res.data.sumTotalPrice
+          const newTableList: any[] = []
+          const results = res.data.results || []
+          results.forEach((item: any) => {
+            item.billPrices.forEach((item2: any) => {
+              newTableList.push({ ...item, ...item2 })
+            })
+          })
+          tableData.value = newTableList
+          orderMap.value = calculate()
+        } else {
+          tableData.value = []
+        }
       }
-    }
-    const newTableList: any[] = []
-    resp.data.results.forEach((item) => {
-      item.billPrices.forEach((item2) => {
-        newTableList.push({ ...item, ...item2 })
-      })
     })
-    console.log(newTableList)
-    tableData.value = newTableList
-    loading.value = false
-    orderMap.value = calculate()
-  }, 1000)
-  getBillPeriodSummaryDetail(params).then((res) => {
-    console.log(res)
-  })
+    .finally(() => {
+      loading.value = false
+    })
 }
 getTableData()
 
@@ -334,6 +320,9 @@ const handleCurrentChange = (val: number) => {
 
 // 处理时间
 const handleTime = (startTime: string, endTime: string) => {
+  if (!startTime && !endTime) {
+    return '--'
+  }
   const start = dayjs(startTime)
   const end = dayjs(endTime)
   const startYear = start.format('YYYY')
@@ -352,14 +341,14 @@ const handleTime = (startTime: string, endTime: string) => {
 }
 
 // 产品类型下拉
-const productTypeOptions = ref(generateProductTypeOptions())
-function generateProductTypeOptions() {
-  const arr = [1, 5, 6, 7, 10]
-  return arr.map((item) => {
-    const value = PRODUCT_TYPE.get(item)
-    return { label: value, value: item }
-  })
-}
+const options = ref<any[]>([])
+const types = [1, 5, 6, 7, 10]
+types.forEach((item) => {
+  const value = PRODUCT_TYPE.get(item)
+  if (value) {
+    options.value.push({ label: value.replace('国内', ''), value: item })
+  }
+})
 
 const checkedAll = ref(false)
 

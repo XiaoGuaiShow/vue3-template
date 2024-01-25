@@ -43,11 +43,29 @@ router.beforeEach((to, from, next) => {
   next()
 
   if (window.microApp) {
+    if (window.__MICRO_APP_ENVIRONMENT__) {
+      // 如果__MICRO_APP_BASE_ROUTE__为 `/基座应用基础路由/子应用基础路由/`，则应去掉`/基座应用基础路由`
+      // 如果对这句话不理解，可以参考案例：https://github.com/micro-zoe/micro-app-demo
+      const realBaseRoute = window.__MICRO_APP_BASE_ROUTE__
+
+      if (typeof window.history.state?.current === 'string') {
+        window.history.state.current = window.history.state.current.replace(
+          new RegExp(realBaseRoute, 'g'),
+          ''
+        )
+      }
+    }
     window.microApp.dispatch({ currentRoute: to.fullPath })
   }
 })
 // 路由后置后卫
 router.afterEach(() => {
+  if (window.__MICRO_APP_ENVIRONMENT__) {
+    const realBaseRoute = window.__MICRO_APP_BASE_ROUTE__
+    if (typeof window.history.state === 'object') {
+      window.history.state.current = realBaseRoute + (window.history.state.current || '')
+    }
+  }
   // 关闭进度条
   close()
 })
