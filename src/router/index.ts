@@ -39,15 +39,14 @@ router.beforeEach((to, from, next) => {
   if (typeof to.meta.title === 'string') {
     document.title = to.meta.title || '结算自动化'
   }
-  console.log(to.fullPath);
+  console.log(to.fullPath)
   // if(to.fullPath.indexOf('#') >=0 ){
   //   to.fullPath.replace('#/','')
   //   next({...to, replace: true});
   // }
   // else{
-    next()
+  next()
   // }
-  
 
   if (window.microApp) {
     if (window.__MICRO_APP_ENVIRONMENT__) {
@@ -61,15 +60,18 @@ router.beforeEach((to, from, next) => {
         )
       }
     }
-  
-    window.microApp.dispatch({ currentRoute: to.fullPath.replace('/#','') })
+
+    window.microApp.dispatch({ currentRoute: to.fullPath.replace('/#', '') })
   }
 })
 // 路由后置后卫
 router.afterEach(() => {
   if (typeof window.history.state?.current === 'string') {
-    window.history.state.current = window.history.state.current.replace(new RegExp(realBaseRoute, 'g'), '')
-}
+    window.history.state.current = window.history.state.current.replace(
+      new RegExp(realBaseRoute, 'g'),
+      ''
+    )
+  }
   // 关闭进度条
   close()
 })
