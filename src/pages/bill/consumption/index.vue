@@ -144,7 +144,7 @@
       <el-table-column prop="price" label="单价(元)"></el-table-column>
       <el-table-column prop="serverPrice" label="服务费(元)" />
       <el-table-column prop="refundPrice" label="退改费(元)" />
-      <el-table-column prop="serverPrice" label="应付金额(元)">
+      <el-table-column prop="serverPrice" label="应付金额(元)" width="110">
         <template #default="{ row }">
           {{ handlePrice(row) }}
         </template>
@@ -202,7 +202,7 @@ const onSubmit = () => {
   getTableData()
 }
 
-const loading = ref(true)
+const loading = ref(false)
 const pageVO = reactive({
   pageIndex: 1,
   pageSize: 10
@@ -238,7 +238,7 @@ function getTableData() {
           })
           tableData.value = newTableList
           total.value = res.data.total
-          totalPrice.value = res.data.results[0].totalPrice
+          totalPrice.value = res.data.sumTotalPrice
         }
       } else {
         ElMessage.error(res.msg)
@@ -251,7 +251,6 @@ function getTableData() {
 watch(
   () => [billStore.enterpriseId, billStore.activeYear],
   (newVal) => {
-    console.log('kkkkkkkk', newVal)
     const [enterpriseId, year] = newVal
     if (enterpriseId && enterpriseId !== '0') {
       formInline.enterpriseId = enterpriseId

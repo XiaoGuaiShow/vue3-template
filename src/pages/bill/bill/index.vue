@@ -13,12 +13,21 @@
       </el-form-item>
       <el-form-item label="结算状态">
         <el-select v-model="params.settlementStatus" placeholder="请选择" clearable>
-          <el-option label="已结算" :value="1" />
+          <el-option label="全部" :value="-1" />
+          <el-option
+            v-for="[key, value] in SETTLEMENT_STATUS"
+            :key="key"
+            :label="value"
+            :value="key" />
           <el-option label="未结算" :value="0" />
         </el-select>
       </el-form-item>
       <el-form-item label="结算单名称">
-        <el-input v-model="params.periodName" placeholder="请输入名称"></el-input>
+        <el-input
+          v-model="params.periodName"
+          placeholder="请输入名称"
+          clearable
+          style="width: 200px"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">查询</el-button>
@@ -54,11 +63,47 @@
       <el-table-column prop="unPaymentAmount" label="未结算(元)" width="100" align="center" />
       <el-table-column prop="invoiced" label="发票信息" width="100" align="center">
         <template #default="{ row }">
-          <span class="link">发票构成</span>
+          <el-popover :width="420">
+            <template #reference>
+              <span class="c-brand-blue ellipsis-1">发票构成</span>
+            </template>
+            <div class="popover-form">
+              <div class="flex">
+                <div class="label">开票单位</div>
+                <div>{{ row.invoiceTitle }}</div>
+              </div>
+              <div class="flex">
+                <div class="label">发票税号</div>
+                <div>{{ row.taxNo }}</div>
+              </div>
+              <div class="flex">
+                <div class="label">公司地址</div>
+                <div>
+                  {{ row.companyAddress }}
+                </div>
+              </div>
+              <div class="flex">
+                <div class="label">公司电话</div>
+                <div>{{ row.companyPhone }}</div>
+              </div>
+              <div class="flex">
+                <div class="label">开户银行</div>
+                <div>{{ row.companyBank }}</div>
+              </div>
+              <div class="flex">
+                <div class="label">银行账号</div>
+                <div>{{ row.companyBankNo }}</div>
+              </div>
+            </div>
+          </el-popover>
         </template>
       </el-table-column>
       <el-table-column prop="trackingNumber" label="快递单号" width="100" align="center" />
-      <el-table-column prop="settlementStatus" label="结算单状态" width="100" align="center" />
+      <el-table-column prop="settlementStatus" label="结算单状态" width="100" align="center">
+        <template #default="{ row }">
+          {{ SETTLEMENT_STATUS.get(row.settlementStatus) }}
+        </template>
+      </el-table-column>
       <el-table-column
         prop="periodLatestPaymentDate"
         label="最晚结算日"
@@ -91,6 +136,9 @@ import { getBillList, getSettledAmountDetails } from '@/api/bill'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
 import { useBillStore } from '@/store/modules/bill'
+import { SETTLEMENT_STATUS } from '@/common/static'
+import { AmountItem } from '@/pages/bill/types'
+
 const billStore = useBillStore()
 const props = defineProps<{
   status: number
@@ -103,15 +151,13 @@ const pageVO = {
   pageIndex: 1,
   pageSize: 10
 }
-const dateRange = ref<any>('')
-const nowDate = dayjs(new Date()).format('YYYY-MM-DD')
-const lastThreeMonth = dayjs(nowDate).subtract(3, 'month').format('YYYY-MM-DD')
-// dateRange.value = [lastThreeMonth, nowDate]
+const currentYear = new Date().getFullYear()
+const dateRange = ref<any>([`${currentYear}-01-01`, `${currentYear}-12-31`])
 const params: any = reactive({
   enterpriseId: 0,
-  settlementStatus: '全部',
-  periodStartDate: '', // 开始日期
-  periodEndDate: '', // 结束日期
+  settlementStatus: status || -1,
+  periodStartDate: `${currentYear}-01-01`,
+  periodEndDate: `${currentYear}-12-31`,
   year: '',
   periodName: ''
 })
@@ -135,7 +181,7 @@ function getTableList() {
     ...params,
     ...pageVO
   }
-  if (newParams.settlementStatus === '全部') {
+  if (newParams.settlementStatus === -1) {
     Reflect.deleteProperty(newParams, 'settlementStatus')
   }
   getBillList(newParams)
@@ -157,10 +203,14 @@ function getTableList() {
     })
 }
 watch(
-  () => billStore.enterpriseId,
-  (val) => {
-    if (val && val !== '0') {
-      params.enterpriseId = val
+  () => [billStore.enterpriseId, billStore.activeYear],
+  (newVal) => {
+    const [enterpriseId, year] = newVal
+    if (enterpriseId && enterpriseId !== '0') {
+      params.enterpriseId = enterpriseId
+      dateRange.value = [`${year}-01-01`, `${year}-12-31`]
+      params.periodStartDate = `${year}-01-01`
+      params.periodEndDate = `${year}-12-31`
       getTableList()
     }
   },
@@ -199,22 +249,16 @@ const handleBeforeEnter = (enterpriseId: number, periodId: number) => {
     periodId
   }
   tLoading.value = true
-  setTimeout(() => {
-    amountTable.value = [
-      { paymentAmount: 1000, paymentDate: '2023-12-12' },
-      { paymentAmount: 4000, paymentDate: '2024-12-12' },
-      { paymentAmount: 5000, paymentDate: '2022-12-12' }
-    ]
-    amountMap.set(periodId, amountTable.value)
-    tLoading.value = false
-  }, 1000)
-  getSettledAmountDetails(params).then((res) => {
-    if (res.code === '0000') {
-      amountTable.value = res.data
-      amountMap.set(periodId, amountTable.value)
-    }
-    tLoading.value = false
-  })
+  getSettledAmountDetails(params)
+    .then((res) => {
+      if (res.code === '0000') {
+        amountTable.value = res.data || []
+        amountMap.set(periodId, amountTable.value)
+      }
+    })
+    .finally(() => {
+      tLoading.value = false
+    })
 }
 </script>
 

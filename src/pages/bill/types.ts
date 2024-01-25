@@ -85,12 +85,13 @@ export interface EnterpriseOptionItem {
 
 // 集团汇总入参
 export interface SumData {
-  enterpriseIdList: number[]
+  enterpriseIdList: string[]
   year: number
 }
 // 出参
 export interface SumResult extends Result {
   data: {
+    balance: number
     totalPrice: number // 总消费
     totalPaymentAmount: number // 已结算
     unPaymentAmount: number // 未结算
@@ -99,6 +100,7 @@ export interface SumResult extends Result {
     unVatInvoiceAmount: number // 增值税发票未开
     unPrintInvoiceAmount: number // 机票行程单未取
     unTakeoutInvoiceAmount: number // 火车票根未取
+    settlementType: number // 结算方式
   }
 }
 
@@ -195,16 +197,18 @@ export interface PeriodSum {
   overPeriodRefundAmount: number // 跨账期改退
   payable: number // 本期应结
   periodName?: string // 账期名称
+  periodId?: number
+  enterpriseId?: number
 }
 
 export interface BillPeriodDetail {
   feeClassSumList: FeeClassItem[]
-  id: number // 账期id
-  latestPaymentDate: string // 最晚还款日
   periodRange: string // 账期周期
   periodSum: Partial<PeriodSum>
   settlementStatus: number | undefined | null | '' // 结算状态
-  settlementStatusDesc: string
+  countDown: number
+  periodLatestPaymentDate: string
+  [propName: string]: any
 }
 
 export interface BillPeriodDetailResult extends Result {
