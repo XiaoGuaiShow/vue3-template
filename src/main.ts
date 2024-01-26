@@ -23,11 +23,13 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 
 if (window.microApp) {
+  const UserStore = useUserStore()
+  const data = window.microApp.getData()
+  UserStore.setUserInfo(data.memberInfo)
   // 监听基座下发的数据变化
-  window.microApp.addDataListener((data) => {
+  window.microApp.addDataListener((data: any) => {
     // 当基座下发跳转指令时进行跳转
     if (data.path) {
-      console.log(data)
       router.push(data.path)
     }
   })

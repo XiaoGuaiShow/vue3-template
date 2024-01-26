@@ -39,6 +39,7 @@ import BillList from './bill/index.vue'
 import ExportRecord from './record/ExportRecord.vue'
 import type { BasicParams } from './types'
 import { useBillStore } from '@/store/modules/bill'
+import mittBus from '@/utils/mitt'
 
 const router = useRouter()
 
@@ -94,6 +95,11 @@ const goLink = (type: number) => {
 const switchTab = (tab: string) => {
   activeName.value = tab
 }
+
+// 监听其他组件需要跳转到账单总览
+mittBus.on('willToBillDetail', (data: any) => {
+  activeName.value = 'first'
+})
 </script>
 
 <style lang="less" scoped>

@@ -39,14 +39,7 @@ router.beforeEach((to, from, next) => {
   if (typeof to.meta.title === 'string') {
     document.title = to.meta.title || '结算自动化'
   }
-  console.log(to.fullPath)
-  // if(to.fullPath.indexOf('#') >=0 ){
-  //   to.fullPath.replace('#/','')
-  //   next({...to, replace: true});
-  // }
-  // else{
   next()
-  // }
 
   if (window.microApp) {
     if (window.__MICRO_APP_ENVIRONMENT__) {

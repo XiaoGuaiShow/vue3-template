@@ -12,7 +12,7 @@
           @change="dateChange" />
       </el-form-item>
       <el-form-item label="结算状态">
-        <el-select v-model="params.settlementStatus" placeholder="请选择" clearable>
+        <el-select v-model="params.settlementStatus" placeholder="请选择">
           <el-option label="全部" :value="-1" />
           <el-option
             v-for="[key, value] in SETTLEMENT_STATUS"
@@ -37,7 +37,9 @@
     <el-table class="mt-6" :data="tableData" stripe border max-height="280" v-loading="loading">
       <el-table-column prop="periodName" label="结算单名称" show-overflow-tooltip>
         <template #default="{ row }">
-          <span class="link">{{ row.periodName + row.periodCycle + '结算单' }}</span>
+          <span class="link" @click="handleLink(row)">
+            {{ row.periodName + row.periodCycle + '结算单' }}
+          </span>
         </template>
       </el-table-column>
       <el-table-column prop="periodCycle" label="结算周期" width="200" align="center" />
@@ -45,6 +47,7 @@
       <el-table-column prop="totalPaymentAmount" label="已结算(元)" width="100" align="center">
         <template #default="{ row }">
           <el-popover
+            v-if="row.settlementType === 1 && row.totalPaymentAmount > 0"
             placement="top"
             :width="310"
             @before-enter="handleBeforeEnter(row.enterpriseId, row.periodId)">
@@ -58,44 +61,13 @@
               </el-table>
             </div>
           </el-popover>
+          <span v-else>{{ row.totalPaymentAmount }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="unPaymentAmount" label="未结算(元)" width="100" align="center" />
       <el-table-column prop="invoiced" label="发票信息" width="100" align="center">
         <template #default="{ row }">
-          <el-popover :width="420">
-            <template #reference>
-              <span class="c-brand-blue ellipsis-1">发票构成</span>
-            </template>
-            <div class="popover-form">
-              <div class="flex">
-                <div class="label">开票单位</div>
-                <div>{{ row.invoiceTitle }}</div>
-              </div>
-              <div class="flex">
-                <div class="label">发票税号</div>
-                <div>{{ row.taxNo }}</div>
-              </div>
-              <div class="flex">
-                <div class="label">公司地址</div>
-                <div>
-                  {{ row.companyAddress }}
-                </div>
-              </div>
-              <div class="flex">
-                <div class="label">公司电话</div>
-                <div>{{ row.companyPhone }}</div>
-              </div>
-              <div class="flex">
-                <div class="label">开户银行</div>
-                <div>{{ row.companyBank }}</div>
-              </div>
-              <div class="flex">
-                <div class="label">银行账号</div>
-                <div>{{ row.companyBankNo }}</div>
-              </div>
-            </div>
-          </el-popover>
+          <span class="link" @click="goLink(row)">发票构成</span>
         </template>
       </el-table-column>
       <el-table-column prop="trackingNumber" label="快递单号" width="100" align="center" />
@@ -138,6 +110,7 @@ import { ElMessage } from 'element-plus'
 import { useBillStore } from '@/store/modules/bill'
 import { SETTLEMENT_STATUS } from '@/common/static'
 import { AmountItem } from '@/pages/bill/types'
+import mittBus from '@/utils/mitt'
 
 const billStore = useBillStore()
 const props = defineProps<{
@@ -258,6 +231,21 @@ const handleBeforeEnter = (enterpriseId: number, periodId: number) => {
     .finally(() => {
       tLoading.value = false
     })
+}
+
+const router = useRouter()
+const goLink = (row: any) => {
+  billStore.setInvoiceHistory(row.periodId, row.enterpriseId)
+  router.push({ name: 'InvoiceHistoryDetail' })
+}
+const handleLink = (row: any) => {
+  // 跳转到账单总览的账单详情
+  mittBus.emit('willToBillDetail', {
+    periodId: row.periodId,
+    enterpriseId: row.enterpriseId,
+    year: row.year,
+    month: row.month
+  })
 }
 </script>
 
