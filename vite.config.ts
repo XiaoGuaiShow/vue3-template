@@ -5,8 +5,8 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
-import {writeFileSync} from "fs";
-import path, {join} from 'path'
+import { writeFileSync } from 'fs'
+import path, { join } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
@@ -35,15 +35,15 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                       return all.replace($3, new URL($3, basePath))
                     }
                   )
-                  const fullPath = join(options.dir, chunk.fileName);
-                  writeFileSync(fullPath, chunk.code);
+                  const fullPath = join(options.dir, chunk.fileName)
+                  writeFileSync(fullPath, chunk.code)
                 }
               }
             }
           }
         }
       })() as any,
-      AutoImport({ 
+      AutoImport({
         resolvers: [ElementPlusResolver()],
         imports: ['vue', 'vue-router', 'pinia'],
         eslintrc: {
