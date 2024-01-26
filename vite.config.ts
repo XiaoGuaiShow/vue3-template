@@ -11,9 +11,9 @@ import path, { join } from 'path'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const root: string = process.cwd()
-  const { VITE_PORT } = loadEnv(mode, root)
+  const { VITE_PORT, VITE_BASE_WEBSITE } = loadEnv(mode, root)
   return {
-    base: `${mode === 'production' ? 'https://manageorder.ceekee.com' : ''}`,
+    base: `${mode === 'production' ? 'https://manageorder.ceekee.com' : VITE_BASE_WEBSITE}`,
     plugins: [
       vue(),
       (function () {
