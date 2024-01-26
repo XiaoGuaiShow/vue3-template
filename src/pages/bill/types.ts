@@ -33,7 +33,7 @@ export interface Result {
 }
 
 export interface OptionItem {
-  value: string
+  value: number
   label: string
 }
 
@@ -70,7 +70,7 @@ export interface RechargeRequestParams {
 }
 
 export interface EnterpriseItem {
-  enterpriseId: string
+  enterpriseId: number
   enterpriseName: string
   type: -1 | 0 | 1
 }
@@ -85,7 +85,7 @@ export interface EnterpriseOptionItem {
 
 // 集团汇总入参
 export interface SumData {
-  enterpriseIdList: string[]
+  enterpriseIdList: number[]
   year: number
 }
 // 出参
@@ -205,7 +205,7 @@ export interface BillPeriodDetail {
   feeClassSumList: FeeClassItem[]
   periodRange: string // 账期周期
   periodSum: Partial<PeriodSum>
-  settlementStatus: number | undefined | null | '' // 结算状态
+  settlementStatus: number // 结算状态
   countDown: number
   periodLatestPaymentDate: string
   [propName: string]: any

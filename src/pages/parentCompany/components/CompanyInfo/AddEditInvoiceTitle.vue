@@ -167,7 +167,7 @@ interface RuleForm {
 }
 
 const addForm = reactive<RuleForm>({
-  accountId: 0,
+  accountId: '',
   bankNo: '',
   companyAddress: '',
   companyPhone: '',

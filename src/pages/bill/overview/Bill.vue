@@ -21,11 +21,7 @@
             </div>
             <div class="ml-24 flex col jc-c">
               <div class="fs-24 fw-600 left-block-title">
-                {{
-                  detail.settlementStatus
-                    ? SETTLEMENT_STATUS.get(detail.settlementStatus)
-                    : '未出账'
-                }}
+                {{ SETTLEMENT_STATUS.get(detail.settlementStatus) ?? '未出账' }}
               </div>
               <div class="flex mt-12 ai-c">
                 <div class="fs-18 fw-500 c-font-primary" v-if="detail.periodLatestPaymentDate">
@@ -172,7 +168,7 @@ const detail: Ref<BillPeriodDetail> = ref({
   periodLatestPaymentDate: '',
   feeClassSumList: [],
   periodRange: '',
-  settlementStatus: undefined,
+  settlementStatus: -1,
   periodSum: {}
 })
 function getBillDeatil() {
@@ -198,7 +194,7 @@ function getBillDeatil() {
         periodLatestPaymentDate: '',
         feeClassSumList: [],
         periodRange: '',
-        settlementStatus: undefined,
+        settlementStatus: -1,
         periodSum: {}
       }
     })

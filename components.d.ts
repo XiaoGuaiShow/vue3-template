@@ -20,6 +20,8 @@ declare module 'vue' {
     CompanyInfo: typeof import('./src/pages/parentCompany/components/CompanyInfo/index.vue')['default']
     CompanyList: typeof import('./src/pages/parentCompany/components/CompanyList/index.vue')['default']
     CustomSelector: typeof import('./src/components/biz/GroupSelector/components/CustomSelector/index.vue')['default']
+    ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
+    ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCascader: typeof import('element-plus/es')['ElCascader']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']

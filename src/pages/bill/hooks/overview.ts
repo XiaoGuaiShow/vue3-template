@@ -5,7 +5,6 @@ import mittBus from '@/utils/mitt.ts'
 
 export const useYearAndCompany = async (needSum = true) => {
   const year = ref(new Date().getFullYear()) // 年份
-  const yearList = generateYears(2023)
   const enterpriseId = ref('') // 公司id
   const enterpriseList: Ref<EnterpriseItem[]> = ref([]) // 公司列表
   const isSummary = ref(false) // 是否是汇总页
@@ -49,27 +48,16 @@ export const useYearAndCompany = async (needSum = true) => {
     console.log(err)
   }
 
-  mittBus.on('changePage', (data: any) => {
-    console.log('接受到的数据', data)
-    enterpriseId.value = data.enterpriseId
+  mittBus.on('willToBillDetail', (data: any) => {
+    data.enterpriseId && (enterpriseId.value = data.enterpriseId)
+    data.year && (year.value = data.year)
   })
 
   return {
     year,
-    yearList,
     enterpriseId,
     enterpriseList,
     enterpriseOptions,
     isSummary
   }
-}
-
-function generateYears(year: number) {
-  const currentYear = new Date().getFullYear()
-  const years = currentYear - year
-  const list = []
-  for (let i = year; i <= year + years; i++) {
-    list.unshift(i)
-  }
-  return list
 }

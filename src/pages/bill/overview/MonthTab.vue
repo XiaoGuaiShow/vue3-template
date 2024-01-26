@@ -2,7 +2,7 @@
   <div class="custom-tab mt-12">
     <div
       class="tab-item"
-      :class="{ active: activeMonth === value }"
+      :class="{ active: month === value }"
       v-for="value in months"
       :key="value"
       @click="handleTabClick(value)">
@@ -12,21 +12,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
 const months = Array.from({ length: 12 }, (_, i) => i + 1)
-const currentMonth = new Date().getMonth() + 1
-const activeMonth = ref(currentMonth)
+const props = defineProps<{
+  month?: number
+  monthChange: (month: number) => void
+}>()
+
 const handleTabClick = (value: number) => {
-  activeMonth.value = value
+  props.monthChange(value)
 }
-const emit = defineEmits(['monthChange'])
-watch(
-  () => activeMonth.value,
-  (value) => {
-    emit('monthChange', value)
-  },
-  { immediate: true }
-)
 </script>
 
 <style lang="less" scoped>

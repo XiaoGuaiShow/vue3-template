@@ -4,7 +4,13 @@
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="账单总览" name="first">
           <Suspense>
-            <DataCard @change="handleChange" @link-change="goLink"></DataCard>
+            <DataCard
+              :year="year"
+              :yearChange="yearChange"
+              :enterpriseId="enterpriseId"
+              :enterpriseIdList="enterpriseIdList"
+              :setEnterpriseIdFn="setEnterpriseIdFn"
+              @link-change="goLink"></DataCard>
           </Suspense>
         </el-tab-pane>
         <el-tab-pane label="消费数据" name="second">
@@ -20,9 +26,22 @@
       </el-tabs>
     </div>
     <template v-if="activeName === 'first'">
-      <MonthTab @month-change="monthChange"></MonthTab>
-      <SummaryTable v-if="isSummary" :basicParams="basicParams"></SummaryTable>
-      <Bill v-else :basicParams="basicParams" @switch-tab="switchTab"></Bill>
+      <MonthTab :month="month" :monthChange="monthChange"></MonthTab>
+      <SummaryTable
+        v-if="isSummary"
+        :basicParams="{
+          year,
+          month,
+          enterpriseIdList
+        }"></SummaryTable>
+      <Bill
+        v-else
+        :basicParams="{
+          year,
+          month,
+          enterpriseIdList
+        }"
+        @switch-tab="switchTab"></Bill>
     </template>
   </div>
 </template>
@@ -37,32 +56,25 @@ import Bill from './overview/Bill.vue'
 import ConsumptionTable from './consumption/index.vue'
 import BillList from './bill/index.vue'
 import ExportRecord from './record/ExportRecord.vue'
-import type { BasicParams } from './types'
 import { useBillStore } from '@/store/modules/bill'
 import mittBus from '@/utils/mitt'
+import { useOverview } from './hooks/useOverview'
+
+const {
+  year,
+  yearChange,
+  enterpriseId,
+  enterpriseIdList,
+  setEnterpriseIdFn,
+  month,
+  monthChange,
+  isSummary
+} = useOverview()
 
 const router = useRouter()
-
-const isSummary = ref(false)
 const activeName = ref('first')
-const basicParams = reactive<BasicParams>({
-  year: new Date().getFullYear(),
-  month: new Date().getMonth() + 1,
-  enterpriseIdList: []
-})
-
 const handleClick = () => {
   status.value = -1
-}
-const handleChange = (arr: [number, number[], boolean]) => {
-  const [year, enterpriseIdList, isSummaryProp] = arr
-  isSummary.value = isSummaryProp
-  basicParams.year = year
-  basicParams.enterpriseIdList = enterpriseIdList
-}
-
-const monthChange = (month: number) => {
-  basicParams.month = month
 }
 
 const status = ref(-1) // 0 全部 1已结算 2未结算
@@ -99,6 +111,8 @@ const switchTab = (tab: string) => {
 // 监听其他组件需要跳转到账单总览
 mittBus.on('willToBillDetail', (data: any) => {
   activeName.value = 'first'
+  data.year && yearChange(data.year)
+  data.month && monthChange(data.month)
 })
 </script>
 

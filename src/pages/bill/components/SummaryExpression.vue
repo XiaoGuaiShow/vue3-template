@@ -1,7 +1,7 @@
 import { Script } from 'vm';
 <template>
   <div class="flex ai-c jc-sb">
-    <div class="flex col ai-c item" v-if="summary.totalPrice">
+    <div class="flex col ai-c item" v-if="typeof summary.totalPrice === 'number'">
       <div class="title">本期消费</div>
       <div class="money">￥{{ summary.totalPrice }}</div>
       <div class="btn" @click="goLink('totalPrice')">查看</div>

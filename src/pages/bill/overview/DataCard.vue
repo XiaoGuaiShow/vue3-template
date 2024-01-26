@@ -1,10 +1,10 @@
 <template>
   <div class="flex ai-c mt-24">
     <div class="title">年度总览</div>
-    <el-select class="ml-12 mr-12" v-model="year" placeholder="请选择">
+    <el-select class="ml-12 mr-12" v-model="props.year" placeholder="请选择" @change="yearChange">
       <el-option v-for="item in yearList" :key="item" :label="item + '年度'" :value="item" />
     </el-select>
-    <el-select v-model="enterpriseId" placeholder="请选择">
+    <el-select v-model="props.enterpriseId" placeholder="请选择" @change="handleChange">
       <el-option-group v-for="group in enterpriseOptions" :key="group.label" :label="group.label">
         <el-option
           v-for="item in group.options"
@@ -82,43 +82,83 @@
 </template>
 
 <script lang="ts" setup>
-import { watch, computed } from 'vue'
-import { useYearAndCompany } from '../hooks/overview'
+import { computed } from 'vue'
 import invoiceImg from '@/assets/images/bill/invoice.png'
 import moneyImg from '@/assets/images/bill/money.png'
 import bpayImg from '@/assets/images/bill/bpay.png'
-import type { EnterpriseItem } from '@/pages/bill/types'
-import { getOverviewDatas } from '@/api/bill'
-import { useBillStore } from '@/store/modules/bill'
+import type { EnterpriseItem, EnterpriseOptionItem } from '@/pages/bill/types'
+import { getOverviewDatas, getCompanyList } from '@/api/bill'
 
-const { year, yearList, enterpriseId, enterpriseList, enterpriseOptions } =
-  await useYearAndCompany()
+const props = defineProps<{
+  year: number
+  yearChange: any
+  enterpriseId: number
+  enterpriseIdList: number[]
+  setEnterpriseIdFn: any
+}>()
+
+const handleChange = (val: number) => {
+  const findItem = enterpriseList.value.find((item) => item.enterpriseId === val)
+  if (findItem) {
+    if (findItem.type === -1) {
+      // 汇总
+      const ids = enterpriseList.value
+        .filter((item) => item.type !== -1)
+        .map((item) => item.enterpriseId)
+      props.setEnterpriseIdFn(val, ids, true)
+    } else {
+      props.setEnterpriseIdFn(val, [val], false)
+    }
+  }
+}
+// 公司列表
+const enterpriseList: Ref<EnterpriseItem[]> = ref([]) // 公司列表
+const enterpriseOptions = ref<EnterpriseOptionItem[]>([])
+getCompanyList(true).then((res) => {
+  if (res.code === '0000') {
+    enterpriseList.value = res.data
+    const option1 = []
+    const option2 = []
+    for (const item of res.data) {
+      if (item.type === 0 || item.type === -1) {
+        option1.push({
+          label: item.enterpriseName,
+          value: item.enterpriseId
+        })
+        // 初始化赋值母公司id
+        if (item.type === 0) {
+          props.setEnterpriseIdFn(item.enterpriseId, [item.enterpriseId], false)
+        }
+      }
+      if (item.type === 1) {
+        option2.push({
+          label: item.enterpriseName,
+          value: item.enterpriseId
+        })
+      }
+    }
+    if (option1.length > 0) {
+      enterpriseOptions.value.push({
+        label: '集团',
+        options: option1
+      })
+    }
+    if (option2.length > 0) {
+      enterpriseOptions.value.push({
+        label: '子公司',
+        options: option2
+      })
+    }
+  }
+})
 const isSummary = computed(() => {
   const findItem = (enterpriseList.value as EnterpriseItem[]).find(
-    (item) => item.enterpriseId === enterpriseId.value
+    (item) => item.enterpriseId === props.enterpriseId
   )
   return findItem ? findItem.type === -1 : false
 })
-// 除了集团汇总所有的id集合
-const idList = enterpriseList.value
-  .filter((item) => item.type !== -1)
-  .map((item) => item.enterpriseId)
-const { setEnterpriseList, setEnterpriseId, setActiveYear } = useBillStore()
-setEnterpriseList(enterpriseList.value.filter((item) => item.type !== -1))
 
-const emits = defineEmits(['change', 'linkChange'])
-watch(
-  () => [year.value, isSummary.value ? idList : [enterpriseId.value], isSummary.value],
-  (newVal) => {
-    emits('change', newVal)
-    // 设置当前选中的企业id
-    setEnterpriseId(enterpriseId.value)
-    setActiveYear(year.value)
-  },
-  {
-    immediate: true
-  }
-)
+const emits = defineEmits(['linkChange'])
 const goLink = (type: number) => {
   emits('linkChange', type)
 }
@@ -138,9 +178,10 @@ const overviewData = reactive({
 const loading = ref(false)
 const settlementType = ref() // 1授信2单结4企业钱包6支付宝——单位代付7银票
 watchEffect(() => {
+  if (props.enterpriseIdList.length === 0) return
   const data = {
-    year: year.value,
-    enterpriseIdList: isSummary.value ? idList : [enterpriseId.value]
+    year: props.year,
+    enterpriseIdList: props.enterpriseIdList
   }
   loading.value = true
   getOverviewDatas(data)
@@ -162,6 +203,18 @@ watchEffect(() => {
       loading.value = false
     })
 })
+
+// 生成年份列表
+function generateYears(year: number) {
+  const currentYear = new Date().getFullYear()
+  const years = currentYear - year
+  const list = []
+  for (let i = year; i <= year + years; i++) {
+    list.unshift(i)
+  }
+  return list
+}
+const yearList = generateYears(2023)
 </script>
 
 <style lang="less" scoped>
