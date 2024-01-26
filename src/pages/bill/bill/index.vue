@@ -12,7 +12,7 @@
           @change="dateChange" />
       </el-form-item>
       <el-form-item label="结算状态">
-        <el-select v-model="params.settlementStatus" placeholder="请选择" clearable>
+        <el-select v-model="params.settlementStatus" placeholder="请选择">
           <el-option label="全部" :value="-1" />
           <el-option
             v-for="[key, value] in SETTLEMENT_STATUS"
@@ -239,9 +239,12 @@ const goLink = (row: any) => {
   router.push({ name: 'InvoiceHistoryDetail' })
 }
 const handleLink = (row: any) => {
-  mittBus.emit('changePage', {
+  // 跳转到账单总览的账单详情
+  mittBus.emit('willToBillDetail', {
     periodId: row.periodId,
-    enterpriseId: row.enterpriseId
+    enterpriseId: row.enterpriseId,
+    year: row.year,
+    month: row.month
   })
 }
 </script>
