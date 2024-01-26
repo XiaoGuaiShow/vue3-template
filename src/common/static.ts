@@ -30,13 +30,11 @@ export const FEE_CLASS = new Map([
 export const SETTLEMENT_STATUS = new Map([
   [0, '待生成'],
   [1, '生成中'],
-  [2, '生成失败'],
-  [3, '待发送'],
   [6, '待确认'],
   [9, '待开票'],
   [10, '开票中'],
-  [12, '待回款'],
-  [15, '部分回款'],
+  [12, '待还款'],
+  [15, '部分还款'],
   [18, '已结算']
 ])
 
@@ -62,7 +60,7 @@ export const ORDER_STATUS_TYPE = new Map([
   [2, '退票']
 ])
 
-export const SETTLEMENT_TYPE = new Map([
+export const RULE_SETTLEMENT_TYPE = new Map([
   [0, '未知'],
   [1, '预存'],
   [2, '授信'],
@@ -87,4 +85,13 @@ export const INVOICE_STATUS = new Map([
   [1, '已开具'],
   [2, '开具失败'],
   [3, '无需开具']
+])
+
+export const SETTLEMENT_TYPE = new Map([
+  [0, '未知'],
+  [1, '授信'],
+  [2, '单结'],
+  [4, '企业钱包(充值)'],
+  [6, '支付宝_单位代付'],
+  [7, '银票']
 ])

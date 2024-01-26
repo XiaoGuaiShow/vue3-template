@@ -1,10 +1,10 @@
 import { Script } from 'vm';
 <template>
   <div class="flex ai-c jc-sb">
-    <div class="flex col ai-c item" v-if="typeof summary.totalPrice === 'number'">
+    <div class="flex col ai-c item" v-if="summary.totalPrice">
       <div class="title">本期消费</div>
       <div class="money">￥{{ summary.totalPrice }}</div>
-      <div class="btn">查看</div>
+      <div class="btn" @click="goLink('totalPrice')">查看</div>
     </div>
     <img :src="plusImg" v-if="typeof summary.lastPeriodPayable === 'number'" />
     <div class="flex col ai-c item" v-if="typeof summary.lastPeriodPayable === 'number'">
@@ -21,7 +21,7 @@ import { Script } from 'vm';
         </el-popover>
       </div>
       <div class="money">￥{{ summary.lastPeriodPayable }}</div>
-      <div class="btn">查看</div>
+      <div class="btn" @click="goLink('lastPeriodPayable')">查看</div>
     </div>
     <img :src="minusImg" v-if="typeof summary.dissentAmount === 'number'" />
     <div class="flex col ai-c item" v-if="typeof summary.dissentAmount === 'number'">
@@ -38,7 +38,7 @@ import { Script } from 'vm';
         </el-popover>
       </div>
       <div class="money">￥{{ summary.dissentAmount }}</div>
-      <div class="btn">查看</div>
+      <div class="btn" @click="goLink('dissentAmount')">查看</div>
     </div>
     <img :src="minusImg" v-if="typeof summary.unRetrievedAmount === 'number'" />
     <div class="flex col ai-c item" v-if="typeof summary.unRetrievedAmount === 'number'">
@@ -55,7 +55,7 @@ import { Script } from 'vm';
         </el-popover>
       </div>
       <div class="money">￥{{ summary.unRetrievedAmount }}</div>
-      <div class="btn">查看</div>
+      <div class="btn" @click="goLink('unRetrievedAmount')">查看</div>
     </div>
 
     <img :src="minusImg" v-if="typeof summary.overPeriodRefundAmount === 'number'" />
@@ -73,7 +73,7 @@ import { Script } from 'vm';
         </el-popover>
       </div>
       <div class="money">￥{{ summary.overPeriodRefundAmount }}</div>
-      <div class="btn">查看</div>
+      <div class="btn" @click="goLink('overPeriodRefundAmount')">查看</div>
     </div>
 
     <img :src="equalImg" v-if="typeof summary.payable === 'number'" />
@@ -82,7 +82,7 @@ import { Script } from 'vm';
         <span class="mr-4">本期应结</span>
       </div>
       <div class="money">￥{{ summary.payable }}</div>
-      <div class="btn">查看</div>
+      <div class="btn" @click="goLink('payable')">查看</div>
     </div>
   </div>
 </template>
@@ -91,21 +91,44 @@ import { Script } from 'vm';
 import plusImg from '@/assets/images/bill/plus.png'
 import minusImg from '@/assets/images/bill/minus.png'
 import equalImg from '@/assets/images/bill/equal.png'
-import type { PeriodSumDTO } from '@/pages/bill/types'
+import type { PeriodSum } from '@/pages/bill/types'
+import { useRouter } from 'vue-router'
+import { useBillStore } from '@/store/modules/bill'
+import mittBus from '@/utils/mitt'
 
 interface Props {
-  summary: Partial<PeriodSumDTO>
+  summary: Partial<PeriodSum>
+  type?: number
 }
 const props = withDefaults(defineProps<Props>(), {
   summary: () => ({
+    enterpriseId: 0, // 企业id
+    periodId: 0, // 账期id
     totalPrice: 0, // 本期消费
     lastPeriodPayable: 0, // 上期未结
     dissentAmount: 0, // 异议金额
     unRetrievedAmount: 0, // 未取回票据
     overPeriodRefundAmount: 0, // 跨账期改退
     payable: 0 // 本期应结
-  })
+  }),
+  type: 1 // 1是其他页面跳转到账单明细页 2是账单明细页内部跳转，不走路由
 })
+
+const router = useRouter()
+const billStore = useBillStore()
+const goLink = (tabName: string) => {
+  if (props.type === 1) {
+    billStore.setBillDetail(props.summary?.periodId, props.summary?.enterpriseId)
+    router.push({
+      name: 'BillDetail',
+      query: {
+        tabName
+      }
+    })
+  } else if (props.type === 2) {
+    mittBus.emit('changeTab', tabName)
+  }
+}
 </script>
 
 <style lang="less" scoped>

@@ -108,7 +108,7 @@ export const getSettledAmountDetails = (
 ): Promise<SettledAmountDetailsResult> => {
   return axiosInstance({
     method: 'get',
-    url: 'finance-bill/platform/settlement/enterprise/period/payment/records',
+    url: 'platform-web/settlement/enterprise/period/payment/records',
     params
   })
 }

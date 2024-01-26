@@ -29,7 +29,6 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import type { TabsPaneContext } from 'element-plus'
 import { useRouter } from 'vue-router'
 import DataCard from './overview/DataCard.vue'
 import MonthTab from './overview/MonthTab.vue'
@@ -39,6 +38,8 @@ import ConsumptionTable from './consumption/index.vue'
 import BillList from './bill/index.vue'
 import ExportRecord from './record/ExportRecord.vue'
 import type { BasicParams } from './types'
+import { useBillStore } from '@/store/modules/bill'
+import mittBus from '@/utils/mitt'
 
 const router = useRouter()
 
@@ -50,8 +51,8 @@ const basicParams = reactive<BasicParams>({
   enterpriseIdList: []
 })
 
-const handleClick = (tab: TabsPaneContext, event: Event) => {
-  console.log(tab, event)
+const handleClick = () => {
+  status.value = -1
 }
 const handleChange = (arr: [number, number[], boolean]) => {
   const [year, enterpriseIdList, isSummaryProp] = arr
@@ -61,35 +62,44 @@ const handleChange = (arr: [number, number[], boolean]) => {
 }
 
 const monthChange = (month: number) => {
-  console.log(month)
   basicParams.month = month
 }
 
-const status = ref(0) // 0 全部 1已结算 2未结算
+const status = ref(-1) // 0 全部 1已结算 2未结算
+const billStore = useBillStore()
 const goLink = (type: number) => {
-  // 1总消费 2已结算 3未结算 4还款记录 5已开票 6未开票
+  // 1总消费 2已结算 3未结算 4还款记录 5已开票 6未开票 7充值记录
   if (type === 1) {
     activeName.value = 'second'
   } else if (type === 2) {
     activeName.value = 'third'
-    status.value = 1
+    status.value = 18
   } else if (type === 3) {
     activeName.value = 'third'
-    status.value = 1
+    status.value = -1
   } else if (type === 4) {
-    const childSurveys = []
-    const hasChild = childSurveys.length > 0
+    const childEnterprise = billStore.enterpriseList.filter((item: any) => item.type === 1)
+    const hasChild = childEnterprise.length > 0
     router.push('repayment?hasChild=' + Number(hasChild))
   } else if (type === 5) {
-    router.push(`/invoice/history?status=1`)
+    router.push(`/invoice-history?status=1`)
   } else if (type === 6) {
-    router.push(`/invoice/history?status=2`)
+    router.push(`/invoice-history?status=0`)
+  } else if (type === 7) {
+    const childEnterprise = billStore.enterpriseList.filter((item: any) => item.type === 1)
+    const hasChild = childEnterprise.length > 0
+    router.push(`/recharge?hasChild=` + Number(hasChild))
   }
 }
 
 const switchTab = (tab: string) => {
   activeName.value = tab
 }
+
+// 监听其他组件需要跳转到账单总览
+mittBus.on('willToBillDetail', (data: any) => {
+  activeName.value = 'first'
+})
 </script>
 
 <style lang="less" scoped>

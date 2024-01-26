@@ -28,7 +28,8 @@
             @change="dateChange" />
         </el-form-item>
         <el-form-item label="开票状态">
-          <el-select v-model="params.invoiceStatus" placeholder="请选择" clearable>
+          <el-select v-model="params.invoiceStatus" placeholder="请选择">
+            <el-option label="全部" :value="-1" />
             <el-option label="已开票" :value="1" />
             <el-option label="未开票" :value="0" />
           </el-select>
@@ -99,12 +100,20 @@ const lastThreeMonth = dayjs(nowDate).subtract(3, 'month').format('YYYY-MM-DD')
 dateRange.value = [lastThreeMonth, nowDate]
 const params: any = reactive({
   enterpriseId: enterpriseId.value || 0,
-  invoiceStatus: '全部',
+  invoiceStatus: -1,
   periodStartDate: lastThreeMonth, // 开始日期
   periodEndDate: nowDate, // 结束日期
   year: '',
   periodName: ''
 })
+const router = useRouter()
+// 获取路由参数信息，给搜索条件-开票状态赋值
+const routeInfo = useRoute()
+if (routeInfo?.query?.status) {
+  params.invoiceStatus = Number(routeInfo.query.status as string)
+} else {
+  params.invoiceStatus = -1
+}
 const dateChange = (date: any) => {
   if (date && date.length === 2) {
     params.periodStartDate = dayjs(date[0]).format('YYYY-MM-DD')
@@ -124,7 +133,7 @@ function getTableList() {
     ...params,
     ...pageVO
   }
-  if (newParams.invoiceStatus === '全部') {
+  if (newParams.invoiceStatus === -1) {
     Reflect.deleteProperty(newParams, 'invoiceStatus')
   }
   getInvoiceHistoryList(newParams)
@@ -133,8 +142,8 @@ function getTableList() {
         if (res.data) {
           tableData.value = res.data.results || []
           total.value = res.data.total
-          sumInvoiceAmount.value = res.data.sumInvoiceAmount
-          sumUnInvoiceAmount.value = res.data.sumUnInvoiceAmount
+          sumInvoiceAmount.value = res.data.sumInvoiceAmount || 0
+          sumUnInvoiceAmount.value = res.data.sumUnInvoiceAmount || 0
         }
       } else {
         ElMessage.error(res.msg || '请求失败')
@@ -153,15 +162,6 @@ const handleSizeChange = (val: number) => {
 const handleCurrentChange = (val: number) => {
   pageVO.pageIndex = val
   getTableList()
-}
-
-const router = useRouter()
-// 获取路由参数信息，给搜索条件-开票状态赋值
-const routeInfo = useRoute()
-if (routeInfo?.query?.status) {
-  params.invoiceStatus = Number(routeInfo.query.status as string)
-} else {
-  params.invoiceStatus = '全部'
 }
 
 const onSubmit = () => {

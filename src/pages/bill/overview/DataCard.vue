@@ -46,8 +46,9 @@
         <div class="w-full flex jc-sb ai-c">
           <div class="yellow-card-item">
             <div class="item-name">当前可用额度</div>
-            <div class="item-money">￥2,000,000.00</div>
-            <div class="item-link" @click="goLink(4)">还款记录</div>
+            <div class="item-money">￥{{ overviewData.balance }}</div>
+            <div class="item-link" @click="goLink(4)" v-if="settlementType === 1">还款记录</div>
+            <div class="item-link" @click="goLink(7)" v-if="settlementType === 4">充值记录</div>
           </div>
           <img class="item-image" :src="bpayImg" />
         </div>
@@ -124,6 +125,7 @@ const goLink = (type: number) => {
 
 // 获取卡片中的数据
 const overviewData = reactive({
+  balance: 0, // 余额
   totalPrice: 0, // 总消费
   totalPaymentAmount: 0, // 已结算
   unPaymentAmount: 0, // 未结算
@@ -134,25 +136,31 @@ const overviewData = reactive({
   unTakeoutInvoiceAmount: 0 // 火车票根未取
 })
 const loading = ref(false)
+const settlementType = ref() // 1授信2单结4企业钱包6支付宝——单位代付7银票
 watchEffect(() => {
   const data = {
     year: year.value,
     enterpriseIdList: isSummary.value ? idList : [enterpriseId.value]
   }
-  loading.value = false
-  getOverviewDatas(data).then((res) => {
-    if (res.code === '0000') {
-      overviewData.totalPrice = res.data.totalPrice ?? 0
-      overviewData.totalPaymentAmount = res.data.totalPaymentAmount ?? 0
-      overviewData.unPaymentAmount = res.data.unPaymentAmount ?? 0
-      overviewData.invoiceAmount = res.data.invoiceAmount ?? 0
-      overviewData.unInvoiceAmount = res.data.unInvoiceAmount ?? 0
-      overviewData.unVatInvoiceAmount = res.data.unVatInvoiceAmount ?? 0
-      overviewData.unPrintInvoiceAmount = res.data.unPrintInvoiceAmount ?? 0
-      overviewData.unTakeoutInvoiceAmount = res.data.unTakeoutInvoiceAmount ?? 0
-    }
-    loading.value = false
-  })
+  loading.value = true
+  getOverviewDatas(data)
+    .then((res) => {
+      if (res.code === '0000') {
+        overviewData.balance = res.data.balance ?? 0
+        overviewData.totalPrice = res.data.totalPrice ?? 0
+        overviewData.totalPaymentAmount = res.data.totalPaymentAmount ?? 0
+        overviewData.unPaymentAmount = res.data.unPaymentAmount ?? 0
+        overviewData.invoiceAmount = res.data.invoiceAmount ?? 0
+        overviewData.unInvoiceAmount = res.data.unInvoiceAmount ?? 0
+        overviewData.unVatInvoiceAmount = res.data.unVatInvoiceAmount ?? 0
+        overviewData.unPrintInvoiceAmount = res.data.unPrintInvoiceAmount ?? 0
+        overviewData.unTakeoutInvoiceAmount = res.data.unTakeoutInvoiceAmount ?? 0
+        settlementType.value = res.data.settlementType
+      }
+    })
+    .finally(() => {
+      loading.value = false
+    })
 })
 </script>
 

@@ -37,6 +37,7 @@
       <el-table-column prop="totalPaymentAmount" label="已结算(元)" width="138" align="center">
         <template #default="{ row }">
           <el-popover
+            v-if="row.settlementType === 1 && row.totalPaymentAmount > 0"
             placement="top"
             :width="310"
             @before-enter="handleBeforeEnter(row.enterpriseId, row.periodId)">
@@ -50,6 +51,7 @@
               </el-table>
             </div>
           </el-popover>
+          <span v-else>{{ row.totalPaymentAmount || 0 }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="unPaymentAmount" label="未结算(元)" width="138" align="center" />
