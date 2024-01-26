@@ -5,16 +5,18 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import {writeFileSync} from "fs";
+import path, {join} from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const root: string = process.cwd()
   const { VITE_PORT } = loadEnv(mode, root)
   return {
-    base: `http://localhost:7038/`,
+    base: `${process.env.NODE_ENV === 'production' ? 'https://manageorder.ceekee.com' : ''}`,
     plugins: [
       vue(),
-      function () {
+      (function () {
         let basePath = ''
         return {
           name: 'vite:micro-app',
@@ -33,15 +35,15 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                       return all.replace($3, new URL($3, basePath))
                     }
                   )
-                  const fullPath = join(options.dir, chunk.fileName)
-                  writeFileSync(fullPath, chunk.code)
+                  const fullPath = join(options.dir, chunk.fileName);
+                  writeFileSync(fullPath, chunk.code);
                 }
               }
             }
           }
         }
-      },
-      AutoImport({
+      })() as any,
+      AutoImport({ 
         resolvers: [ElementPlusResolver()],
         imports: ['vue', 'vue-router', 'pinia'],
         eslintrc: {
