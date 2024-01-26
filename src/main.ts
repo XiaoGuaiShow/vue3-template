@@ -17,7 +17,7 @@ pinia.use(piniaPluginPersistedstate)
 app.use(router)
 app.use(ElementPlus)
 app.use(pinia)
-app.mount('#app')
+app.mount('#settlement-app')
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
@@ -26,15 +26,18 @@ if (window.microApp) {
   const UserStore = useUserStore()
   const data = window.microApp.getData()
   UserStore.setUserInfo(data.memberInfo)
-  // 当基座下发跳转指令时进行跳转
-  if (data.path) {
-    router.push(data.path)
-  }
+  // 监听基座下发的数据变化
+  window.microApp.addDataListener((data: any) => {
+    // 当基座下发跳转指令时进行跳转
+    if (data.path) {
+      router.push(data.path)
+    }
+  })
 }
 
-// 监听卸载操作
-window.addEventListener('unmount', function () {
-  app.unmount()
-  // 卸载所有数据监听函数
-  window.microApp?.clearDataListener()
-})
+// // 监听卸载操作
+// window.addEventListener('unmount', function () {
+//   app.unmount()
+//   // 卸载所有数据监听函数
+//   window.microApp?.clearDataListener()
+// })

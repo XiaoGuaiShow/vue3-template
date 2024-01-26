@@ -184,7 +184,6 @@ watch(
       dateRange.value = [`${year}-01-01`, `${year}-12-31`]
       params.periodStartDate = `${year}-01-01`
       params.periodEndDate = `${year}-12-31`
-      getTableList()
     }
   },
   {
