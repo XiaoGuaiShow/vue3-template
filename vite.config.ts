@@ -5,42 +5,44 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import { writeFileSync } from 'fs'
+import path, { join } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const root: string = process.cwd()
-  const { VITE_PORT } = loadEnv(mode, root)
+  const { VITE_PORT, VITE_BASE_WEBSITE } = loadEnv(mode, root)
   return {
-    base: `http://localhost:7038/`,
+    base: `${mode === 'production' ? 'https://manage-settlement.ceekee.com' : VITE_BASE_WEBSITE}`,
     plugins: [
       vue(),
-      // function () {
-      //   let basePath = ''
-      //   return {
-      //     name: 'vite:micro-app',
-      //     apply: 'build',
-      //     configResolved(config) {
-      //       basePath = `${config.base}${config.build.assetsDir}/`
-      //     },
-      //     writeBundle(options, bundle) {
-      //       for (const chunkName in bundle) {
-      //         if (Object.prototype.hasOwnProperty.call(bundle, chunkName)) {
-      //           const chunk = bundle[chunkName]
-      //           if (chunk.fileName && chunk.fileName.endsWith('.js')) {
-      //             chunk.code = chunk.code.replace(
-      //               /(from|import\()(\s*['"])(\.\.?\/)/g,
-      //               (all, $1, $2, $3) => {
-      //                 return all.replace($3, new URL($3, basePath))
-      //               }
-      //             )
-      //             const fullPath = join(options.dir, chunk.fileName)
-      //             writeFileSync(fullPath, chunk.code)
-      //           }
-      //         }
-      //       }
-      //     }
-      //   }
-      // },
+      (function () {
+        let basePath = ''
+        return {
+          name: 'vite:micro-app',
+          apply: 'build',
+          configResolved(config) {
+            basePath = `${config.base}${config.build.assetsDir}/`
+          },
+          writeBundle(options, bundle) {
+            for (const chunkName in bundle) {
+              if (Object.prototype.hasOwnProperty.call(bundle, chunkName)) {
+                const chunk = bundle[chunkName]
+                if (chunk.fileName && chunk.fileName.endsWith('.js')) {
+                  chunk.code = chunk.code.replace(
+                    /(from|import\()(\s*['"])(\.\.?\/)/g,
+                    (all, $1, $2, $3) => {
+                      return all.replace($3, new URL($3, basePath))
+                    }
+                  )
+                  const fullPath = join(options.dir, chunk.fileName)
+                  writeFileSync(fullPath, chunk.code)
+                }
+              }
+            }
+          }
+        }
+      })() as any,
       AutoImport({
         resolvers: [ElementPlusResolver()],
         imports: ['vue', 'vue-router', 'pinia'],
