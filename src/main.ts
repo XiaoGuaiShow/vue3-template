@@ -32,6 +32,13 @@ if (window.microApp) {
   }
 }
 
+window.microApp.addDataListener((data: any) => {
+  // 当主应用下发跳转指令时进行跳转
+  if (data.path) {
+    router.push(data.path)
+  }
+})
+
 // 监听卸载操作
 window.addEventListener('unmount', function () {
   app.unmount()

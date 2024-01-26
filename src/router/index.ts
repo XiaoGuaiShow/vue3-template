@@ -58,12 +58,6 @@ router.beforeEach((to) => {
 })
 // 路由后置后卫
 router.afterEach(() => {
-  if (window.__MICRO_APP_ENVIRONMENT__) {
-    const realBaseRoute = window.__MICRO_APP_BASE_ROUTE__
-    if (typeof window.history.state === 'object') {
-      window.history.state.current = realBaseRoute + (window.history.state.current || '')
-    }
-  }
   // 关闭进度条
   close()
 })
