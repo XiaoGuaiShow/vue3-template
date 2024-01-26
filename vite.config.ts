@@ -13,7 +13,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const root: string = process.cwd()
   const { VITE_PORT } = loadEnv(mode, root)
   return {
-    base: `${process.env.NODE_ENV === 'production' ? 'https://manageorder.ceekee.com' : ''}`,
+    base: `${mode === 'production' ? 'https://manageorder.ceekee.com' : ''}`,
     plugins: [
       vue(),
       (function () {
