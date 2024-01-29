@@ -20,7 +20,9 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">查询</el-button>
-        <el-button type="primary" plain @click="handleExportAll">导出汇总账单</el-button>
+        <el-button class="transparent-bg" type="primary" plain @click="handleExportAll">
+          导出汇总账单
+        </el-button>
       </el-form-item>
     </el-form>
 

@@ -184,13 +184,14 @@ const goBill = (row: TableItem) => {
 
 <style lang="less" scoped>
 .container {
-  padding: 12px;
+  padding: 0 12px 12px;
   background-color: rgb(242, 243, 245);
 }
 .section {
   padding: 24px;
   background-color: #fff;
   border-radius: 8px;
+  min-height: 600px;
 }
 .title {
   font-size: 16px;

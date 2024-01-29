@@ -11,7 +11,9 @@
             @change="inputChange"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button plain :icon="Plus" @click="openDialog">新增邮寄地址</el-button>
+          <el-button class="transparent-bg" plain :icon="Plus" @click="openDialog">
+            新增邮寄地址
+          </el-button>
         </el-form-item>
       </el-form>
 

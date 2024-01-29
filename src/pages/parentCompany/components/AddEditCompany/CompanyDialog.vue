@@ -13,7 +13,9 @@
         </el-form-item>
         <el-form-item label="结算员">
           <div>
-            <el-button type="primary" plain @click="handleAddPerson">选择人员</el-button>
+            <el-button class="transparent-bg" type="primary" plain @click="handleAddPerson">
+              选择人员
+            </el-button>
             <div class="tag-list mt-12" v-if="settleMembers.length">
               <el-tag
                 closable

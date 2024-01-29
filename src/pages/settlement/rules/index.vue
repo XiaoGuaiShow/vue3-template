@@ -19,7 +19,7 @@
           <div class="text-form">
             <div class="label">结算方式</div>
             <div class="value">
-              {{ RULE_SETTLEMENT_TYPE.get(details.contractSettlement.settlementType) }}
+              {{ SETTLEMENT_TYPE.get(details.contractSettlement.settlementType) || '--' }}
             </div>
           </div>
           <div class="text-form">
@@ -126,12 +126,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { getContractList, getContractDetails, saveSettlementUser } from '@/api/rules'
-import {
-  RULE_SETTLEMENT_TYPE,
-  SETTLEMENT_DIMENSION,
-  YES_OR_NO,
-  PRODUCT_TYPE
-} from '@/common/static'
+import { SETTLEMENT_TYPE, SETTLEMENT_DIMENSION, YES_OR_NO, PRODUCT_TYPE } from '@/common/static'
 import GroupSelector from '@/components/biz/GroupSelector/index.vue'
 import { ElMessage } from 'element-plus'
 
@@ -531,7 +526,7 @@ const optionChange = (val: string) => {
 
 <style lang="less" scoped>
 .container {
-  padding: 12px;
+  padding: 0 12px 12px;
   background-color: rgb(242, 243, 245);
 }
 .section {

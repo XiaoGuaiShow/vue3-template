@@ -21,6 +21,7 @@
 .parent-company {
   display: flex;
   padding: 0 12px 12px;
+  align-items: stretch;
   .left-container {
     width: 25%;
     margin-right: 12px;

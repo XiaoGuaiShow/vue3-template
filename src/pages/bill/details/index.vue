@@ -14,7 +14,7 @@
         {{ periodSumDTO.periodName }}
       </div>
       <div>
-        <el-button type="primary" plain>导出账单</el-button>
+        <el-button class="transparent-bg" type="primary" plain>导出账单</el-button>
         <el-button
           v-if="periodSumDTO.settlementStatus === 6"
           type="primary"

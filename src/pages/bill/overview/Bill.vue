@@ -24,24 +24,33 @@
                 {{ SETTLEMENT_STATUS.get(detail.settlementStatus) ?? '未出账' }}
               </div>
               <div class="flex mt-12 ai-c">
-                <div class="fs-18 fw-500 c-font-primary" v-if="detail.periodLatestPaymentDate">
+                <div
+                  class="fs-18 fw-500 c-font-primary mr-12"
+                  v-if="detail.periodLatestPaymentDate">
                   最晚结算日: {{ detail.periodLatestPaymentDate }}
                 </div>
-                <div
-                  class="flex ai-c elliptic ml-12"
-                  v-if="detail.countDown && detail.countDown > 0">
+                <div class="flex ai-c elliptic" v-if="detail.countDown && detail.countDown > 0">
                   <img :src="timeImg" alt="" />
-                  <div class="fs-12 h-12 lh-12 c-font-hint ml-2">距最晚结算日</div>
+                  <div class="fs-12 h-12 lh-12 c-font-hint ml-2">
+                    {{ detail.periodId > 0 ? '距最晚结算日' : '距出账日' }}
+                  </div>
                   <div class="fs-16 h-16 lh-16 c-brand-blue">{{ detail.countDown }}天</div>
                 </div>
               </div>
             </div>
           </div>
           <div>
-            <el-button type="primary" plain @click="goLink(1)" v-if="detail.settlementStatus">
+            <el-button
+              class="transparent-bg"
+              type="primary"
+              plain
+              @click="goLink(1)"
+              v-if="detail.periodId > 0">
               查看账单明细
             </el-button>
-            <el-button type="primary" plain @click="goLink(2)" v-else>查看消费明细</el-button>
+            <el-button class="transparent-bg" type="primary" plain @click="goLink(2)" v-else>
+              查看消费明细
+            </el-button>
             <el-button
               type="primary"
               @click="showBillDialog = true"
@@ -60,10 +69,13 @@
 
       <div class="section mt-24">
         <div class="fs-20 fw-600 c-font-primary">账单汇总</div>
-        <SummaryExpression class="mt-12" :summary="detail.periodSum"></SummaryExpression>
+        <SummaryExpression
+          class="mt-12"
+          :summary="detail.periodSum"
+          :showLink="SETTLEMENT_STATUS.has(detail.settlementStatus)"></SummaryExpression>
       </div>
 
-      <div class="section mt-24">
+      <div class="section mt-24" v-if="feeClassList(detail.feeClassSumList).length > 0">
         <div class="fs-20 fw-600 c-font-primary h-20 lh-20">账单分类概览</div>
         <div
           class="bill-item"
@@ -172,8 +184,8 @@ const detail: Ref<BillPeriodDetail> = ref({
   periodSum: {}
 })
 function getBillDeatil() {
-  sLoading.value = true
   if (billPeriodList.value.length === 0) return
+  sLoading.value = true
   const activePeriod = billPeriodList.value[activeIndex.value]
   const params = {
     enterpriseId: activePeriod.enterpriseId,

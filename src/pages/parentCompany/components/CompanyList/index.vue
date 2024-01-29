@@ -112,6 +112,8 @@ onUnmounted(() => {
   background: var(--bg-white);
   padding: 24px 12px;
   border-radius: 8px;
+  height: calc(100% - 120px);
+  box-sizing: border-box;
   :deep(.el-tree-node__content) {
     .el-tree-node__label {
       color: var(--font-primary);

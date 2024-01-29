@@ -132,6 +132,7 @@ const statusList = ['文件生成中 ', '文件已生成 ', '文件已失效 ', 
 }
 .export-view {
   background-color: #fff;
+  min-height: 600px;
 }
 .remind-view {
   box-sizing: border-box;

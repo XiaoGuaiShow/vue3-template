@@ -10,9 +10,16 @@
         <!-- 新增开票单位 -->
         <div class="add-edit-company">
           <div class="title-label">新增操作</div>
-          <el-button class="w-full mt-12" type="primary" :icon="Plus" @click="handleAdd">
-            新增开票单位
-          </el-button>
+          <div class="flex jc-c">
+            <el-button
+              class="mt-12"
+              type="primary"
+              :icon="Plus"
+              @click="handleAdd"
+              style="width: 50%">
+              新增开票单位
+            </el-button>
+          </div>
         </div>
         <!-- 开票单位列表 -->
         <div class="company-list">
@@ -135,7 +142,7 @@
               </div>
             </div>
             <div class="info-content flex wrap">
-              <div class="info-item">
+              <div class="info-item info-item-100">
                 <span>适用</span>
                 <span class="flex">
                   {{ dimensionName }}
@@ -348,9 +355,8 @@ const saveConfirm = () => {
 }
 
 // 设置开票维度
-const router = useRouter()
 const handleSetDimension = () => {
-  router.push({
+  window.microApp.dispatch({
     name: 'setInvoiceDimension',
     query: {
       dimensionType: dimensionType.value,
@@ -364,6 +370,10 @@ const handleSetDimension = () => {
 .parent-company {
   display: flex;
   padding: 0 12px 12px;
+  align-items: stretch;
+  min-height: 600px;
+  height: auto;
+  box-sizing: border-box;
   .left-container {
     width: 25%;
     margin-right: 12px;
@@ -398,6 +408,8 @@ const handleSetDimension = () => {
   background: var(--bg-white);
   padding: 24px 12px;
   border-radius: 8px;
+  height: calc(100% - 120px);
+  box-sizing: border-box;
   :deep(.el-tree-node__content) {
     .el-tree-node__label {
       color: var(--font-primary);
@@ -441,6 +453,8 @@ const handleSetDimension = () => {
   background: var(--bg-white);
   border-radius: 8px;
   padding: 24px;
+  box-sizing: border-box;
+  height: 100%;
   .title-label {
     font-size: 16px;
     font-weight: 600;
