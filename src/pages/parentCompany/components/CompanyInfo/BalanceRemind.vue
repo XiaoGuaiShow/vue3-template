@@ -41,7 +41,12 @@
           </el-input>
         </el-form-item>
         <el-form-item label="提醒人" prop="userInfos">
-          <el-button type="primary" plain size="default" @click="handleAddPerson">
+          <el-button
+            class="transparent-bg"
+            type="primary"
+            plain
+            size="default"
+            @click="handleAddPerson">
             选择提醒人
           </el-button>
         </el-form-item>

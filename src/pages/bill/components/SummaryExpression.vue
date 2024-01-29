@@ -4,15 +4,15 @@ import { Script } from 'vm';
     <div class="flex col ai-c item" v-if="typeof summary.totalPrice === 'number'">
       <div class="title">本期消费</div>
       <div class="money">￥{{ summary.totalPrice }}</div>
-      <div class="btn" @click="goLink('totalPrice')">查看</div>
+      <div v-if="showLink" class="btn" @click="goLink('totalPrice')">查看</div>
     </div>
     <img :src="plusImg" v-if="typeof summary.lastPeriodPayable === 'number'" />
     <div class="flex col ai-c item" v-if="typeof summary.lastPeriodPayable === 'number'">
       <div class="title flex ai-c">
-        <span class="mr-4">上期未结</span>
+        <span>上期未结</span>
         <el-popover placement="top" :width="310">
           <template #reference>
-            <svg-icon name="tip" size="14" color="#bfbfbf"></svg-icon>
+            <svg-icon class="custom-popover-icon" name="tip" size="14" color="#bfbfbf"></svg-icon>
           </template>
           <div class="flex ai-c fs-12">
             <el-icon class="mr-4" color="#fab938" :size="14"><WarningFilled /></el-icon>
@@ -21,15 +21,15 @@ import { Script } from 'vm';
         </el-popover>
       </div>
       <div class="money">￥{{ summary.lastPeriodPayable }}</div>
-      <div class="btn" @click="goLink('lastPeriodPayable')">查看</div>
+      <div v-if="showLink" class="btn" @click="goLink('lastPeriodPayable')">查看</div>
     </div>
     <img :src="minusImg" v-if="typeof summary.dissentAmount === 'number'" />
     <div class="flex col ai-c item" v-if="typeof summary.dissentAmount === 'number'">
       <div class="title flex ai-c">
-        <span class="mr-4">本期异议</span>
+        <span>本期异议</span>
         <el-popover placement="top" :width="350">
           <template #reference>
-            <svg-icon name="tip" size="14" color="#bfbfbf"></svg-icon>
+            <svg-icon class="custom-popover-icon" name="tip" size="14" color="#bfbfbf"></svg-icon>
           </template>
           <div class="flex ai-c fs-12">
             <el-icon class="mr-4" color="#fab938" :size="14"><WarningFilled /></el-icon>
@@ -38,15 +38,15 @@ import { Script } from 'vm';
         </el-popover>
       </div>
       <div class="money">￥{{ summary.dissentAmount }}</div>
-      <div class="btn" @click="goLink('dissentAmount')">查看</div>
+      <div v-if="showLink" class="btn" @click="goLink('dissentAmount')">查看</div>
     </div>
     <img :src="minusImg" v-if="typeof summary.unRetrievedAmount === 'number'" />
     <div class="flex col ai-c item" v-if="typeof summary.unRetrievedAmount === 'number'">
       <div class="title flex ai-c">
-        <span class="mr-4">未取回票据</span>
+        <span>未取回票据</span>
         <el-popover placement="top" :width="430">
           <template #reference>
-            <svg-icon name="tip" size="14" color="#bfbfbf"></svg-icon>
+            <svg-icon class="custom-popover-icon" name="tip" size="14" color="#bfbfbf"></svg-icon>
           </template>
           <div class="flex ai-c fs-12">
             <el-icon class="mr-4" color="#fab938" :size="14"><WarningFilled /></el-icon>
@@ -55,16 +55,16 @@ import { Script } from 'vm';
         </el-popover>
       </div>
       <div class="money">￥{{ summary.unRetrievedAmount }}</div>
-      <div class="btn" @click="goLink('unRetrievedAmount')">查看</div>
+      <div v-if="showLink" class="btn" @click="goLink('unRetrievedAmount')">查看</div>
     </div>
 
     <img :src="minusImg" v-if="typeof summary.overPeriodRefundAmount === 'number'" />
     <div class="flex col ai-c item" v-if="typeof summary.overPeriodRefundAmount === 'number'">
       <div class="title flex ai-c">
-        <span class="mr-4">跨账期退改</span>
+        <span>跨账期退改</span>
         <el-popover placement="top" :width="420">
           <template #reference>
-            <svg-icon name="tip" size="14" color="#bfbfbf"></svg-icon>
+            <svg-icon class="custom-popover-icon" name="tip" size="14" color="#bfbfbf"></svg-icon>
           </template>
           <div class="flex ai-c fs-12">
             <el-icon class="mr-4" color="#fab938" :size="14"><WarningFilled /></el-icon>
@@ -73,7 +73,7 @@ import { Script } from 'vm';
         </el-popover>
       </div>
       <div class="money">￥{{ summary.overPeriodRefundAmount }}</div>
-      <div class="btn" @click="goLink('overPeriodRefundAmount')">查看</div>
+      <div v-if="showLink" class="btn" @click="goLink('overPeriodRefundAmount')">查看</div>
     </div>
 
     <img :src="equalImg" v-if="typeof summary.payable === 'number'" />
@@ -82,7 +82,7 @@ import { Script } from 'vm';
         <span class="mr-4">本期应结</span>
       </div>
       <div class="money">￥{{ summary.payable }}</div>
-      <div class="btn" @click="goLink('payable')">查看</div>
+      <div v-if="showLink" class="btn" @click="goLink('payable')">查看</div>
     </div>
   </div>
 </template>
@@ -99,6 +99,7 @@ import mittBus from '@/utils/mitt'
 interface Props {
   summary: Partial<PeriodSum>
   type?: number
+  showLink?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   summary: () => ({
@@ -111,7 +112,8 @@ const props = withDefaults(defineProps<Props>(), {
     overPeriodRefundAmount: 0, // 跨账期改退
     payable: 0 // 本期应结
   }),
-  type: 1 // 1是其他页面跳转到账单明细页 2是账单明细页内部跳转，不走路由
+  type: 1, // 1是其他页面跳转到账单明细页 2是账单明细页内部跳转，不走路由
+  showLink: true
 })
 
 const router = useRouter()
@@ -138,6 +140,13 @@ const goLink = (tabName: string) => {
     line-height: 14px;
     font-size: 14px;
     color: var(--font-secondary);
+    position: relative;
+
+    .custom-popover-icon {
+      position: absolute;
+      top: 0;
+      right: -18px;
+    }
   }
   .money {
     font-size: 20px;

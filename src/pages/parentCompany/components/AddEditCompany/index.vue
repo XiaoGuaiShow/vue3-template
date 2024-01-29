@@ -1,9 +1,12 @@
 <template>
   <div class="add-edit-company">
     <div class="title-label">新增操作</div>
-    <el-button class="w-full mt-12" type="primary" :icon="Plus" @click="handleAdd">
-      新增子公司
-    </el-button>
+    <div class="flex jc-c">
+      <el-button class="mt-12" type="primary" :icon="Plus" @click="handleAdd" style="width: 50%">
+        新增子公司
+      </el-button>
+    </div>
+
     <CompanyDialog :visible="commonVisible" @on-close="commonVisible = false"></CompanyDialog>
   </div>
 </template>

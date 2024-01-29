@@ -48,7 +48,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">查询</el-button>
-        <!-- <el-button type="primary" plain @click="handleExport">导出账单</el-button> -->
+        <!-- <el-button class="transparent-bg" type="primary" plain @click="handleExport">导出账单</el-button> -->
       </el-form-item>
     </el-form>
 
@@ -342,5 +342,6 @@ const handleTime = (startTime: string, endTime: string) => {
 .inner-section {
   padding: 24px 0;
   background: var(--bg-white);
+  min-height: 600px;
 }
 </style>

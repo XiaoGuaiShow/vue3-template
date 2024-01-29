@@ -261,5 +261,6 @@ const handleLink = (row: any) => {
 .inner-section {
   padding: 24px 0;
   background: var(--bg-white);
+  min-height: 600px;
 }
 </style>
