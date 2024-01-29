@@ -142,12 +142,12 @@
                   <div
                     class="c-font-primary ml-12 ellipsis-1"
                     v-if="dimensionType === 2 && info.departments?.length">
-                    ({{ info.departments.map((item) => item.deptName).join('、') || '-' }})
+                    ({{ info.departments.map((item: any) => item.deptName).join('、') || '-' }})
                   </div>
                   <div
                     class="c-font-primary ml-12 ellipsis-1"
                     v-if="dimensionType === 1 && info.users?.length">
-                    ({{ info.users.map((item) => item.deptName).join('、') || '-' }})
+                    ({{ info.users.map((item: any) => item.deptName).join('、') || '-' }})
                   </div>
                 </span>
               </div>
@@ -206,7 +206,7 @@ const defaultProps = {
   label: 'invoiceTitle'
 }
 
-const dimensionType = ref('') // 1人员 2部门
+const dimensionType = ref(1) // 1人员 2部门
 const dimensionSubType = ref('') // 1个人 2部门
 const dimensionName = ref('')
 getEnterpriseDimension().then((res) => {
@@ -243,7 +243,7 @@ const getDataList = (needReset = true) => {
       if (res.code === '0000') {
         if (res.data) {
           if (res.data.unValidList && res.data.unValidList.length > 0) {
-            TreeData.value[1].children = res.data.unValidList.map((item) => {
+            TreeData.value[1].children = res.data.unValidList.map((item: any) => {
               return {
                 ...item,
                 isValid: 0
@@ -251,7 +251,7 @@ const getDataList = (needReset = true) => {
             })
           }
           if (res.data.validList && res.data.validList.length > 0) {
-            TreeData.value[0].children = res.data.validList.map((item) => {
+            TreeData.value[0].children = res.data.validList.map((item: any) => {
               return {
                 ...item,
                 isValid: 1
@@ -261,7 +261,7 @@ const getDataList = (needReset = true) => {
           if (needReset) {
             const validTree = TreeData.value[0].children
             const unValidTree = TreeData.value[1].children
-            isValid.value = validTree.length ? 1 : unValidTree.length ? 0 : ''
+            isValid.value = validTree.length ? 1 : 0
             currentNodeKey.value = validTree.length
               ? validTree[0].id
               : unValidTree.length
@@ -301,7 +301,7 @@ watch(filterText, (val: string) => {
 })
 
 const rightLoading = ref(true)
-const info = ref({
+const info: Ref<any> = ref({
   invoiceTitle: ''
 })
 function getInvoiceDetails() {
@@ -320,7 +320,7 @@ function getInvoiceDetails() {
 }
 
 // 开票状态
-const beforeChange = async () => {
+const beforeChange = async (): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const stopMsg = '确定要停用该开票吗？'
     const startMsg = '确认要启用该开票吗?'
@@ -513,5 +513,8 @@ const handleSetDimension = () => {
     border-radius: 2px;
     cursor: pointer;
   }
+}
+:deep(.el-tree-node__expand-icon.is-leaf) {
+  visibility: hidden;
 }
 </style>

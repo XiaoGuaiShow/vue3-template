@@ -45,7 +45,9 @@
       <el-table class="mt-6" :data="tableData" stripe border max-height="280" v-loading="loading">
         <el-table-column prop="periodName" label="结算单名称" show-overflow-tooltip>
           <template #default="{ row }">
-            <div class="link">{{ row.periodName + row.periodCycle + '结算单' }}</div>
+            <div class="link" @click="goBill(row)">
+              {{ row.periodName + row.periodCycle + '结算单' }}
+            </div>
           </template>
         </el-table-column>
         <el-table-column prop="periodCycle" label="结算周期" width="215" align="center" />
@@ -173,6 +175,10 @@ const billStore = useBillStore()
 const goLink = (row: TableItem) => {
   billStore.setInvoiceHistory(row.periodId, row.enterpriseId)
   router.push('invoice-history-detail')
+}
+const goBill = (row: TableItem) => {
+  billStore.setOverviewDatas(row)
+  router.push('bill')
 }
 </script>
 

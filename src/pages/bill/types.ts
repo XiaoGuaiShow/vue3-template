@@ -199,6 +199,7 @@ export interface PeriodSum {
   periodName?: string // 账期名称
   periodId?: number
   enterpriseId?: number
+  settlementStatus?: number // 结算状态
 }
 
 export interface BillPeriodDetail {

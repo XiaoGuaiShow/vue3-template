@@ -14,10 +14,17 @@
           </Suspense>
         </el-tab-pane>
         <el-tab-pane label="消费数据" name="second">
-          <ConsumptionTable v-if="activeName === 'second'"></ConsumptionTable>
+          <ConsumptionTable
+            v-if="activeName === 'second'"
+            :year="year"
+            :enterpriseId="enterpriseId"></ConsumptionTable>
         </el-tab-pane>
         <el-tab-pane label="账单列表" name="third">
-          <BillList :status="status" v-if="activeName === 'third'"></BillList>
+          <BillList
+            v-if="activeName === 'third'"
+            :status="status"
+            :year="year"
+            :enterpriseId="enterpriseId"></BillList>
         </el-tab-pane>
         <el-tab-pane label="导出记录" name="fourth">
           <ExportRecord v-if="activeName === 'fourth'"></ExportRecord>
@@ -48,7 +55,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import DataCard from './overview/DataCard.vue'
 import MonthTab from './overview/MonthTab.vue'
 import SummaryTable from './overview/SummaryTable.vue'
@@ -113,6 +120,10 @@ mittBus.on('willToBillDetail', (data: any) => {
   activeName.value = 'first'
   data.year && yearChange(data.year)
   data.month && monthChange(data.month)
+})
+
+onBeforeRouteLeave(() => {
+  billStore.resetOverviewDatas()
 })
 </script>
 
