@@ -9,6 +9,12 @@ export const useBillStore = defineStore('enterprise', {
       enterpriseId: '0',
       // 当前总览的年度
       activeYear: new Date().getFullYear(),
+      overviewDatas: {
+        year: null,
+        month: null,
+        enterpriseId: null,
+        periodId: null
+      },
       // 开票历史-列表页点击明细记录账期id和企业id
       invoiceHistory: {
         periodId: '',
@@ -40,6 +46,16 @@ export const useBillStore = defineStore('enterprise', {
     setBillDetail(periodId: string, enterpriseId: string) {
       this.billDetail.periodId = periodId
       this.billDetail.enterpriseId = enterpriseId
+    },
+    setOverviewDatas(data: any) {
+      const { year, month, enterpriseId, periodId } = data
+      year && (this.overviewDatas.year = year)
+      month && (this.overviewDatas.month = month)
+      enterpriseId && (this.overviewDatas.enterpriseId = enterpriseId)
+      periodId && (this.overviewDatas.periodId = periodId)
+    },
+    resetOverviewDatas() {
+      this.overviewDatas = { year: '', month: '', enterpriseId: '', periodId: '' }
     }
   },
   persist: true

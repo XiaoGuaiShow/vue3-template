@@ -115,6 +115,8 @@ import mittBus from '@/utils/mitt'
 const billStore = useBillStore()
 const props = defineProps<{
   status: number
+  year: number
+  enterpriseId: number
 }>()
 const { status } = toRefs(props)
 
@@ -176,14 +178,15 @@ function getTableList() {
     })
 }
 watch(
-  () => [billStore.enterpriseId, billStore.activeYear],
+  () => [props.enterpriseId, props.year],
   (newVal) => {
     const [enterpriseId, year] = newVal
-    if (enterpriseId && enterpriseId !== '0') {
+    if (enterpriseId && enterpriseId !== 0) {
       params.enterpriseId = enterpriseId
       dateRange.value = [`${year}-01-01`, `${year}-12-31`]
       params.periodStartDate = `${year}-01-01`
       params.periodEndDate = `${year}-12-31`
+      getTableList()
     }
   },
   {

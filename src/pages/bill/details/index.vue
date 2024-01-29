@@ -15,7 +15,12 @@
       </div>
       <div>
         <el-button type="primary" plain>导出账单</el-button>
-        <el-button type="primary">确认并提交开票</el-button>
+        <el-button
+          v-if="periodSumDTO.settlementStatus === 6"
+          type="primary"
+          @click="showBillDialog = true">
+          确认并提交开票
+        </el-button>
       </div>
     </div>
     <div class="section mt-12">
@@ -26,13 +31,20 @@
       <el-tabs v-model="activeName">
         <el-tab-pane v-for="item in tabs" :key="item.field" :label="item.label" :name="item.field">
           <OrderTable
+            v-if="activeName === item.field"
             :dataType="item.type"
             :enterpriseId="enterpriseId"
-            :periodId="periodId"
-            v-if="activeName === item.field" />
+            :periodId="periodId" />
         </el-tab-pane>
       </el-tabs>
     </div>
+    <BillConfirmationDialog
+      v-if="showBillDialog"
+      :expressionType="2"
+      :enterpriseId="enterpriseId"
+      :periodId="periodId"
+      @close="showBillDialog = false"
+      @confirm="handleConfirm" />
   </div>
 </template>
 
@@ -66,7 +78,7 @@ const periodSumDTO: Ref<Partial<PeriodSum>> = ref({
   periodName: ''
 })
 const route = useRoute()
-watchEffect(() => {
+const getDetail = () => {
   if (periodId.value && enterpriseId.value) {
     loading.value = true
     const params = {
@@ -104,22 +116,28 @@ watchEffect(() => {
         loading.value = false
       })
   }
-})
+}
+getDetail()
 
 mittBus.on('changeTab', (tabName: any) => {
   activeName.value = tabName
+  showBillDialog.value = false
 })
 
 function generateTabs(obj: any): TabItem[] {
   const tabs: TabItem[] = []
   const category = [...BILL_CATEGORY.values()]
-  console.log(category)
   category.forEach((item) => {
     if (obj[item.field] || obj[item.field] === 0) {
       tabs.push(item)
     }
   })
   return tabs
+}
+
+const showBillDialog = ref(false)
+const handleConfirm = () => {
+  getDetail()
 }
 
 const goBack = () => {

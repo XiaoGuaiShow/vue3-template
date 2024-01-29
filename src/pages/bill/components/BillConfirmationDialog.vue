@@ -3,7 +3,10 @@
     <div>
       <div class="section">
         <div class="fs-20 fw-600 c-font-primary">账单汇总</div>
-        <SummaryExpression class="mt-12" :summary="summaryData"></SummaryExpression>
+        <SummaryExpression
+          :type="expressionType"
+          class="mt-12"
+          :summary="summaryData"></SummaryExpression>
       </div>
       <div class="fs-16 fw-600 c-font-primary mt-24">开票概览</div>
       <InvoiceTable
@@ -34,6 +37,7 @@ import { ElMessage } from 'element-plus'
 const props = defineProps<{
   enterpriseId: number
   periodId: number
+  expressionType?: number
 }>()
 const summaryData: Ref<Partial<PeriodSum>> = ref({})
 watchEffect(() => {

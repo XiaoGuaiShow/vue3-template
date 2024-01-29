@@ -48,7 +48,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">查询</el-button>
-        <el-button type="primary" plain @click="handleExport">导出账单</el-button>
+        <!-- <el-button type="primary" plain @click="handleExport">导出账单</el-button> -->
       </el-form-item>
     </el-form>
 
@@ -182,8 +182,11 @@ import { getConsumptionData } from '@/api/bill'
 import { ElMessage } from 'element-plus'
 import dayjs from 'dayjs'
 import { PRODUCT_TYPE, ORDER_STATUS_TYPE } from '@/common/static'
-import { useBillStore } from '@/store/modules/bill'
-const billStore = useBillStore()
+
+const props = defineProps<{
+  year: number
+  enterpriseId: number
+}>()
 
 const commonVisible = ref(false)
 const selectedList = ref<any[]>([])
@@ -216,7 +219,7 @@ const formInline = reactive({
   productTypes: [],
   deptNames: [],
   travelingPerson: '',
-  enterpriseId: ''
+  enterpriseId: 0
 })
 
 const totalPrice = ref(0)
@@ -249,10 +252,10 @@ function getTableData() {
     })
 }
 watch(
-  () => [billStore.enterpriseId, billStore.activeYear],
+  () => [props.enterpriseId, props.year],
   (newVal) => {
     const [enterpriseId, year] = newVal
-    if (enterpriseId && enterpriseId !== '0') {
+    if (enterpriseId) {
       formInline.enterpriseId = enterpriseId
       dateRange.value = [`${year}-01-01`, `${year}-12-31`]
       formInline.periodStartDate = `${year}-01-01`

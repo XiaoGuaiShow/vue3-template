@@ -32,7 +32,7 @@ import mittBus from '@/utils/mitt.ts'
 import { useZimuStore } from '@/store/modules/zimu'
 const zimuStore = useZimuStore()
 
-const currentNodeKey = ref(0)
+const currentNodeKey = ref(JSON.parse(localStorage.getItem('EnterpriseId') || '{}').data.toString())
 interface Tree {
   companyName: string
   children?: Tree[]
@@ -150,5 +150,8 @@ onUnmounted(() => {
       font-weight: normal;
     }
   }
+}
+:deep(.el-tree-node__expand-icon.is-leaf) {
+  visibility: hidden;
 }
 </style>
