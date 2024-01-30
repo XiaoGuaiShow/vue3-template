@@ -25,6 +25,7 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             :value-format="'YYYY-MM-DD'"
+            style="width: 250px"
             @change="dateChange" />
         </el-form-item>
         <el-form-item label="开票状态">

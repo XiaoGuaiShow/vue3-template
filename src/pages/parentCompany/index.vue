@@ -15,7 +15,9 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import CompanyList from '@/pages/parentCompany/components/CompanyList/index.vue'
+</script>
 
 <style lang="less" scoped>
 .parent-company {

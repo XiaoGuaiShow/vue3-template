@@ -9,6 +9,7 @@
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           :clearable="false"
+          style="width: 250px"
           @change="dateRangeChange" />
       </el-form-item>
       <el-form-item label="产品类型">
@@ -54,7 +55,7 @@
       </el-form-item>
     </el-form>
 
-    <el-table class="mt-6" :data="tableData" stripe border max-height="280" v-loading="loading">
+    <el-table class="mt-6" :data="tableData" stripe border max-height="1000" v-loading="loading">
       <el-table-column prop="orderSerialNo" label="订单编号" show-overflow-tooltip width="150">
         <template #default="{ row }">
           <span>{{ row.orderSerialNo }}</span>
@@ -75,26 +76,10 @@
       <el-table-column prop="travelingPerson" label="出行人/收货人" width="138" />
       <el-table-column label="开票单位" width="138">
         <template #default="{ row }">
-          <div class="flex">
-            <el-dropdown trigger="click">
-              <span class="flex ai-c">
-                {{ row.invoiceTitle }}
-                <el-icon class="el-icon--right">
-                  <arrow-down />
-                </el-icon>
-              </span>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item>广州技术公司</el-dropdown-item>
-                  <el-dropdown-item>武汉美丽公司</el-dropdown-item>
-                  <el-dropdown-item>杭州电子公司</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
+          {{ row.invoiceTitle }}
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="成本中心" width="138">
+      <!-- <el-table-column prop="status" label="成本中心" width="138">
         <template #default="{ row }">
           <div class="flex">
             <el-dropdown trigger="click">
@@ -135,8 +120,8 @@
             </el-dropdown>
           </div>
         </template>
-      </el-table-column>
-      <el-table-column prop="trip" label="行程/商家" width="150">
+      </el-table-column> -->
+      <el-table-column prop="trip" label="行程/商家" width="190">
         <template #default="{ row }">
           <div>{{ handleTime(row.departureDate, row.arrivalDate) }}</div>
           <div>{{ row.productInfo }}</div>
@@ -151,7 +136,11 @@
           {{ handlePrice(row) }}
         </template>
       </el-table-column>
-      <el-table-column prop="payType" label="支付方式" width="138" />
+      <el-table-column prop="payType" label="支付方式" width="138">
+        <template #default="{ row }">
+          {{ PAY_TYPE.get(row.payType) || '-' }}
+        </template>
+      </el-table-column>
     </el-table>
 
     <div class="flex jc-sb ai-c mt-16">
@@ -183,7 +172,7 @@ import type { TableItem } from '../types'
 import { getConsumptionData } from '@/api/bill'
 import { ElMessage } from 'element-plus'
 import dayjs from 'dayjs'
-import { PRODUCT_TYPE, ORDER_STATUS_TYPE } from '@/common/static'
+import { PRODUCT_TYPE, ORDER_STATUS_TYPE, PAY_TYPE } from '@/common/static'
 
 const props = defineProps<{
   year: number
