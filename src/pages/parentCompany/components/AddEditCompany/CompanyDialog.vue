@@ -38,6 +38,7 @@
   </div>
   <GroupSelector
     v-model:visible="showDialog"
+    :isSingleChoice="true"
     :popSelectType="2"
     v-if="showDialog"
     @on-ok="handleSelectConfirm" />

@@ -97,6 +97,7 @@
   <GroupSelector
     v-if="commonVisible"
     v-model:visible="commonVisible"
+    :isSingleChoice="true"
     :popSelectType="2"
     :showSettlementMember="true"
     @on-ok="handleSelectConfirm" />
@@ -138,7 +139,7 @@ const companyInfo = ref<CompanyInfo>({
   settlementOfficer: '',
   settlements: []
 })
-let loading = ref<boolean>(true)
+let loading = ref<boolean>(false)
 const getCompanyInfo = async (id: string) => {
   loading.value = true
   try {

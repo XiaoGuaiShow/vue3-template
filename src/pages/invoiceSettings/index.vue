@@ -364,11 +364,11 @@ const handleSetDimension = () => {
   display: flex;
   padding: 0 12px 12px;
   align-items: stretch;
-  min-height: 600px;
+  min-height: 650px;
   height: auto;
   box-sizing: border-box;
   .left-container {
-    width: 20%;
+    width: 240px;
     margin-right: 12px;
   }
   .right-container {

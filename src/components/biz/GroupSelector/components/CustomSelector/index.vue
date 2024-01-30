@@ -238,4 +238,7 @@ defineExpose({
 
 <style lang="less" scoped>
 @import url('index.less');
+:deep(.el-tree-node__expand-icon.is-leaf) {
+  visibility: hidden;
+}
 </style>

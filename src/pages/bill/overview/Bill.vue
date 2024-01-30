@@ -60,7 +60,7 @@
         </div>
       </div>
 
-      <div class="section mt-24">
+      <div class="section mt-24" v-if="detail.periodSum">
         <div class="fs-20 fw-600 c-font-primary">账单汇总</div>
         <SummaryExpression
           class="mt-12"
@@ -261,6 +261,10 @@ const goLink = (type: number) => {
     billStore.setBillDetail(periodId, enterpriseId)
     router.push(`/bill/details`)
   } else if (type === 2) {
+    billStore.setConsumptionData({
+      startDate: billPeriodList.value[activeIndex.value].periodStartDate,
+      endDate: billPeriodList.value[activeIndex.value].periodEndDate
+    })
     emit('switchTab', 'second')
   } else if (type === 3) {
     const periodId = billPeriodList.value[activeIndex.value].periodId

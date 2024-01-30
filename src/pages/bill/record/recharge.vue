@@ -55,7 +55,7 @@
     </div>
     <!--表格-->
     <div class="table">
-      <el-table :data="tableData" border stripe v-loading.lock="loading">
+      <el-table :data="tableData" border stripe v-loading.lock="loading" max-height="560">
         <el-table-column prop="EnterpriseName" label="企业名称"></el-table-column>
         <el-table-column prop="CustomerName" label="用户" width="180"></el-table-column>
         <el-table-column prop="PayPrice" label="充值金额" width="180"></el-table-column>

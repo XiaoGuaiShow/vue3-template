@@ -15,7 +15,7 @@
         </el-form-item>
       </el-form>
 
-      <el-table :data="tableData" v-loading="loading" stripe border max-height="285">
+      <el-table :data="tableData" v-loading="loading" stripe border max-height="560">
         <el-table-column label="选择" width="60" align="center" class-name="single-radio">
           <template #default="scope">
             <el-radio

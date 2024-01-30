@@ -35,7 +35,7 @@
       </el-form-item>
     </el-form>
 
-    <el-table class="mt-6" :data="tableData" stripe border max-height="280" v-loading="loading">
+    <el-table class="mt-6" :data="tableData" stripe border max-height="560" v-loading="loading">
       <el-table-column prop="periodName" label="结算单名称" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="link" @click="handleLink(row)">
@@ -262,6 +262,6 @@ const handleLink = (row: any) => {
 .inner-section {
   padding: 24px 0;
   background: var(--bg-white);
-  min-height: 600px;
+  min-height: 650px;
 }
 </style>
