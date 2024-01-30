@@ -62,7 +62,7 @@
           <div>{{ PRODUCT_TYPE.get(row.productType) }}</div>
         </template>
       </el-table-column>
-      <el-table-column prop="memberName" label="预定人" width="215">
+      <el-table-column prop="memberName" label="预订人" width="215">
         <template #default="{ row }">
           <div>{{ row.memberName }}</div>
           <div>{{ row.departmentName }}</div>
@@ -128,14 +128,18 @@
           <div>{{ row.productName }}</div>
         </template>
       </el-table-column>
-      <el-table-column prop="price" label="单价(元)"></el-table-column>
-      <el-table-column prop="serverPrice" label="服务费(元)" />
-      <el-table-column prop="refundPrice" label="退改费(元)" />
-      <el-table-column prop="serverPrice" label="应付金额(元)" width="110">
+      <el-table-column prop="price" label="单价(元)">
         <template #default="{ row }">
           {{ handlePrice(row) }}
         </template>
       </el-table-column>
+      <el-table-column prop="serverPrice" label="服务费(元)" />
+      <el-table-column prop="changePrice" label="退改费(元)">
+        <template #default="{ row }">
+          {{ row.changePrice + row.refundPrice }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="totalPrice" label="应付金额(元)" width="110" />
       <el-table-column prop="payType" label="支付方式" width="138">
         <template #default="{ row }">
           {{ PAY_TYPE.get(row.payType) || '-' }}
@@ -162,6 +166,7 @@
   <GroupSelector
     v-if="commonVisible"
     v-model:visible="commonVisible"
+    title="选择部门"
     :popSelectType="4"
     @on-ok="handleSelectConfirm" />
 </template>
@@ -173,7 +178,8 @@ import { getConsumptionData } from '@/api/bill'
 import { ElMessage } from 'element-plus'
 import dayjs from 'dayjs'
 import { PRODUCT_TYPE, ORDER_STATUS_TYPE, PAY_TYPE } from '@/common/static'
-
+import { useBillStore } from '@/store/modules/bill'
+const billStore = useBillStore()
 const props = defineProps<{
   year: number
   enterpriseId: number
@@ -202,11 +208,10 @@ const pageVO = reactive({
   pageSize: 10
 })
 const total = ref(0)
-const currentYear = new Date().getFullYear()
-const dateRange = ref<any>([`${currentYear}-01-01`, `${currentYear}-12-31`])
+const dateRange = ref<any>([])
 const formInline = reactive({
-  periodStartDate: `${currentYear}-01-01`,
-  periodEndDate: `${currentYear}-12-31`,
+  periodStartDate: '',
+  periodEndDate: '',
   productTypes: [],
   deptNames: [],
   travelingPerson: '',
@@ -233,6 +238,10 @@ function getTableData() {
           tableData.value = newTableList
           total.value = res.data.total
           totalPrice.value = res.data.sumTotalPrice
+        } else {
+          tableData.value = []
+          total.value = res.data.total
+          totalPrice.value = res.data.sumTotalPrice
         }
       } else {
         ElMessage.error(res.msg)
@@ -248,9 +257,18 @@ watch(
     const [enterpriseId, year] = newVal
     if (enterpriseId) {
       formInline.enterpriseId = enterpriseId
-      dateRange.value = [`${year}-01-01`, `${year}-12-31`]
-      formInline.periodStartDate = `${year}-01-01`
-      formInline.periodEndDate = `${year}-12-31`
+      const start = billStore.consumptionData.startDate
+      const end = billStore.consumptionData.endDate
+      // 如果有传进来的日期就默认传过来的，否则就是今年的
+      if (start && end) {
+        dateRange.value = [start, end]
+        formInline.periodStartDate = start
+        formInline.periodEndDate = end
+      } else {
+        dateRange.value = [`${year}-01-01`, `${year}-12-31`]
+        formInline.periodStartDate = `${year}-01-01`
+        formInline.periodEndDate = `${year}-12-31`
+      }
       getTableData()
     }
   },
@@ -266,10 +284,6 @@ const dateRangeChange = (date: any) => {
     formInline.periodStartDate = ''
     formInline.periodEndDate = ''
   }
-}
-
-const handleExport = (row: TableItem) => {
-  console.log(row)
 }
 
 const handleSizeChange = (val: number) => {
@@ -325,6 +339,13 @@ const handleTime = (startTime: string, endTime: string) => {
     return `${startMonthDay} ${startHour}至${endHour}`
   }
 }
+
+onBeforeRouteLeave(() => {
+  billStore.resetOverviewDatas()
+})
+onUnmounted(() => {
+  billStore.resetConsumptionData()
+})
 </script>
 
 <style lang="less" scoped>
@@ -336,6 +357,6 @@ const handleTime = (startTime: string, endTime: string) => {
 .inner-section {
   padding: 24px 0;
   background: var(--bg-white);
-  min-height: 600px;
+  min-height: 650px;
 }
 </style>

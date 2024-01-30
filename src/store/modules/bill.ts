@@ -15,6 +15,11 @@ export const useBillStore = defineStore('enterprise', {
         enterpriseId: null,
         periodId: null
       },
+      // 消费数据保存的数据
+      consumptionData: {
+        startDate: '',
+        endDate: ''
+      },
       // 开票历史-列表页点击明细记录账期id和企业id
       invoiceHistory: {
         periodId: '',
@@ -56,6 +61,16 @@ export const useBillStore = defineStore('enterprise', {
     },
     resetOverviewDatas() {
       this.overviewDatas = { year: '', month: '', enterpriseId: '', periodId: '' }
+    },
+    setConsumptionData(data: any) {
+      data.startDate && (this.consumptionData.startDate = data.startDate)
+      data.endDate && (this.consumptionData.endDate = data.endDate)
+    },
+    resetConsumptionData() {
+      this.consumptionData = {
+        startDate: '',
+        endDate: ''
+      }
     }
   },
   persist: true

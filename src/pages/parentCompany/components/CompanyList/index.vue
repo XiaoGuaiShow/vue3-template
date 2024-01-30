@@ -30,9 +30,12 @@ import { Search } from '@element-plus/icons-vue'
 import { ElTree } from 'element-plus'
 import mittBus from '@/utils/mitt.ts'
 import { useZimuStore } from '@/store/modules/zimu'
+import { useUserStore } from '@/store/modules/user'
 const zimuStore = useZimuStore()
+const UserStore = useUserStore()
+const userInfo = UserStore.userInfo
 
-const currentNodeKey = ref(JSON.parse(localStorage.getItem('EnterpriseId') || '{}').data)
+const currentNodeKey = ref(`${userInfo.enterpriseId}`)
 interface Tree {
   companyName: string
   children?: Tree[]
@@ -58,8 +61,7 @@ const getDataList = async () => {
   TreeData.value = [parentObj, childObj]
   loading.value = false
   // 高亮当前登录企业
-  const enterpriseId = JSON.parse(localStorage.getItem('EnterpriseId') || '{}').data
-  const findItem = res.data.find((f: any) => +f.accountEnterpriseId === +enterpriseId)
+  const findItem = res.data.find((f: any) => f.accountEnterpriseId === currentNodeKey.value)
   if (findItem) {
     currentNodeKey.value = findItem.accountEnterpriseId
     mittBus.emit('mittGetCompanyInfo', findItem.id)
@@ -150,6 +152,10 @@ onUnmounted(() => {
     }
     .fontNormal {
       font-weight: normal;
+    }
+    // 树结构不要缩进
+    :deep(.el-tree-node__content) {
+      padding-left: 0 !important;
     }
   }
 }

@@ -106,7 +106,7 @@
         label="订单编号"
         show-overflow-tooltip
         width="150"></el-table-column>
-      <el-table-column prop="memberName" label="预定人" width="215">
+      <el-table-column prop="memberName" label="预订人" width="215">
         <template #default="{ row }">
           <span>{{ row.memberName }}</span>
           <div>{{ row.departmentName }}</div>
@@ -168,7 +168,7 @@
           </div>
         </template>
       </el-table-column> -->
-      <el-table-column prop="trip" label="行程/商家">
+      <el-table-column prop="trip" label="行程/商家" width="190">
         <template #default="{ row }">
           <div>{{ handleTime(row.departureDate, row.arrivalDate) }}</div>
           <div>{{ row.productInfo }}</div>
@@ -176,7 +176,11 @@
         </template>
       </el-table-column>
       <template v-if="dataType !== 3">
-        <el-table-column prop="price" label="单价(元)" width="138"></el-table-column>
+        <el-table-column prop="price" label="单价(元)" width="138">
+          <template #default="{ row }">
+            {{ handlePrice(row) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="serverPrice" label="服务费(元)" width="138" />
       </template>
     </el-table>
@@ -204,6 +208,7 @@
   <GroupSelector
     v-if="commonVisible"
     v-model:visible="commonVisible"
+    title="选择部门"
     :popSelectType="4"
     @on-ok="handleSelectConfirm" />
 </template>
@@ -357,6 +362,19 @@ const calculate = () => {
   })
   return map
 }
+
+// 计算单价
+const handlePrice = computed(() => {
+  return (row: any) => {
+    if (row.productType === 5) {
+      return row.price + row.fuelTax + row.airportTax + row.tax + row.insurancePrice
+    } else if (row.productType == 6) {
+      return row.price + row.grabTicketPrice + row.speedTicketPrice
+    } else {
+      return row.price
+    }
+  }
+})
 
 const statusDescComputed = computed(() => {
   return (statusDesc: number) => {

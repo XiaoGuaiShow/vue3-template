@@ -71,8 +71,8 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <div class="btn-info" @click="beforeClose">取消</div>
-          <div class="btn-primary" @click="handleConfirm()">确定</div>
+          <div class="btn btn-info" @click="beforeClose">取消</div>
+          <div class="btn btn-primary" @click="handleConfirm()">确定</div>
         </span>
       </template>
     </el-dialog>

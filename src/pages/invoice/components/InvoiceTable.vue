@@ -11,7 +11,7 @@
     :data="tableData"
     stripe
     border
-    :max-height="from === 'invoiceDetail' ? 480 : 240"
+    :max-height="from === 'invoiceDetail' ? 560 : 280"
     v-loading="loading">
     <el-table-column type="index" label="开票编号" width="80" align="center">
       <template #default="{ $index }">

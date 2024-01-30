@@ -25,7 +25,7 @@ import CompanyList from '@/pages/parentCompany/components/CompanyList/index.vue'
   padding: 0 12px 12px;
   align-items: stretch;
   .left-container {
-    width: 25%;
+    width: 240px;
     margin-right: 12px;
   }
   .right-container {

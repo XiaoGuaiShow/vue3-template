@@ -119,6 +119,7 @@
   <GroupSelector
     v-if="visible"
     :popSelectType="2"
+    :isSingleChoice="true"
     @onOk="handleInnerDialogConfirm"
     @update:visible="(e) => (visible = e)" />
 </template>

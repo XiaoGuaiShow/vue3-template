@@ -43,7 +43,7 @@
         </el-form-item>
       </el-form>
 
-      <el-table class="mt-6" :data="tableData" stripe border max-height="280" v-loading="loading">
+      <el-table class="mt-6" :data="tableData" stripe border max-height="560" v-loading="loading">
         <el-table-column prop="periodName" label="结算单名称" show-overflow-tooltip>
           <template #default="{ row }">
             <div class="link" @click="goBill(row)">
@@ -192,7 +192,7 @@ const goBill = (row: TableItem) => {
   padding: 24px;
   background-color: #fff;
   border-radius: 8px;
-  min-height: 600px;
+  min-height: 650px;
 }
 .title {
   font-size: 16px;

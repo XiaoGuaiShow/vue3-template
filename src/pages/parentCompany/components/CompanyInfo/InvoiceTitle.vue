@@ -26,7 +26,7 @@
         stripe
         border
         v-loading="loading"
-        max-height="240"
+        max-height="560"
         @select="handleSelectionChange"
         @select-all="handleSelectionAllChange">
         <el-table-column type="selection" width="55" align="center" reserve-selection />

@@ -93,6 +93,7 @@
   <GroupSelector
     v-if="commonVisible"
     v-model:visible="commonVisible"
+    :title="popSelectType === 4 ? '选择部门' : '选择人员'"
     :popSelectType="popSelectType"
     :before-list="beforeList"
     @on-ok="handleSelectConfirm" />

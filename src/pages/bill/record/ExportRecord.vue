@@ -5,7 +5,7 @@
       <el-button type="primary" size="small" @click="getTableData">刷新列表</el-button>
     </div>
 
-    <el-table class="mt-24" :data="tableData" v-loading="loading" stripe border>
+    <el-table class="mt-24" :data="tableData" v-loading="loading" stripe border max-height="560">
       <el-table-column type="index" width="50" align="center" />
       <el-table-column prop="fileName" label="文件名" show-overflow-tooltip>
         <template #default="{ row }">
@@ -132,7 +132,7 @@ const statusList = ['文件生成中 ', '文件已生成 ', '文件已失效 ', 
 }
 .export-view {
   background-color: #fff;
-  min-height: 600px;
+  min-height: 650px;
 }
 .remind-view {
   box-sizing: border-box;
