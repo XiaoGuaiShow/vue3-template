@@ -40,29 +40,22 @@
             </div>
           </div>
           <div>
-            <el-button
-              class="transparent-bg"
-              type="primary"
-              plain
-              @click="goLink(1)"
-              v-if="detail.periodId > 0">
+            <div class="btn btn-primary plain" @click="goLink(1)" v-if="detail.periodId > 0">
               查看账单明细
-            </el-button>
-            <el-button class="transparent-bg" type="primary" plain @click="goLink(2)" v-else>
-              查看消费明细
-            </el-button>
-            <el-button
-              type="primary"
+            </div>
+            <div class="btn btn-primary plain" @click="goLink(2)" v-else>查看消费明细</div>
+            <div
+              class="btn btn-primary"
               @click="showBillDialog = true"
               v-if="detail.settlementStatus === 6">
               确认账单
-            </el-button>
-            <el-button
-              type="primary"
+            </div>
+            <!-- <div
+              class="btn btn-primary"
               v-if="typeof detail.settlementStatus === 'number' && detail.settlementStatus > 6"
               @click="goLink(3)">
               查看发票
-            </el-button>
+            </div> -->
           </div>
         </div>
       </div>
@@ -157,7 +150,7 @@ watchEffect(() => {
   })
     .then((res) => {
       billPeriodList.value = res.data || []
-      activeIndex.value = res.data.length ? 0 : -1
+      activeIndex.value = res.data?.length ? 0 : -1
       getBillDeatil()
     })
     .finally(() => {
@@ -262,18 +255,18 @@ const feeClassList = computed(() => {
 const emit = defineEmits(['switchTab'])
 const billStore = useBillStore()
 const goLink = (type: number) => {
-  const periodId = billPeriodList.value[activeIndex.value].periodId
-  const enterpriseId = billPeriodList.value[activeIndex.value].enterpriseId
   if (type === 1) {
+    const periodId = billPeriodList.value[activeIndex.value].periodId
+    const enterpriseId = billPeriodList.value[activeIndex.value].enterpriseId
     billStore.setBillDetail(periodId, enterpriseId)
     router.push(`/bill/details`)
   } else if (type === 2) {
     emit('switchTab', 'second')
   } else if (type === 3) {
     const periodId = billPeriodList.value[activeIndex.value].periodId
-    router.push({
-      path: `/invoice/history/${periodId}`
-    })
+    const enterpriseId = billPeriodList.value[activeIndex.value].enterpriseId
+    billStore.setInvoiceHistory(periodId, enterpriseId)
+    router.push('invoice-history-detail')
   }
 }
 </script>

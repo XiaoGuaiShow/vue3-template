@@ -38,7 +38,7 @@
           <el-input v-model="params.periodName" placeholder="请输入名称" clearable></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">查询</el-button>
+          <div class="btn-primary w-100" @click="onSubmit">查询</div>
         </el-form-item>
       </el-form>
 

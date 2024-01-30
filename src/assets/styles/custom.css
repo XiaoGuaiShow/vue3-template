@@ -1,5 +1,12 @@
+/* 宽高相关 */
 .w-full {
   width: 100%;
+}
+.w-100 {
+  width: 100px;
+}
+.h-32 {
+  height: 32px;
 }
 /* margin相关 */
 .mt-12 {
@@ -14,7 +21,7 @@
 .ml-2 {
   margin-left: 2px;
 }
-.ml-4{
+.ml-4 {
   margin-left: 4px;
 }
 .ml-8 {
@@ -47,11 +54,14 @@
 .mr-6 {
   margin-right: 6px;
 }
-.mr-16 {
-  margin-right: 16px;
+.mr-10 {
+  margin-right: 10px;
 }
 .mr-12 {
   margin-right: 12px;
+}
+.mr-16 {
+  margin-right: 16px;
 }
 .mr-24 {
   margin-right: 24px;
@@ -99,7 +109,7 @@
 .col {
   flex-direction: column;
 }
-.ellipsis{
+.ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -118,6 +128,13 @@ shrink-0 {
 .c-font-hint {
   color: var(--font-hint);
 }
+.c-font-anti {
+  color: var(--font-anti);
+}
+/* 背景色相关 */
+.bg-primary {
+  background-color: var(--brand-blue);
+}
 /* 省略 */
 .ellipsis-1 {
   -webkit-line-clamp: 1;
@@ -125,4 +142,8 @@ shrink-0 {
   overflow: hidden;
   display: -webkit-box;
   word-break: break-all;
+}
+/* 圆角 */
+.br-2 {
+  border-radius: 2px;
 }

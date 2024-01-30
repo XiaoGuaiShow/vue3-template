@@ -78,8 +78,8 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="beforeClose">取 消</el-button>
-          <el-button type="primary" :loading="btnLoading" @click="handleConfirm">保存</el-button>
+          <div class="btn btn-info" @click="beforeClose">取 消</div>
+          <div class="btn btn-primary" v-loading="btnLoading" @click="handleConfirm">保存</div>
         </span>
       </template>
     </el-dialog>

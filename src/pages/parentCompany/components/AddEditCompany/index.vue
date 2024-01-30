@@ -2,9 +2,7 @@
   <div class="add-edit-company">
     <div class="title-label">新增操作</div>
     <div class="flex jc-c">
-      <el-button class="mt-12" type="primary" :icon="Plus" @click="handleAdd" style="width: 50%">
-        新增子公司
-      </el-button>
+      <div class="btn-primary mt-12 w-full" @click="handleAdd">+ 新增子公司</div>
     </div>
 
     <CompanyDialog :visible="commonVisible" @on-close="commonVisible = false"></CompanyDialog>
@@ -12,7 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import { Plus } from '@element-plus/icons-vue'
 let commonVisible = ref<boolean>(false)
 
 const handleAdd = () => {

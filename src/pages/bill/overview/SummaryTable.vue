@@ -19,10 +19,8 @@
           style="width: 200px"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
-        <el-button class="transparent-bg" type="primary" plain @click="handleExportAll">
-          导出汇总账单
-        </el-button>
+        <div class="btn btn-primary w-100" @click="onSubmit">查询</div>
+        <!-- <div class="btn btn-primary plain" @click="handleExportAll">导出汇总账单</div> -->
       </el-form-item>
     </el-form>
 

@@ -14,13 +14,13 @@
         {{ periodSumDTO.periodName }}
       </div>
       <div>
-        <el-button class="transparent-bg" type="primary" plain>导出账单</el-button>
-        <el-button
+        <!-- <div class="btn btn-primary plain">导出账单</div> -->
+        <div
           v-if="periodSumDTO.settlementStatus === 6"
-          type="primary"
+          class="btn btn-primary"
           @click="showBillDialog = true">
           确认并提交开票
-        </el-button>
+        </div>
       </div>
     </div>
     <div class="section mt-12">

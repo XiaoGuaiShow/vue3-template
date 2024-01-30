@@ -25,8 +25,8 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleConfirm" :loading="btnLoading">保存</el-button>
+        <div class="btn-info mr-10" @click="dialogVisible = false">取消</div>
+        <div class="btn-primary" @click="handleConfirm" v-loading="btnLoading">保存</div>
       </span>
     </template>
   </el-dialog>
