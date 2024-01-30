@@ -26,7 +26,8 @@
           end-placeholder="结束日期"
           align="right"
           value-format="YYYY-MM-DD"
-          @change="changeTime"></el-date-picker>
+          style="width: 250px"
+          @change="changeTime" />
       </div>
       <div class="search-item">
         <span class="search-item-label">状态</span>
