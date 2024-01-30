@@ -67,14 +67,14 @@ export const getBelongCompanyList = (): Promise<any> => {
 }
 
 // 单账期导出
-export const exportPeriodItem = (params: {
+export const exportPeriodItem = (data: {
   enterpriseId: number
   periodId: number
 }): Promise<any> => {
   return axiosInstance({
-    method: 'get',
+    method: 'post',
     url: 'platform-web/settlement/enterprise/period/export',
-    params,
+    data,
     isDownload: true,
     skipTypeCheck: true
   } as any)
@@ -111,12 +111,12 @@ export const exportPeriodAll = (data: SummaryTableParams): Promise<any> => {
 
 // 已结算金额鼠标悬浮的金额明细
 export const getSettledAmountDetails = (
-  params: SettledAmountDetailsParams
+  data: SettledAmountDetailsParams
 ): Promise<SettledAmountDetailsResult> => {
   return axiosInstance({
-    method: 'get',
+    method: 'post',
     url: 'platform-web/settlement/enterprise/period/payment/records',
-    params
+    data
   })
 }
 
@@ -130,28 +130,28 @@ export const getBillPeriodList = (data: BillPeriodListParams): Promise<BillPerio
 }
 
 // 账单汇总-每月单个账期的详情，包含分类概览
-export const getBillPeriodDetail = (params: {
+export const getBillPeriodDetail = (data: {
   enterpriseId: number
   periodId: number
   periodStartDate: string
   periodEndDate: string
 }): Promise<BillPeriodDetailResult> => {
   return axiosInstance({
-    method: 'get',
+    method: 'post',
     url: 'platform-web/settlement/enterprise/period/sum/detail',
-    params
+    data
   })
 }
 
 // 单账期-账期汇总数据
-export const getBillPeriodSummary = (params: {
+export const getBillPeriodSummary = (data: {
   enterpriseId: number
   periodId: number
 }): Promise<BillPeriodSummary> => {
   return axiosInstance({
-    method: 'get',
+    method: 'post',
     url: 'platform-web/settlement/enterprise/period/sum',
-    params
+    data
   })
 }
 

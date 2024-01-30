@@ -66,11 +66,11 @@ export const getInvoiceHistoryList = (data: any): Promise<any> => {
   })
 }
 // 发票历史详情
-export const getInvoiceHistoryDetail = (params: any): Promise<any> => {
+export const getInvoiceHistoryDetail = (data: any): Promise<any> => {
   return axiosInstance({
-    method: 'get',
+    method: 'post',
     url: 'platform-web/settlement/enterprise/period/invoice/sum',
-    params
+    data
   })
 }
 // 开票设置-开票单位列表
@@ -100,11 +100,11 @@ export const downloadInvoice = (params: any): Promise<any> => {
   } as any)
 }
 // 获取开票历史明细中的发票抬头
-export const getInvoiceTitleList = (params: any): Promise<any> => {
+export const getInvoiceTitleList = (data: any): Promise<any> => {
   return axiosInstance({
-    method: 'get',
+    method: 'post',
     url: 'platform-web/settlement/enterprise/period/invoice/titles',
-    params
+    data
   })
 }
 // 确认并提交开票申请
