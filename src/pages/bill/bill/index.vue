@@ -30,7 +30,7 @@
           style="width: 200px"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
+        <div class="btn-primary w-100" @click="onSubmit">查询</div>
       </el-form-item>
     </el-form>
 

@@ -47,15 +47,17 @@
         <el-input v-model="formInline.travelingPerson" placeholder="请输入出行人"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
-        <!-- <el-button class="transparent-bg" type="primary" plain @click="handleExport">导出账单</el-button> -->
+        <div class="btn btn-primary w-100" @click="onSubmit">查询</div>
+        <!-- <div class="btn btn-primary plain w-100" type="primary" plain @click="handleExport">
+          导出账单
+        </div> -->
       </el-form-item>
     </el-form>
 
     <el-table class="mt-6" :data="tableData" stripe border max-height="280" v-loading="loading">
-      <el-table-column prop="orderSerialNo" label="订单编号" show-overflow-tooltip>
+      <el-table-column prop="orderSerialNo" label="订单编号" show-overflow-tooltip width="150">
         <template #default="{ row }">
-          <div>{{ row.orderSerialNo }}</div>
+          <span>{{ row.orderSerialNo }}</span>
           <div>{{ PRODUCT_TYPE.get(row.productType) }}</div>
         </template>
       </el-table-column>
@@ -76,7 +78,7 @@
           <div class="flex">
             <el-dropdown trigger="click">
               <span class="flex ai-c">
-                苏州科技公司
+                {{ row.invoiceTitle }}
                 <el-icon class="el-icon--right">
                   <arrow-down />
                 </el-icon>
@@ -134,7 +136,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="trip" label="行程/商家">
+      <el-table-column prop="trip" label="行程/商家" width="150">
         <template #default="{ row }">
           <div>{{ handleTime(row.departureDate, row.arrivalDate) }}</div>
           <div>{{ row.productInfo }}</div>
@@ -315,6 +317,9 @@ const handlePrice = computed(() => {
 
 // 处理时间
 const handleTime = (startTime: string, endTime: string) => {
+  if (!startTime && !endTime) {
+    return '--'
+  }
   const start = dayjs(startTime)
   const end = dayjs(endTime)
   const startYear = start.format('YYYY')

@@ -41,14 +41,7 @@
           </el-input>
         </el-form-item>
         <el-form-item label="提醒人" prop="userInfos">
-          <el-button
-            class="transparent-bg"
-            type="primary"
-            plain
-            size="default"
-            @click="handleAddPerson">
-            选择提醒人
-          </el-button>
+          <div class="btn-primary plain" @click="handleAddPerson">选择提醒人</div>
         </el-form-item>
         <div class="personList">
           <el-form-item
@@ -78,8 +71,8 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="beforeClose">取消</el-button>
-          <el-button type="primary" @click="handleConfirm()">确定</el-button>
+          <div class="btn-info" @click="beforeClose">取消</div>
+          <div class="btn-primary" @click="handleConfirm()">确定</div>
         </span>
       </template>
     </el-dialog>

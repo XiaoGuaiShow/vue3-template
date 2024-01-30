@@ -10,15 +10,8 @@
         <!-- 新增开票单位 -->
         <div class="add-edit-company">
           <div class="title-label">新增操作</div>
-          <div class="flex jc-c">
-            <el-button
-              class="mt-12"
-              type="primary"
-              :icon="Plus"
-              @click="handleAdd"
-              style="width: 50%">
-              新增开票单位
-            </el-button>
+          <div class="flex">
+            <div class="btn-primary mt-12 w-full" @click="handleAdd">+ 新增开票单位</div>
           </div>
         </div>
         <!-- 开票单位列表 -->
@@ -375,7 +368,7 @@ const handleSetDimension = () => {
   height: auto;
   box-sizing: border-box;
   .left-container {
-    width: 25%;
+    width: 20%;
     margin-right: 12px;
   }
   .right-container {

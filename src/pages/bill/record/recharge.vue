@@ -42,8 +42,8 @@
       </div>
       <!--查询按钮-->
       <div class="search-item">
-        <el-button type="primary" @click="onSearch">查询</el-button>
-        <el-button type="primary" @click="onExport">导出</el-button>
+        <div class="btn btn-primary" @click="onSearch">查询</div>
+        <div class="btn btn-primary" @click="onExport">导出</div>
       </div>
     </div>
     <!--充值总额展示-->

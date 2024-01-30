@@ -86,3 +86,9 @@ export const SETTLEMENT_TYPE = new Map([
   [6, '支付宝_单位代付'],
   [7, '银票']
 ])
+
+export const DISSENT_STATUS = new Map([
+  [0, '待处理'],
+  [1, '待处理'],
+  [9, '自动处理']
+])

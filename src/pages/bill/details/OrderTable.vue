@@ -48,14 +48,14 @@
           clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="handleSearch">查询</el-button>
+        <div class="btn-primary w-100" @click="handleSearch">查询</div>
       </el-form-item>
     </el-form>
     <!-- <div class="flex ai-c mb-18" v-if="dataType !== 3 && dataType !== 4">
       <el-checkbox v-model="checkedAll" label="全选（跨分页）" size="large" />
-      <el-button type="primary" @click="openAdjustDialog('开票单位')">批量调整开票单位</el-button>
-      <el-button type="primary" @click="openAdjustDialog('成本中心')">批量调整成本中心</el-button>
-      <el-button type="primary" @click="openAdjustDialog('项目中心')">批量调整项目中心</el-button>
+      <div class="btn btn-primary" @click="openAdjustDialog('开票单位')">批量调整开票单位</div>
+      <div class="btn btn-primary" @click="openAdjustDialog('成本中心')">批量调整成本中心</div>
+      <div class="btn btn-primary" @click="openAdjustDialog('项目中心')">批量调整项目中心</div>
     </div> -->
 
     <el-table
@@ -73,15 +73,16 @@
         v-if="dataType !== 3 && dataType !== 4" />
       <!-- 只在本期异议里展示 -->
       <template v-if="dataType === 3">
-        <el-table-column prop="adjustType" label="调整类型" align="center"></el-table-column>
-        <el-table-column prop="statusDesc" label="状态" align="center">
+        <el-table-column prop="dissentStatus" label="状态" align="center">
           <template #default="{ row }">
-            <el-tag :type="statusDescComputed(row.statusDesc)">{{ row.statusDesc }}</el-tag>
+            <el-tag :type="statusDescComputed(row.dissentStatus)">
+              {{ DISSENT_STATUS.get(row.dissentStatus) }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="url" label="反馈信息" align="center">
           <template #default="{ row }">
-            <el-button type="primary" link v-if="row.url">查看</el-button>
+            <span class="link" v-if="row.url">查看</span>
             <span v-else>--</span>
           </template>
         </el-table-column>
@@ -103,10 +104,11 @@
       <el-table-column
         prop="orderSerialNo"
         label="订单编号"
-        show-overflow-tooltip></el-table-column>
+        show-overflow-tooltip
+        width="150"></el-table-column>
       <el-table-column prop="memberName" label="预定人" width="215">
         <template #default="{ row }">
-          <div>{{ row.memberName }}</div>
+          <span>{{ row.memberName }}</span>
           <div>{{ row.departmentName }}</div>
         </template>
       </el-table-column>
@@ -121,26 +123,10 @@
       </template>
       <el-table-column label="开票单位" width="138">
         <template #default="{ row }">
-          <div class="flex">
-            <el-dropdown trigger="click">
-              <span class="flex ai-c">
-                {{ row.invoiceTitle }}
-                <el-icon class="el-icon--right">
-                  <arrow-down />
-                </el-icon>
-              </span>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item>广州技术公司</el-dropdown-item>
-                  <el-dropdown-item>武汉美丽公司</el-dropdown-item>
-                  <el-dropdown-item>杭州电子公司</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
+          {{ row.invoiceTitle }}
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="成本中心" width="138">
+      <!-- <el-table-column prop="status" label="成本中心" width="138">
         <template #default="{ row }">
           <div class="flex">
             <el-dropdown trigger="click">
@@ -181,7 +167,7 @@
             </el-dropdown>
           </div>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column prop="trip" label="行程/商家">
         <template #default="{ row }">
           <div>{{ handleTime(row.departureDate, row.arrivalDate) }}</div>
@@ -226,7 +212,7 @@
 import { ref, reactive, toRefs, computed } from 'vue'
 import AdjustDialog from '../components/AdjustDialog.vue'
 import { getBillPeriodSummaryDetail } from '@/api/bill'
-import { PRODUCT_TYPE, ORDER_STATUS_TYPE } from '@/common/static'
+import { PRODUCT_TYPE, ORDER_STATUS_TYPE, DISSENT_STATUS } from '@/common/static'
 import dayjs from 'dayjs'
 
 const props = defineProps<{
@@ -373,10 +359,10 @@ const calculate = () => {
 }
 
 const statusDescComputed = computed(() => {
-  return (statusDesc) => {
-    if (statusDesc === '待处理') {
+  return (statusDesc: number) => {
+    if (statusDesc === 0) {
       return 'danger'
-    } else if (statusDesc === '已处理') {
+    } else if (statusDesc === 1) {
       return ''
     } else {
       return ''

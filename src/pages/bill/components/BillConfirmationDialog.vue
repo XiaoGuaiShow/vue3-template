@@ -16,10 +16,10 @@
     </div>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleConfirm" :loading="btnLoading">
+        <div class="btn-info mr-10" @click="dialogVisible = false">取消</div>
+        <div class="btn-primary" @click="handleConfirm" v-loading="btnLoading">
           确认并提交开票申请
-        </el-button>
+        </div>
       </span>
     </template>
   </el-dialog>

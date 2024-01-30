@@ -11,9 +11,7 @@
             @change="inputChange"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button class="transparent-bg" plain :icon="Plus" @click="openDialog">
-            新增邮寄地址
-          </el-button>
+          <div class="btn-primary plain" @click="openDialog">+ 新增邮寄地址</div>
         </el-form-item>
       </el-form>
 
@@ -39,8 +37,8 @@
         <el-table-column prop="receiverEmail" label="邮箱" width="160" />
         <el-table-column label="操作" align="center" width="80">
           <template #default="scope">
-            <el-button type="primary" link @click="handleEdit(scope.row)">编辑</el-button>
-            <!-- <el-button type="primary" link @click="handleDelete(scope.row)">删除</el-button> -->
+            <span class="link-btn" @click="handleEdit(scope.row)">编辑</span>
+            <!-- <span class="link-btn" @click="handleDelete(scope.row)">删除</span> -->
           </template>
         </el-table-column>
       </el-table>
@@ -59,8 +57,8 @@
     </div>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="onConfirm">确认</el-button>
+        <div class="btn btn-info" @click="dialogVisible = false">取消</div>
+        <div class="btn btn-primary" @click="onConfirm">确认</div>
       </span>
     </template>
   </el-dialog>
@@ -73,7 +71,6 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getMailingAddressList } from '@/api/address'
 

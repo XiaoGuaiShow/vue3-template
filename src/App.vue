@@ -24,6 +24,7 @@ export default defineComponent({
 
 <style lang="less">
 @import url('./assets/styles/element.custom.less');
+@import url('./assets/styles/framework.less');
 
 html,
 body,

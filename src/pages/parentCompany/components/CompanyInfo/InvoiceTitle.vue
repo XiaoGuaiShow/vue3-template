@@ -59,7 +59,7 @@
       </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" @click="handleConfirm">确 定</el-button>
+          <div class="btn-primary" @click="handleConfirm">确 定</div>
         </span>
       </template>
     </el-dialog>
