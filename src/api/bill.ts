@@ -20,6 +20,13 @@ import type {
   BillPeriodSummaryDetailParams
 } from '@/pages/bill/types'
 
+export const getTabIds = (params: { menuId: number }): Promise<any> => {
+  return axiosInstance({
+    method: 'get',
+    url: 'platform/pc-user-menu/listTab',
+    params
+  })
+}
 export const getExportRecordList = (data: PageVO1): Promise<ExportRecordResult> => {
   return axiosInstance({
     method: 'post',

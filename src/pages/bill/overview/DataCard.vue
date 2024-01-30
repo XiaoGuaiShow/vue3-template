@@ -177,32 +177,34 @@ const overviewData = reactive({
 })
 const loading = ref(false)
 const settlementType = ref() // 1授信2单结4企业钱包6支付宝——单位代付7银票
-watchEffect(() => {
-  if (props.enterpriseIdList.length === 0) return
-  const data = {
-    year: props.year,
-    enterpriseIdList: props.enterpriseIdList
+watch(
+  () => [props.enterpriseIdList, props.year],
+  () => {
+    const data = {
+      year: props.year,
+      enterpriseIdList: props.enterpriseIdList
+    }
+    loading.value = true
+    getOverviewDatas(data)
+      .then((res) => {
+        if (res.code === '0000') {
+          overviewData.balance = res.data.balance ?? 0
+          overviewData.totalPrice = res.data.totalPrice ?? 0
+          overviewData.totalPaymentAmount = res.data.totalPaymentAmount ?? 0
+          overviewData.unPaymentAmount = res.data.unPaymentAmount ?? 0
+          overviewData.invoiceAmount = res.data.invoiceAmount ?? 0
+          overviewData.unInvoiceAmount = res.data.unInvoiceAmount ?? 0
+          overviewData.unVatInvoiceAmount = res.data.unVatInvoiceAmount ?? 0
+          overviewData.unPrintInvoiceAmount = res.data.unPrintInvoiceAmount ?? 0
+          overviewData.unTakeoutInvoiceAmount = res.data.unTakeoutInvoiceAmount ?? 0
+          settlementType.value = res.data.settlementType
+        }
+      })
+      .finally(() => {
+        loading.value = false
+      })
   }
-  loading.value = true
-  getOverviewDatas(data)
-    .then((res) => {
-      if (res.code === '0000') {
-        overviewData.balance = res.data.balance ?? 0
-        overviewData.totalPrice = res.data.totalPrice ?? 0
-        overviewData.totalPaymentAmount = res.data.totalPaymentAmount ?? 0
-        overviewData.unPaymentAmount = res.data.unPaymentAmount ?? 0
-        overviewData.invoiceAmount = res.data.invoiceAmount ?? 0
-        overviewData.unInvoiceAmount = res.data.unInvoiceAmount ?? 0
-        overviewData.unVatInvoiceAmount = res.data.unVatInvoiceAmount ?? 0
-        overviewData.unPrintInvoiceAmount = res.data.unPrintInvoiceAmount ?? 0
-        overviewData.unTakeoutInvoiceAmount = res.data.unTakeoutInvoiceAmount ?? 0
-        settlementType.value = res.data.settlementType
-      }
-    })
-    .finally(() => {
-      loading.value = false
-    })
-})
+)
 
 // 生成年份列表
 function generateYears(year: number) {

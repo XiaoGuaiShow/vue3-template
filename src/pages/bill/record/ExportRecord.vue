@@ -66,19 +66,23 @@ const pageVo = reactive({
 })
 const total = ref(0)
 const tableData = ref<ExportRecordListItem[]>()
-const loading = ref(true)
+const loading = ref(false)
 
 const getTableData = () => {
   loading.value = true
-  getExportRecordList(pageVo).then((res) => {
-    if (res.code === '0000') {
-      tableData.value = res.data?.list || []
-      total.value = res.data?.total || 0
-    } else {
-      ElMessage.error(res.message)
-    }
-    loading.value = false
-  })
+  getExportRecordList(pageVo)
+    .then((res) => {
+      console.log(res)
+      if (res.code === '0000') {
+        tableData.value = res.data?.list || []
+        total.value = res.data?.total || 0
+      } else {
+        ElMessage.error(res.message)
+      }
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 getTableData()
 

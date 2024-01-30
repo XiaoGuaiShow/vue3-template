@@ -17,7 +17,7 @@
             placeholder="请输入收件详细地址"
             clearable
             class="w-all" />
-          <span class="c-brand-blue" @click="reuseInvoiceAddress">复用发票地址</span>
+          <!-- <span class="c-brand-blue" @click="reuseInvoiceAddress">复用发票地址</span> -->
         </el-form-item>
         <el-form-item label="收件人" prop="receiver">
           <el-input

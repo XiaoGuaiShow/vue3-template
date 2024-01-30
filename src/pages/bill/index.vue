@@ -2,35 +2,36 @@
   <div class="container">
     <div class="section">
       <el-tabs v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="账单总览" name="first">
-          <Suspense>
-            <DataCard
-              :year="year"
-              :yearChange="yearChange"
-              :enterpriseId="enterpriseId"
-              :enterpriseIdList="enterpriseIdList"
-              :setEnterpriseIdFn="setEnterpriseIdFn"
-              @link-change="goLink"></DataCard>
-          </Suspense>
-        </el-tab-pane>
-        <el-tab-pane label="消费数据" name="second">
-          <ConsumptionTable
-            v-if="activeName === 'second'"
-            :year="year"
-            :enterpriseId="enterpriseId"></ConsumptionTable>
-        </el-tab-pane>
-        <el-tab-pane label="账单列表" name="third">
-          <BillList
-            v-if="activeName === 'third'"
-            :status="status"
-            :year="year"
-            :enterpriseId="enterpriseId"></BillList>
-        </el-tab-pane>
-        <el-tab-pane label="导出记录" name="fourth">
-          <ExportRecord v-if="activeName === 'fourth'"></ExportRecord>
-        </el-tab-pane>
-        <!-- <el-tab-pane label="导出模板" name="fifth">Task</el-tab-pane> -->
+        <el-tab-pane
+          v-for="item in tabs"
+          :key="item.tabId"
+          :label="item.label"
+          :name="item.name"></el-tab-pane>
       </el-tabs>
+      <!-- 账单总览 -->
+      <Suspense v-if="activeName === 'first'">
+        <DataCard
+          v-if="activeName === 'first'"
+          :year="year"
+          :yearChange="yearChange"
+          :enterpriseId="enterpriseId"
+          :enterpriseIdList="enterpriseIdList"
+          :setEnterpriseIdFn="setEnterpriseIdFn"
+          @link-change="goLink"></DataCard>
+      </Suspense>
+      <!-- 消费数据 -->
+      <ConsumptionTable
+        v-if="activeName === 'second'"
+        :year="year"
+        :enterpriseId="enterpriseId"></ConsumptionTable>
+      <!-- 账单列表 -->
+      <BillList
+        v-if="activeName === 'third'"
+        :status="status"
+        :year="year"
+        :enterpriseId="enterpriseId"></BillList>
+      <!-- 导出记录 -->
+      <ExportRecord v-if="activeName === 'fourth'"></ExportRecord>
     </div>
     <template v-if="activeName === 'first'">
       <MonthTab :month="month" :monthChange="monthChange"></MonthTab>
@@ -66,6 +67,33 @@ import ExportRecord from './record/ExportRecord.vue'
 import { useBillStore } from '@/store/modules/bill'
 import mittBus from '@/utils/mitt'
 import { useOverview } from './hooks/useOverview'
+import { getTabIds } from '@/api/bill'
+
+// 获取tab权限
+const menuId = 64
+const tabsMap = new Map([
+  [82, { label: '账单总览', name: 'first', tabId: 82 }],
+  [83, { label: '消费数据', name: 'second', tabId: 83 }],
+  [84, { label: '账单列表', name: 'third', tabId: 84 }],
+  [65, { label: '导出记录', name: 'fourth', tabId: 65 }],
+  [85, { label: '导出模板', name: 'fifth', tabId: 85 }]
+])
+const tabs = ref<any[]>([])
+const activeName = ref('')
+getTabIds({ menuId }).then((res) => {
+  if (res.code === '0000') {
+    const data = res.data || []
+    const keys = [...tabsMap.keys()]
+    keys.forEach((item: number) => {
+      if (data.includes(item)) {
+        tabs.value.push(tabsMap.get(item))
+      }
+    })
+    if (tabs.value.length > 0) {
+      activeName.value = tabs.value[0].name
+    }
+  }
+})
 
 const {
   year,
@@ -79,7 +107,6 @@ const {
 } = useOverview()
 
 const router = useRouter()
-const activeName = ref('first')
 const handleClick = () => {
   status.value = -1
 }

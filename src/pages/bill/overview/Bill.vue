@@ -27,7 +27,8 @@
                 <div
                   class="fs-18 fw-500 c-font-primary mr-12"
                   v-if="detail.periodLatestPaymentDate">
-                  最晚结算日: {{ detail.periodLatestPaymentDate }}
+                  {{ detail.periodId > 0 ? '最晚结算日:' : '出账日:' }}
+                  {{ detail.periodLatestPaymentDate }}
                 </div>
                 <div class="flex ai-c elliptic" v-if="detail.countDown && detail.countDown > 0">
                   <img :src="timeImg" alt="" />
@@ -87,11 +88,15 @@
               }}
             </div>
             <div class="l-money">
-              {{ +item2.productTotalPrice === 0 ? '-' : `￥${item2.productTotalPrice}` }}
+              <template v-if="typeof item2.productTotalPrice !== 'number'">-</template>
+              <template v-else>
+                <span v-if="item2.productType === 0">￥</span>
+                {{ item2.productTotalPrice }}
+              </template>
             </div>
             <div v-for="(item3, index3) in feeTypeList(item2.feeDetailList)" :key="index3">
-              <span class="s-label">{{ FEE_TYPE.get(item3.feeType) }}</span>
-              <template v-if="+item3.totalPrice === 0">-</template>
+              <span class="s-label mr-12">{{ FEE_TYPE.get(item3.feeType) }}</span>
+              <template v-if="typeof item3.totalPrice !== 'number'">-</template>
               <template v-else>
                 <span v-if="item2.productType === 0">￥</span>
                 {{ item3.totalPrice }}
@@ -139,24 +144,29 @@ const props = defineProps<{
 const billPeriodList = ref<BillPeriodItem[]>([])
 const activeIndex = ref(0)
 // 查询该月有多少账期
-watchEffect(() => {
-  const enterpriseId = props.basicParams.enterpriseIdList[0]
-  if (!enterpriseId) return
-  loading.value = true
-  getBillPeriodList({
-    enterpriseId,
-    month: props.basicParams.month,
-    year: props.basicParams.year
-  })
-    .then((res) => {
-      billPeriodList.value = res.data || []
-      activeIndex.value = res.data?.length ? 0 : -1
-      getBillDeatil()
+watch(
+  () => props.basicParams,
+  (newParams) => {
+    console.log(newParams)
+    const enterpriseId = newParams.enterpriseIdList[0]
+    if (!enterpriseId) return
+    loading.value = true
+    getBillPeriodList({
+      enterpriseId,
+      month: newParams.month,
+      year: newParams.year
     })
-    .finally(() => {
-      loading.value = false
-    })
-})
+      .then((res) => {
+        billPeriodList.value = res.data || []
+        activeIndex.value = res.data?.length ? 0 : -1
+        getBillDeatil()
+      })
+      .finally(() => {
+        loading.value = false
+      })
+  },
+  { immediate: true, deep: true }
+)
 const tabClick = (index: number) => {
   activeIndex.value = index
 }
