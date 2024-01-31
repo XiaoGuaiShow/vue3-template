@@ -130,10 +130,10 @@ import type {
 import SummaryExpression from '../components/SummaryExpression.vue'
 import BillConfirmationDialog from '../components/BillConfirmationDialog.vue'
 import { getBillPeriodList, getBillPeriodDetail } from '@/api/bill'
-import mittBus from '@/utils/mitt'
 import { useBillStore } from '@/store/modules/bill'
 import { useRouter } from 'vue-router'
 const router = useRouter()
+const billStore = useBillStore()
 
 const loading = ref(true)
 const props = defineProps<{
@@ -159,6 +159,14 @@ watch(
         .then((res) => {
           billPeriodList.value = res.data || []
           activeIndex.value = res.data?.length ? 0 : -1
+          const periodId = billStore.overviewDatas.periodId
+          if (periodId) {
+            const findIndex = billPeriodList.value.findIndex((item) => item.periodId === periodId)
+            if (findIndex !== -1) {
+              activeIndex.value = findIndex
+              billStore.resetOverviewDatas()
+            }
+          }
           getBillDeatil()
         })
         .finally(() => {
@@ -260,7 +268,6 @@ const feeClassList = computed(() => {
 })
 
 const emit = defineEmits(['switchTab'])
-const billStore = useBillStore()
 const goLink = (type: number) => {
   if (type === 1) {
     const periodId = billPeriodList.value[activeIndex.value].periodId

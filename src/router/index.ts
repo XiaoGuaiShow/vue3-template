@@ -53,7 +53,6 @@ router.beforeEach((to) => {
         )
       }
     }
-    console.log('----------子应用的to---', to)
     window.microApp.dispatch({ currentRoute: to.fullPath })
   }
 })

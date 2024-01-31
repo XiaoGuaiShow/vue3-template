@@ -29,7 +29,7 @@
         <span class="info-title">财务信息</span>
         <div class="info-title-right flex ai-c">
           <span @click="handleBalanceRemind">设置余额提醒</span>
-          <span @click="goToRechargeRecords">充值</span>
+          <span v-if="companyInfo.debitType !== 1" @click="goToRechargeRecords">充值</span>
         </div>
       </div>
       <div class="info-content flex wrap">
@@ -232,7 +232,14 @@ const balanceRemindConfirm = () => {}
 
 // 跳转充值记录页面
 const goToRechargeRecords = () => {
-  window.microApp.getData().pushState('/manage/#/goRecharge?enterpriseId=' + companyInfo.value.id)
+  window.microApp
+    .getData()
+    .pushState(
+      '/manage/#/goRecharge?enterpriseId=' +
+        companyInfo.value.id +
+        '&enterpriseName=' +
+        companyInfo.value.companyName
+    )
 }
 
 // 发票单位编辑

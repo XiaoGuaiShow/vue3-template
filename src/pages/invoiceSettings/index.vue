@@ -322,19 +322,15 @@ function getInvoiceDetails() {
 // 开票状态
 const beforeChange = async (): Promise<boolean> => {
   return new Promise((resolve, reject) => {
-    const stopMsg = '确定要停用该开票吗？'
-    const startMsg = '确认要启用该开票吗?'
-    ElMessageBox.confirm(isValid.value ? stopMsg : startMsg, '提示').then(() => {
-      validInvoice({ id: currentNodeKey.value }).then((res: any) => {
-        if (res.code === '0000') {
-          ElMessage.success('操作成功')
-          getDataList()
-          resolve(true)
-        } else {
-          ElMessage.error(res.msg)
-          reject(false)
-        }
-      })
+    validInvoice({ id: currentNodeKey.value }).then((res: any) => {
+      if (res.code === '0000') {
+        ElMessage.success('操作成功')
+        getDataList(false)
+        resolve(true)
+      } else {
+        ElMessage.error(res.msg)
+        reject(false)
+      }
     })
   })
 }
