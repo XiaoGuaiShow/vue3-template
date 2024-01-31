@@ -5,7 +5,7 @@ import mittBus from '@/utils/mitt.ts'
 
 export const useYearAndCompany = async (needSum = true) => {
   const year = ref(new Date().getFullYear()) // 年份
-  const enterpriseId = ref('') // 公司id
+  const enterpriseId = ref<any>() // 公司id
   const enterpriseList: Ref<EnterpriseItem[]> = ref([]) // 公司列表
   const isSummary = ref(false) // 是否是汇总页
   const enterpriseOptions = ref<EnterpriseOptionItem[]>([])
@@ -14,6 +14,7 @@ export const useYearAndCompany = async (needSum = true) => {
     enterpriseList.value = data
     const option1 = []
     const option2 = []
+    let hasParent = false
     for (const item of data) {
       if (item.type === 0 || item.type === -1) {
         option1.push({
@@ -22,6 +23,7 @@ export const useYearAndCompany = async (needSum = true) => {
         })
         // 初始化赋值母公司id
         if (item.type === 0) {
+          hasParent = true
           enterpriseId.value = item.enterpriseId
         }
       }
@@ -31,6 +33,11 @@ export const useYearAndCompany = async (needSum = true) => {
           value: item.enterpriseId
         })
       }
+    }
+    // 如果没有母公司
+    if (!hasParent) {
+      const childId = option2[0].value
+      enterpriseId.value = childId
     }
     if (option1.length > 0) {
       enterpriseOptions.value.push({

@@ -116,9 +116,10 @@ const enterpriseList: Ref<EnterpriseItem[]> = ref([]) // 公司列表
 const enterpriseOptions = ref<EnterpriseOptionItem[]>([])
 getCompanyList(true).then((res) => {
   if (res.code === '0000') {
-    enterpriseList.value = res.data
+    enterpriseList.value = res.data || []
     const option1 = []
     const option2 = []
+    let hasParent = false // 判断是否有母公司
     for (const item of res.data) {
       if (item.type === 0 || item.type === -1) {
         option1.push({
@@ -127,6 +128,7 @@ getCompanyList(true).then((res) => {
         })
         // 初始化赋值母公司id
         if (item.type === 0) {
+          hasParent = true
           props.setEnterpriseIdFn(item.enterpriseId, [item.enterpriseId], false)
         }
       }
@@ -136,6 +138,11 @@ getCompanyList(true).then((res) => {
           value: item.enterpriseId
         })
       }
+    }
+    // 如果没有母公司
+    if (!hasParent) {
+      const childId = option2[0].value
+      props.setEnterpriseIdFn(childId, [childId], false)
     }
     if (option1.length > 0) {
       enterpriseOptions.value.push({

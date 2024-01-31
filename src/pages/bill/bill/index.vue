@@ -20,7 +20,6 @@
             :key="key"
             :label="value"
             :value="key" />
-          <el-option label="未结算" :value="0" />
         </el-select>
       </el-form-item>
       <el-form-item label="结算单名称">
