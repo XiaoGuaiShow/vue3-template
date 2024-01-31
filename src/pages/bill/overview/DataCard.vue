@@ -47,8 +47,8 @@
           <div class="yellow-card-item">
             <div class="item-name">当前可用额度</div>
             <div class="item-money">￥{{ overviewData.balance }}</div>
-            <div class="item-link" @click="goLink(4)" v-if="settlementType === 1">还款记录</div>
-            <div class="item-link" @click="goLink(7)" v-if="settlementType === 4">充值记录</div>
+            <!-- <div class="item-link" @click="goLink(4)" v-if="settlementType === 1">还款记录</div>
+            <div class="item-link" @click="goLink(7)" v-if="settlementType === 4">充值记录</div> -->
           </div>
           <img class="item-image" :src="bpayImg" />
         </div>

@@ -71,7 +71,7 @@
             <div class="flex-box">
               <div class="text-form">
                 <div class="label">结算员</div>
-                <div class="value">{{ details.accountUser.memberName || '--' }}</div>
+                <div class="value">{{ details.accountUser?.memberName || '--' }}</div>
               </div>
             </div>
           </div>
@@ -317,8 +317,8 @@ function getDetails(id: string) {
         // 赋值选中结算员
         settleMembers.value = [
           {
-            CustomerId: res.data.accountUser.memberId,
-            Name: res.data.accountUser.memberName
+            CustomerId: res.data.accountUser?.memberId,
+            Name: res.data.accountUser?.memberName
           }
         ]
       }

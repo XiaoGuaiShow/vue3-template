@@ -264,6 +264,9 @@ const handleConfirm = async () => {
     if (valid) {
       btnLoading.value = true
       const params = props.invoiceId ? { ...addForm, id: props.invoiceId } : addForm
+      if (params.accountId === '') {
+        params.accountId = 0
+      }
       saveInvoiceUnit(params)
         .then((res) => {
           if (res.code === '0000') {
