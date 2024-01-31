@@ -135,7 +135,8 @@ if (props.invoiceId) {
   getInvoiceDetail(props.invoiceId).then((res) => {
     if (res.code === '0000') {
       if (res.data) {
-        addForm.accountId = res.data.accountId || 0
+        addForm.accountId =
+          !res.data.accountId || res.data.accountId === '0' ? '' : res.data.accountId
         addForm.bankName = res.data.bankName
         addForm.bankNo = res.data.bankNo
         addForm.companyAddress = res.data.companyAddress

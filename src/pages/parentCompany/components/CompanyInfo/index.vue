@@ -98,6 +98,7 @@
   <GroupSelector
     v-if="commonVisible"
     v-model:visible="commonVisible"
+    :is-show-son-dep="false"
     :isSingleChoice="true"
     :popSelectType="2"
     :showSettlementMember="true"
@@ -106,13 +107,10 @@
 
 <script setup lang="ts">
 import { accountDetail, accountValid } from '@/api/modules/parentCompany'
-import { saveSettlementUser } from '@/api/rules'
 import { saveEnterpriseAccount } from '@/api/modules/parentCompany'
 import mittBus from '@/utils/mitt.ts'
 import type { CompanyInfo } from '../../types'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { useZimuStore } from '@/store/modules/zimu'
-const zimuStore = useZimuStore()
 
 // 企业id
 let companyId = ref<string>('')
