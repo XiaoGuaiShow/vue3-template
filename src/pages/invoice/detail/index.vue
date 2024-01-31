@@ -86,7 +86,7 @@ if (periodId && enterpriseId) {
 }
 
 const goBack = () => {
-  router.go(-1)
+  window.history.go(-1)
 }
 const year = billStore.invoiceHistory.year
 const month = billStore.invoiceHistory.month

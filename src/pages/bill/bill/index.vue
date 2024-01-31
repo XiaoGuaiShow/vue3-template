@@ -244,7 +244,7 @@ const goLink = (row: any) => {
     year: row.year,
     month: row.month
   })
-  router.push({ name: 'InvoiceHistoryDetail' })
+  router.push('/invoice-history-detail')
 }
 const handleLink = (row: any) => {
   // 跳转到账单总览的账单详情

@@ -196,7 +196,7 @@ const handleSizeChange = (val: number) => {
   fetchData()
 }
 const goLink = () => {
-  router.go(-1)
+  window.history.go(-1)
 }
 </script>
 

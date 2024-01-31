@@ -180,7 +180,7 @@ const goLink = (row: TableItem) => {
     year: row.year,
     month: row.month
   })
-  router.push('invoice-history-detail')
+  router.push('/invoice-history-detail')
 }
 const goBill = (row: TableItem) => {
   billStore.setOverviewDatas(row)
