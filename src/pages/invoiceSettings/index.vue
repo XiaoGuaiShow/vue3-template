@@ -131,6 +131,8 @@
                 <span class="fs-12 c-font-hint">维护开具当前发票单位的部门或人员</span>
               </span>
               <div class="info-title-right flex ai-c">
+                <span v-if="dimensionType === 1" @click="handleImport">导入</span>
+                <span @click="handleExport">导出</span>
                 <span @click="handleEdit">编辑</span>
               </div>
             </div>
@@ -177,20 +179,31 @@
         :invoiceId="invoiceId"
         @on-close="visible = false"
         @on-confirm="saveConfirm" />
+
+      <!-- 下载上传模版 -->
+      <DownloadUpload
+        :visible="uploadVisible"
+        :downloadUrl="downloadUrl"
+        :uploadUrl="importInvoice"
+        @on-close="uploadVisible = false"
+        @on-confirm="handleUploadSuccess"></DownloadUpload>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Plus, Search } from '@element-plus/icons-vue'
+import { Search } from '@element-plus/icons-vue'
 import {
   getAllInvoiceList,
   getInvoiceDetail,
   validInvoice,
-  getEnterpriseDimension
+  getEnterpriseDimension,
+  exportInvoice,
+  importInvoice
 } from '@/api/invoice'
-import { ElMessage, ElTree, ElMessageBox } from 'element-plus'
+import { ElMessage, ElTree } from 'element-plus'
 import AddEditInvoiceTitle from '@/pages/parentCompany/components/CompanyInfo/AddEditInvoiceTitle.vue'
+import DownloadUpload from '@/components/DownloadUpload/index.vue'
 
 const visible = ref(false)
 const handleAdd = () => {
@@ -336,11 +349,12 @@ const beforeChange = async (): Promise<boolean> => {
 }
 const saveConfirm = () => {
   // 编辑确认
-  if (invoiceId.value) {
-    getInvoiceDetails()
-  } else {
-    getDataList(false)
-  }
+  // if (invoiceId.value) {
+  //   getInvoiceDetails()
+  // } else {
+  //   getDataList(false)
+  // }
+  getDataList(false)
 }
 
 // 设置开票维度
@@ -352,6 +366,25 @@ const handleSetDimension = () => {
       dimensionSubType: dimensionSubType.value
     }
   })
+}
+
+// 导出
+const handleExport = () => {
+  exportInvoice()
+}
+
+// 导入模版
+let uploadVisible = ref(false)
+const handleImport = () => {
+  uploadVisible.value = true
+}
+// 模版下载地址
+let downloadUrl =
+  'https://saas.ceekee.com/saas/%E5%AF%BC%E5%85%A5%E5%BC%80%E7%A5%A8%E8%A7%84%E5%88%99%E6%A8%A1%E7%89%88.xlsx'
+
+// 模版上传成功
+const handleUploadSuccess = () => {
+  getDataList()
 }
 </script>
 

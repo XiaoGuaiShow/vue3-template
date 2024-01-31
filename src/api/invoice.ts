@@ -123,3 +123,23 @@ export const modifyInvoiceItem = (data: any): Promise<any> => {
     data
   })
 }
+// 导出
+export const exportInvoice = (): Promise<any> => {
+  return axiosInstance({
+    method: 'get',
+    url: 'platform/invoice/export',
+    isDownload: true,
+    skipTypeCheck: true
+  } as any)
+}
+// 导入
+export const importInvoice = (data: any): Promise<any> => {
+  return axiosInstance({
+    method: 'post',
+    url: 'platform/invoice/import',
+    data,
+    headers: { 'Content-Type': 'multipart/form-data' },
+    // isDownload: true,
+    skipTypeCheck: true
+  } as any)
+}

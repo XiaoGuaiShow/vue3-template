@@ -64,7 +64,7 @@ const getDataList = async () => {
   const findItem = res.data.find((f: any) => f.accountEnterpriseId === currentNodeKey.value)
   if (findItem) {
     currentNodeKey.value = findItem.accountEnterpriseId
-    mittBus.emit('mittGetCompanyInfo', findItem.id)
+    mittBus.emit('mittGetCompanyInfo', findItem)
     zimuStore.setEnterpriseInfo(findItem)
   }
 }
@@ -72,7 +72,7 @@ getDataList()
 // 点击tree节点
 const handleClickCompany = (data: any) => {
   if (data.id) {
-    mittBus.emit('mittGetCompanyInfo', data.id)
+    mittBus.emit('mittGetCompanyInfo', data)
     zimuStore.setEnterpriseInfo(data)
   }
 }

@@ -3,6 +3,7 @@
     <div class="flex jc-sb ai-c">
       <div class="title-label">{{ companyInfo.companyName || '-' }}</div>
       <el-switch
+        v-if="companyItem?.companyType === 2"
         v-model="companyInfo.isValid"
         inline-prompt
         active-text="启用"
@@ -114,11 +115,13 @@ const zimuStore = useZimuStore()
 
 // 企业id
 let companyId = ref<string>('')
+const companyItem = ref<any>()
 onMounted(() => {
   // 监听点击公司列表,获取公司详情
-  mittBus.on('mittGetCompanyInfo', (id: any) => {
-    companyId.value = id
-    getCompanyInfo(id)
+  mittBus.on('mittGetCompanyInfo', (item: any) => {
+    companyItem.value = item
+    companyId.value = item.id
+    getCompanyInfo(item.id)
   })
 })
 
@@ -236,7 +239,7 @@ const goToRechargeRecords = () => {
     .getData()
     .pushState(
       '/manage/#/goRecharge?enterpriseId=' +
-        companyInfo.value.id +
+        companyInfo.value.accountEnterpriseId +
         '&enterpriseName=' +
         companyInfo.value.companyName
     )
