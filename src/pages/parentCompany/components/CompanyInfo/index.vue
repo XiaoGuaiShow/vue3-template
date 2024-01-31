@@ -107,6 +107,7 @@
 <script setup lang="ts">
 import { accountDetail, accountValid } from '@/api/modules/parentCompany'
 import { saveSettlementUser } from '@/api/rules'
+import { saveEnterpriseAccount } from '@/api/modules/parentCompany'
 import mittBus from '@/utils/mitt.ts'
 import type { CompanyInfo } from '../../types'
 import { ElMessageBox, ElMessage } from 'element-plus'
@@ -199,9 +200,11 @@ const handleSettlementEdit = () => {
   commonVisible.value = true
 }
 const handleSelectConfirm = (data: any) => {
-  console.log(data)
+  // console.log(data)
   if (data && data.list) {
     const params = {
+      companyName: companyItem.value.companyName,
+      id: companyItem.value.id,
       settleMembers: [
         {
           jobNo: data.list[0].WorkCode,
@@ -210,7 +213,7 @@ const handleSelectConfirm = (data: any) => {
         }
       ]
     }
-    saveSettlementUser(params).then((res: any) => {
+    saveEnterpriseAccount(params).then((res: any) => {
       if (res.code === '0000') {
         ElMessage.success('操作成功')
         commonVisible.value = false
