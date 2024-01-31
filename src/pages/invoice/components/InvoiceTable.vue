@@ -244,18 +244,22 @@ const handleModify = (row: any) => {
 
 const handleConfirm = (row: any) => {
   modifyInvoiceItem({
-    mailAddress: row.address,
+    mailAddress: rowData.value.category === 0 ? row.receiverEmail : row.address,
     mailUserName: row.receiver,
     mailUserPhone: row.receiverPhone,
     enterpriseId: props.enterpriseId,
-    invoiceId: rowInvoiceId,
+    invoiceId: rowInvoiceId.value,
     remark: row.remark
-  }).then((res) => {
-    if (res.code === '0000') {
-      ElMessage.success('保存成功')
-      getTableList()
-    }
   })
+    .then((res) => {
+      if (res.code === '0000') {
+        ElMessage.success('保存成功')
+        getTableList()
+      }
+    })
+    .finally(() => {
+      showMailingInformation.value = false
+    })
 }
 
 const pageVO = reactive({
