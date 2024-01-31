@@ -360,6 +360,7 @@ const calculate = () => {
       map.set(item.orderSerialNo, { count: 1, rowIndex: index })
     }
   })
+  // console.log('map=======', map)
   return map
 }
 

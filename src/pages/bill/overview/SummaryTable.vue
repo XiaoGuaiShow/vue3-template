@@ -65,11 +65,11 @@
         label="最晚结算日"
         width="138"
         align="center" />
-      <el-table-column label="操作" width="100" align="center">
+      <!-- <el-table-column label="操作" width="100" align="center">
         <template #default="scope">
           <div class="link" @click="handleExport(scope.row)">导出</div>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
 
     <div class="flex jc-sb ai-c mt-16">
@@ -169,7 +169,7 @@ watch(
 )
 
 const goLink = (row: any) => {
-  mittBus.emit('changePage', {
+  mittBus.emit('willToBillDetail', {
     periodId: row.periodId,
     enterpriseId: row.enterpriseId
   })

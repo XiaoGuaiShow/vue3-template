@@ -3,7 +3,9 @@
     <el-select v-model="params.invoiceTitle" placeholder="请选择" clearable>
       <el-option v-for="(item, index) in enterpriseList" :key="index" :label="item" :value="item" />
     </el-select>
-    <div class="link" v-if="from === 'invoiceDetail'" @click="handleDownload()">批量下载</div>
+    <div class="link" v-if="from === 'invoiceDetail' && isAllDownload" @click="handleDownload()">
+      批量下载
+    </div>
   </div>
 
   <el-table
@@ -71,12 +73,17 @@
     </el-table-column>
     <el-table-column prop="productType" label="业务线" align="center">
       <template #default="{ row }">
-        {{ PRODUCT_TYPE.get(row.productType) || '--' }}
+        {{ PRODUCT_TYPE_PART.get(row.productType) || '--' }}
       </template>
     </el-table-column>
     <el-table-column prop="invoiceType" label="开票类型" align="center" show-overflow-tooltip>
       <template #default="{ row }">
-        {{ INVOICE_TYPE.get(row.invoiceType) || '--' }}
+        {{
+          INVOICE_CATEGORY.get(row.category) +
+          '(' +
+          (INVOICE_TYPE.get(row.invoiceType) || '--') +
+          ')'
+        }}
       </template>
     </el-table-column>
     <el-table-column prop="item" label="开票类目" align="center" show-overflow-tooltip />
@@ -140,9 +147,7 @@
     </el-table-column>
     <el-table-column label="操作" align="center" width="80" v-if="from === 'invoiceDetail'">
       <template #default="{ row }">
-        <span class="link" v-if="row.invoiceType !== 6" @click="handleDownload(row.invoiceId)">
-          下载
-        </span>
+        <span class="link" v-if="row.isDownload" @click="handleDownload(row.invoiceId)">下载</span>
         <span v-else>--</span>
       </template>
     </el-table-column>
@@ -151,7 +156,7 @@
         <el-input
           v-model="row.remark"
           placeholder="填写（选填）"
-          v-if="row.invoiceType !== 6"
+          v-if="row.category === 0"
           @blur="handleModify(row)"></el-input>
         <span v-else>--</span>
       </template>
@@ -171,13 +176,17 @@
       :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange" />
-    <MailingInformation
+    <!-- <MailingInformation
       :enterpriseId="enterpriseId"
       :invoiceId="rowInvoiceId"
       :rowData="rowData"
       v-if="showMailingInformation"
       @close="showMailingInformation = false"
-      @confirm="getTableList" />
+      @confirm="getTableList" /> -->
+    <AddressListDialog
+      v-if="showMailingInformation"
+      @close="showMailingInformation = false"
+      @on-confirm="handleConfirm" />
   </div>
 </template>
 
@@ -186,9 +195,10 @@ import { ref } from 'vue'
 import { getInvoiceList } from '@/api/bill'
 import { getInvoiceTitleList, downloadInvoice, modifyInvoiceItem } from '@/api/invoice'
 import type { InvoiceListItem } from '@/pages/bill/types'
-import { PRODUCT_TYPE, INVOICE_TYPE, INVOICE_STATUS } from '@/common/static'
-import MailingInformation from '@/pages/bill/components/MailingInformation.vue'
+import { PRODUCT_TYPE_PART, INVOICE_TYPE, INVOICE_STATUS, INVOICE_CATEGORY } from '@/common/static'
+// import MailingInformation from '@/pages/bill/components/MailingInformation.vue'
 import { ElMessage } from 'element-plus'
+import AddressListDialog from '@/pages/parentCompany/components/CompanyInfo/AddressListDialog.vue'
 
 const props = withDefaults(
   defineProps<{ from: string; periodId: string | number; enterpriseId: string | number }>(),
@@ -223,11 +233,27 @@ const handleModify = (row: any) => {
     mailUserName: row.mailUserName,
     mailUserPhone: row.mailUserPhone,
     enterpriseId: props.enterpriseId,
-    id: row.invoiceId,
+    invoiceId: row.invoiceId,
     remark: row.remark
   }).then((res) => {
     if (res.code === '0000') {
       ElMessage.success('保存成功')
+    }
+  })
+}
+
+const handleConfirm = (row: any) => {
+  modifyInvoiceItem({
+    mailAddress: row.address,
+    mailUserName: row.receiver,
+    mailUserPhone: row.receiverPhone,
+    enterpriseId: props.enterpriseId,
+    invoiceId: rowInvoiceId,
+    remark: row.remark
+  }).then((res) => {
+    if (res.code === '0000') {
+      ElMessage.success('保存成功')
+      getTableList()
     }
   })
 }
@@ -245,6 +271,7 @@ const total = ref(0)
 const loading = ref(false)
 const tableData: Ref<Partial<InvoiceListItem>[]> = ref([])
 const sumInvoiceAmount = ref(0)
+const isAllDownload = ref(false)
 
 watchEffect(() => {
   loading.value = true
@@ -254,12 +281,12 @@ watchEffect(() => {
     pageSize: pageVO.pageSize
   })
     .then((res) => {
-      console.log(res)
       if (res.code === '0000') {
         if (res.data) {
           tableData.value = res.data.results || []
           total.value = res.data.total || 0
           sumInvoiceAmount.value = res.data.sumInvoiceAmount || 0
+          isAllDownload.value = res.data.isAllDownload || false
         }
       }
     })

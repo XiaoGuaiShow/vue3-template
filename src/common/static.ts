@@ -18,6 +18,14 @@ export const PRODUCT_TYPE = new Map([
   [21, '汽车票']
 ])
 
+export const PRODUCT_TYPE_PART = new Map([
+  [5, '机票'],
+  [1, '酒店'],
+  [6, '火车票'],
+  [7, '用车'],
+  [10, '外卖']
+])
+
 export const FEE_CLASS = new Map([
   [0, '本期应结'],
   [1, '本期消费'],
@@ -101,4 +109,9 @@ export const PAY_TYPE = new Map([
   [100, '积分支付'],
   [110, '支付宝(单位代付)'],
   [97, '企业钱包帐户']
+])
+
+export const INVOICE_CATEGORY = new Map([
+  [0, '电子票'],
+  [1, '纸质票']
 ])

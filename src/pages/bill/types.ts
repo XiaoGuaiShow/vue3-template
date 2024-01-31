@@ -249,6 +249,7 @@ export interface InvoiceListResult extends Result {
     total: number
     results: InvoiceListItem[]
     sumInvoiceAmount: number
+    isAllDownload: boolean
   }
 }
 

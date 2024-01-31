@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="bill-card" v-loading="sLoading">
+    <div class="bill-card" v-loading="sLoading" v-if="billPeriodList.length">
       <div>
         <div class="flex jc-sb ai-c">
           <div class="left-block flex" :class="[statusColor(detail.settlementStatus)]">
@@ -61,7 +61,7 @@
         </div>
       </div>
 
-      <div class="section mt-24" v-if="detail.periodSum">
+      <div class="section mt-24" v-if="billPeriodList.length && detail.periodSum">
         <div class="fs-20 fw-600 c-font-primary">账单汇总</div>
         <SummaryExpression
           class="mt-12"
@@ -125,7 +125,6 @@ import type {
   ProductTypeItem,
   FeeClassItem,
   BillPeriodItem,
-  BasicParams,
   BillPeriodDetail
 } from '../types'
 import SummaryExpression from '../components/SummaryExpression.vue'
@@ -138,44 +137,40 @@ const router = useRouter()
 
 const loading = ref(true)
 const props = defineProps<{
-  basicParams: BasicParams
+  year: number
+  month: number
+  enterpriseId: number
 }>()
 // 获取选中月份的账期列表
 const billPeriodList = ref<BillPeriodItem[]>([])
 const activeIndex = ref(0)
 // 查询该月有多少账期
 watch(
-  () => props.basicParams,
+  () => [props.year, props.month, props.enterpriseId],
   (newParams) => {
-    console.log(newParams)
-    const enterpriseId = newParams.enterpriseIdList[0]
-    if (!enterpriseId) return
-    loading.value = true
-    getBillPeriodList({
-      enterpriseId,
-      month: newParams.month,
-      year: newParams.year
-    })
-      .then((res) => {
-        billPeriodList.value = res.data || []
-        activeIndex.value = res.data?.length ? 0 : -1
-        getBillDeatil()
+    const [year, month, enterpriseId] = newParams
+    if (enterpriseId) {
+      loading.value = true
+      getBillPeriodList({
+        enterpriseId,
+        month: month,
+        year: year
       })
-      .finally(() => {
-        loading.value = false
-      })
+        .then((res) => {
+          billPeriodList.value = res.data || []
+          activeIndex.value = res.data?.length ? 0 : -1
+          getBillDeatil()
+        })
+        .finally(() => {
+          loading.value = false
+        })
+    }
   },
   { immediate: true, deep: true }
 )
 const tabClick = (index: number) => {
   activeIndex.value = index
 }
-mittBus.on('changePage', (data: any) => {
-  const findIndex = billPeriodList.value.findIndex((item) => item.periodId === data.periodId)
-  if (findIndex > -1) {
-    activeIndex.value = findIndex
-  }
-})
 
 const sLoading = ref(false)
 const detail: Ref<BillPeriodDetail> = ref({
@@ -187,7 +182,9 @@ const detail: Ref<BillPeriodDetail> = ref({
   periodSum: {}
 })
 function getBillDeatil() {
-  if (billPeriodList.value.length === 0) return
+  if (billPeriodList.value.length === 0) {
+    return
+  }
   sLoading.value = true
   const activePeriod = billPeriodList.value[activeIndex.value]
   const params = {

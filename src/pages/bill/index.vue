@@ -44,11 +44,9 @@
         }"></SummaryTable>
       <Bill
         v-else
-        :basicParams="{
-          year,
-          month,
-          enterpriseIdList
-        }"
+        :year="year"
+        :month="month"
+        :enterpriseId="enterpriseId"
         @switch-tab="switchTab"></Bill>
     </template>
   </div>
@@ -147,6 +145,7 @@ mittBus.on('willToBillDetail', (data: any) => {
   activeName.value = 'first'
   data.year && yearChange(data.year)
   data.month && monthChange(data.month)
+  data.enterpriseId && setEnterpriseIdFn(data.enterpriseId, [data.enterpriseId], false)
 })
 
 onBeforeRouteLeave(() => {
