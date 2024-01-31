@@ -176,7 +176,9 @@ const billStore = useBillStore()
 const goLink = (row: TableItem) => {
   billStore.setInvoiceHistory({
     periodId: row.periodId,
-    enterpriseId: row.enterpriseId
+    enterpriseId: row.enterpriseId,
+    year: row.year,
+    month: row.month
   })
   router.push('invoice-history-detail')
 }

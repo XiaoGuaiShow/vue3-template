@@ -240,7 +240,9 @@ const router = useRouter()
 const goLink = (row: any) => {
   billStore.setInvoiceHistory({
     periodId: row.periodId,
-    enterpriseId: row.enterpriseId
+    enterpriseId: row.enterpriseId,
+    year: row.year,
+    month: row.month
   })
   router.push({ name: 'InvoiceHistoryDetail' })
 }
