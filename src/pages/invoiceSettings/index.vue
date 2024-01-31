@@ -147,7 +147,7 @@
                   <div
                     class="c-font-primary ml-12 ellipsis-1"
                     v-if="dimensionType === 1 && info.users?.length">
-                    ({{ info.users.map((item: any) => item.deptName).join('、') || '-' }})
+                    ({{ info.users.map((item: any) => item.memberName).join('、') || '-' }})
                   </div>
                 </span>
               </div>
