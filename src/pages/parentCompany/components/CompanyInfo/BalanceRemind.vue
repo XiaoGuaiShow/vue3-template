@@ -81,6 +81,7 @@
       v-if="staffListVisable"
       v-model:visible="staffListVisable"
       :popSelectType="2"
+      :isShowSonDep="false"
       :showSettlementMember="true"
       :before-list="beforeList"
       @on-ok="handleSelectConfirm" />

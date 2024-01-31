@@ -1,6 +1,15 @@
 <template>
   <div class="container">
     <div class="section">
+      <div class="flex mb-24">
+        <span class="link flex ai-c" @click="goBack">
+          <el-icon :size="14" color="#057bff">
+            <ArrowLeft />
+          </el-icon>
+          返回发票列表
+        </span>
+        <span class="link ml-24" @click="goBill">查看当前账期</span>
+      </div>
       <div class="title fs-18 flex ai-c">
         账期
         <div class="blue-tab ml-12">{{ pageDetail.periodRange }}</div>
@@ -48,6 +57,7 @@
 import InvoiceTable from '@/pages/invoice/components/InvoiceTable.vue'
 import { getInvoiceHistoryDetail } from '@/api/invoice'
 import { useBillStore } from '@/store/modules/bill'
+import router from '@/router'
 const billStore = useBillStore()
 const pageDetail: any = reactive({
   periodRange: '',
@@ -73,6 +83,21 @@ if (periodId && enterpriseId) {
       }
     }
   })
+}
+
+const goBack = () => {
+  router.go(-1)
+}
+const year = billStore.invoiceHistory.year
+const month = billStore.invoiceHistory.month
+const goBill = () => {
+  billStore.setOverviewDatas({
+    enterpriseId,
+    periodId,
+    year,
+    month
+  })
+  router.push('bill')
 }
 </script>
 
@@ -130,5 +155,10 @@ if (periodId && enterpriseId) {
       margin-left: 4px;
     }
   }
+}
+.link {
+  color: var(--brand-blue);
+  font-size: 14px;
+  cursor: pointer;
 }
 </style>

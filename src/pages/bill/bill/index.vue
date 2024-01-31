@@ -239,7 +239,10 @@ const handleBeforeEnter = (enterpriseId: number, periodId: number) => {
 
 const router = useRouter()
 const goLink = (row: any) => {
-  billStore.setInvoiceHistory(row.periodId, row.enterpriseId)
+  billStore.setInvoiceHistory({
+    periodId: row.periodId,
+    enterpriseId: row.enterpriseId
+  })
   router.push({ name: 'InvoiceHistoryDetail' })
 }
 const handleLink = (row: any) => {

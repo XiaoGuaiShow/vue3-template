@@ -174,7 +174,10 @@ const onSubmit = () => {
 
 const billStore = useBillStore()
 const goLink = (row: TableItem) => {
-  billStore.setInvoiceHistory(row.periodId, row.enterpriseId)
+  billStore.setInvoiceHistory({
+    periodId: row.periodId,
+    enterpriseId: row.enterpriseId
+  })
   router.push('invoice-history-detail')
 }
 const goBill = (row: TableItem) => {

@@ -44,8 +44,8 @@
     </div>
     <template #footer>
       <span class="dialog-footer">
-        <div class="btn-info" @click="dialogVisible = false">取消</div>
-        <div class="btn-primary" @click="confirm" v-loading="btnLoading">保存</div>
+        <div class="btn btn-info" @click="dialogVisible = false">取消</div>
+        <div class="btn btn-primary" @click="confirm" v-loading="btnLoading">保存</div>
       </span>
     </template>
   </el-dialog>

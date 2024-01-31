@@ -2,21 +2,44 @@
   <div class="rule-setting">
     <div class="deduction-rule">
       <span class="title-label">扣款规则</span>
-      <span>统一扣母公司</span>
-      <span>每个子公司可独立结算。根据关联的发票抬头从对应的子公司或者母公司扣</span>
+      <span>{{ deductionAccountType ? '统一从母公司扣款' : '子公司从自己公司扣款' }}</span>
     </div>
     <div class="rule-setting-btn" @click="handleCommonSetting">规则设置</div>
   </div>
   <!-- 通用规则设置 -->
-  <CommonSetting :visible="commonVisible" @on-close="commonVisible = false"></CommonSetting>
+  <CommonSetting :visible="commonVisible" @on-close="handleClose"></CommonSetting>
 </template>
 
 <script setup lang="ts">
+import { commonSettingInfo } from '@/api/modules/parentCompany'
+import { ElMessage } from 'element-plus'
 // 通用设置
 let commonVisible = ref(false)
 
 const handleCommonSetting = () => {
   commonVisible.value = true
+}
+
+const deductionParentAccountStatus = ref()
+const deductionAccountType = ref()
+// 获取设置信息
+const getSettingInfo = () => {
+  commonSettingInfo().then((res: any) => {
+    if (res.code === '0000') {
+      if (res.data) {
+        deductionParentAccountStatus.value = res.data.deductionParentAccountStatus || 0
+        deductionAccountType.value = res.data.deductionAccountType || 0
+      }
+    } else {
+      ElMessage.error(res.msg)
+    }
+  })
+}
+getSettingInfo()
+
+const handleClose = () => {
+  commonVisible.value = false
+  getSettingInfo()
 }
 </script>
 

@@ -23,7 +23,9 @@ export const useBillStore = defineStore('enterprise', {
       // 开票历史-列表页点击明细记录账期id和企业id
       invoiceHistory: {
         periodId: '',
-        enterpriseId: ''
+        enterpriseId: '',
+        year: '',
+        month: ''
       },
       // 账单明细保存的数据
       billDetail: {
@@ -44,9 +46,11 @@ export const useBillStore = defineStore('enterprise', {
     setActiveYear(year: number) {
       this.activeYear = year
     },
-    setInvoiceHistory(periodId: string, enterpriseId: string) {
-      this.invoiceHistory.periodId = periodId
-      this.invoiceHistory.enterpriseId = enterpriseId
+    setInvoiceHistory(data: any) {
+      data.periodId && (this.invoiceHistory.periodId = data.periodId)
+      data.enterpriseId && (this.invoiceHistory.enterpriseId = data.enterpriseId)
+      data.year && (this.invoiceHistory.year = data.year)
+      data.month && (this.invoiceHistory.month = data.month)
     },
     setBillDetail(periodId: string, enterpriseId: string) {
       this.billDetail.periodId = periodId

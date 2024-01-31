@@ -5,7 +5,10 @@
       <div class="btn-primary mt-12 w-full" @click="handleAdd">+ 新增子公司</div>
     </div>
 
-    <CompanyDialog :visible="commonVisible" @on-close="commonVisible = false"></CompanyDialog>
+    <CompanyDialog
+      v-if="commonVisible"
+      :visible="commonVisible"
+      @on-close="commonVisible = false"></CompanyDialog>
   </div>
 </template>
 

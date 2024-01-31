@@ -276,7 +276,7 @@ const goLink = (type: number) => {
   } else if (type === 3) {
     const periodId = billPeriodList.value[activeIndex.value].periodId
     const enterpriseId = billPeriodList.value[activeIndex.value].enterpriseId
-    billStore.setInvoiceHistory(periodId, enterpriseId)
+    billStore.setInvoiceHistory({ periodId, enterpriseId })
     router.push('invoice-history-detail')
   }
 }

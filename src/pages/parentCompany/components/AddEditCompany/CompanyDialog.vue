@@ -40,6 +40,7 @@
     v-model:visible="showDialog"
     :isSingleChoice="true"
     :popSelectType="2"
+    :isShowSonDep="false"
     v-if="showDialog"
     @on-ok="handleSelectConfirm" />
 </template>
@@ -81,7 +82,6 @@ const handleSelectConfirm = (data: any) => {
 
 // 增加人员
 const handleAddPerson = () => {
-  companyName.value = ''
   settleMembers.value = []
   showDialog.value = true
 }

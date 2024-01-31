@@ -7,11 +7,11 @@
             v-model="address"
             placeholder="请输入地址名称"
             clearable
-            style="width: 140px"
-            @change="inputChange"></el-input>
+            style="width: 140px"></el-input>
         </el-form-item>
         <el-form-item>
-          <div class="btn-primary plain" @click="openDialog">+ 新增邮寄地址</div>
+          <div class="btn btn-primary" @click="handleSearch">查询</div>
+          <div class="btn btn-primary plain" @click="openDialog">+ 新增邮寄地址</div>
         </el-form-item>
       </el-form>
 
@@ -71,7 +71,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { getMailingAddressList } from '@/api/address'
 
 const props = defineProps<{
@@ -141,31 +141,9 @@ const handleSizeChange = (val: number) => {
   pageVO.pageSize = val
   getTableData()
 }
-const inputChange = (val: string) => {
-  address.value = val
+const handleSearch = () => {
+  pageVO.currentIndex = 1
   getTableData()
-}
-// 删除
-const handleDelete = async (row) => {
-  try {
-    let params = {
-      mailAddressIds: [row.id]
-    }
-    const res = await request({
-      apiModule: invoiceApi.batchDeleteMailAddress,
-      data: params
-    })
-    if (res.code == '0000') {
-      ElMessage.success('删除成功')
-      getTableData()
-    } else {
-      await ElMessageBox.alert(`${res.message}`, '提示', {
-        confirmButtonText: '知道了',
-        type: 'warning',
-        center: true
-      })
-    }
-  } catch (err) {}
 }
 
 // 表格单选
