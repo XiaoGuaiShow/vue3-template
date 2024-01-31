@@ -359,13 +359,14 @@ const saveConfirm = () => {
 
 // 设置开票维度
 const handleSetDimension = () => {
-  window.microApp.dispatch({
-    name: 'setInvoiceDimension',
-    query: {
-      dimensionType: dimensionType.value,
-      dimensionSubType: dimensionSubType.value
-    }
-  })
+  window.microApp
+    .getData()
+    .pushState(
+      '/setInvoiceDimension?dimensionType=' +
+        dimensionType.value +
+        '&dimensionSubType=' +
+        dimensionSubType.value
+    )
 }
 
 // 导出
