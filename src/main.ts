@@ -25,6 +25,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 if (window.microApp) {
   const UserStore = useUserStore()
   const data = window.microApp.getData()
+  router.push(data.path)
   UserStore.setUserInfo(data.memberInfo)
   // 监听基座下发的数据变化
   window.microApp.addDataListener((data: any) => {
