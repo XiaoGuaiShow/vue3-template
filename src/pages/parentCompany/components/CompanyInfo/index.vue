@@ -198,7 +198,6 @@ const handleSettlementEdit = () => {
   commonVisible.value = true
 }
 const handleSelectConfirm = (data: any) => {
-  // console.log(data)
   if (data && data.list) {
     const params = {
       companyName: companyItem.value.companyName,

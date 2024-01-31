@@ -150,7 +150,6 @@ const handleSelectionChange = (selection: any, row: any) => {
 }
 // 全选
 const handleSelectionAllChange = (selection: any) => {
-  console.log(selection)
   if (selection.length) {
     // 全选
     const ids = selection.map((item: any) => item.id)

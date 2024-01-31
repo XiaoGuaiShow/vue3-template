@@ -202,24 +202,18 @@ function handleSearch() {
 function handleCheckTreeChange(data: any, checked: boolean, indeterminate: any, emitEvent: any) {
   if (emitEvent) {
     emit(emitEvent, { data, checked, indeterminate })
-  } else {
-    console.log('请传入emitEventName')
   }
 }
 
 function loadTreeNode(node: any, resolve: any, emitEvent: any) {
   if (emitEvent) {
     emit(emitEvent, { node, resolve })
-  } else {
-    console.log('请传入emitEventName')
   }
 }
 
 function handleCheckboxChange(event: any, data: any, key: any, emitEvent: any) {
   if (emitEvent) {
     emit(emitEvent, { event, data, key })
-  } else {
-    console.log('请传入emitEventName')
   }
 }
 

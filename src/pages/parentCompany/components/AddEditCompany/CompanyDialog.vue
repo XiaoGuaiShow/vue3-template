@@ -100,7 +100,6 @@ const handleConfirm = async () => {
     settleMembers: settleMembers.value
   }
   const res: any = await saveEnterpriseAccount(params)
-  console.log(res)
   if (res.code === '0000') {
     ElMessage.success('操作成功')
     mittBus.emit('mittGetCompanyList')

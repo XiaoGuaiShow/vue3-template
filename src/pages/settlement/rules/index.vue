@@ -483,7 +483,6 @@ function filterGiveResults(staticResults: any, giveMap: any, obj: any) {
 }
 
 const handleInnerDialogConfirm = (data: any) => {
-  console.log(data)
   if (data?.list?.length > 0) {
     const user = data.list[0]
     // const enterpriseId = JSON.parse(localStorage.getItem('EnterpriseId') || '{}').data

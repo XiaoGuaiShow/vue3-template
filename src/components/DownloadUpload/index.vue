@@ -142,7 +142,6 @@ const handleHttpRequest = async (item) => {
     props
       .uploadUrl(formData)
       .then((res) => {
-        console.log(22222, res)
         if (res.code == '0000') {
           loadResponse.loadMsg = '导入成功'
           beforeClose()
@@ -151,12 +150,8 @@ const handleHttpRequest = async (item) => {
           loadResponse.failUrl = res.data
         }
       })
-      .catch((err) => {
-        console.log(11, err)
-      })
-  } catch (err) {
-    console.log(err)
-  }
+      .catch((err) => {})
+  } catch (err) {}
 }
 
 // 下载失败列表

@@ -208,7 +208,6 @@ function getBillDeatil() {
       }
     })
     .catch((err) => {
-      console.log('eeeeeeeeeeeee', err)
       detail.value = {
         countDown: 0,
         periodLatestPaymentDate: '',

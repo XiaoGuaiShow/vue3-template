@@ -115,7 +115,6 @@ const emit = defineEmits(['on-close', 'on-confirm'])
 watch(
   () => props.visible,
   (val) => {
-    console.log(1111, val)
     if (val) {
       if (props.enterpriseId) {
         getInfo() // 详情

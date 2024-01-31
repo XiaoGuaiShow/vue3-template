@@ -154,7 +154,6 @@ const fetchData = () => {
   loading.value = true
   getRechargeList(data)
     .then((res: any) => {
-      console.log(res)
       if (res.Code === '0000') {
         total.value = res.Data.TotalRecharge
         tableData.value = res.Data.RechargeList

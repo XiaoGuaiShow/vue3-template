@@ -227,7 +227,6 @@ const handleChange = (val: any) => {
 // 获取省市区
 const getAreaList = () => {
   getAddressList().then((res) => {
-    console.log(res)
     if (res.code == '0000') {
       cityOptions.value = res.data
     } else {

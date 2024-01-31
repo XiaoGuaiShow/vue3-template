@@ -70,7 +70,6 @@ onMounted(() => {
   dialogVisible.value = true
 })
 const handleClose = () => {
-  console.log('动画结束后执行')
   emits('close')
 }
 

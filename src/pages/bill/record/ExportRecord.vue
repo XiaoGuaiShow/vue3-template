@@ -72,7 +72,6 @@ const getTableData = () => {
   loading.value = true
   getExportRecordList(pageVo)
     .then((res) => {
-      console.log(res)
       if (res.code === '0000') {
         tableData.value = res.data?.list || []
         total.value = res.data?.total || 0
