@@ -31,6 +31,7 @@ const router = createRouter({
   routes
 })
 
+const realBaseRoute = '/settlement/#' || '/settlement#'
 // 路由前置后卫
 router.beforeEach((to) => {
   // 开启进度条
@@ -44,7 +45,6 @@ router.beforeEach((to) => {
     if (window.__MICRO_APP_ENVIRONMENT__) {
       // 如果__MICRO_APP_BASE_ROUTE__为 `/基座应用基础路由/子应用基础路由/`，则应去掉`/基座应用基础路由`
       // 如果对这句话不理解，可以参考案例：https://github.com/micro-zoe/micro-app-demo
-      const realBaseRoute = window.__MICRO_APP_BASE_ROUTE__
 
       if (typeof window.history.state?.current === 'string') {
         window.history.state.current = window.history.state.current.replace(
@@ -58,7 +58,12 @@ router.beforeEach((to) => {
 })
 // 路由后置后卫
 router.afterEach(() => {
-  // 关闭进度条
+  if (typeof window.history.state?.current === 'string') {
+    window.history.state.current = window.history.state.current.replace(
+      new RegExp(realBaseRoute, 'g'),
+      ''
+    )
+  } // 关闭进度条
   close()
 })
 
