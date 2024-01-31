@@ -216,7 +216,7 @@ function generateYears(year: number) {
   }
   return list
 }
-const yearList = generateYears(2023)
+const yearList = generateYears(2024)
 </script>
 
 <style lang="less" scoped>
