@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddEditCompany: typeof import('./src/pages/parentCompany/components/AddEditCompany/index.vue')['default']
+    AddEditCompanyNameDialog: typeof import('./src/pages/parentCompany/components/CompanyInfo/AddEditCompanyNameDialog.vue')['default']
     AddEditInvoiceTitle: typeof import('./src/pages/parentCompany/components/CompanyInfo/AddEditInvoiceTitle.vue')['default']
     AddressFormDialog: typeof import('./src/pages/parentCompany/components/CompanyInfo/AddressFormDialog.vue')['default']
     AddressListDialog: typeof import('./src/pages/parentCompany/components/CompanyInfo/AddressListDialog.vue')['default']

@@ -2,13 +2,13 @@
   <div class="parent-company">
     <div class="left-container">
       <!-- 新增公司 -->
-      <AddEditCompany></AddEditCompany>
+      <AddEditCompany v-if="isManager"></AddEditCompany>
       <!-- 公司列表 -->
       <CompanyList></CompanyList>
     </div>
     <div class="right-container">
       <!-- 规则设置 -->
-      <RuleSetting></RuleSetting>
+      <RuleSetting v-if="isManager"></RuleSetting>
       <!-- 公司信息 -->
       <CompanyInfo></CompanyInfo>
     </div>
@@ -17,6 +17,10 @@
 
 <script setup lang="ts">
 import CompanyList from '@/pages/parentCompany/components/CompanyList/index.vue'
+import { useUserStore } from '@/store/modules/user'
+
+const userStore = useUserStore()
+const isManager = computed(() => userStore.userInfo.isManager === 1)
 </script>
 
 <style lang="less" scoped>
@@ -27,9 +31,13 @@ import CompanyList from '@/pages/parentCompany/components/CompanyList/index.vue'
   .left-container {
     width: 240px;
     margin-right: 12px;
+    display: flex;
+    flex-direction: column;
   }
   .right-container {
     flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 }
 </style>

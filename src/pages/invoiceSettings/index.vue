@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="tips-action b-flex b-align-center">
+    <div class="tips-action b-flex b-align-center" v-if="isManager">
       <el-icon><WarningFilled /></el-icon>
       <span>当前开票维度：{{ dimensionName }}</span>
       <span class="update-btn" @click="handleSetDimension">修改开票维度</span>
@@ -204,6 +204,10 @@ import {
 import { ElMessage, ElTree } from 'element-plus'
 import AddEditInvoiceTitle from '@/pages/parentCompany/components/CompanyInfo/AddEditInvoiceTitle.vue'
 import DownloadUpload from '@/components/DownloadUpload/index.vue'
+import { useUserStore } from '@/store/modules/user'
+
+const userStore = useUserStore()
+const isManager = computed(() => userStore.userInfo.isManager === 1)
 
 const visible = ref(false)
 const handleAdd = () => {

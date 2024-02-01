@@ -2,15 +2,17 @@
   <div class="company-info" v-loading="loading">
     <div class="flex jc-sb ai-c">
       <div class="title-label">{{ companyInfo.companyName || '-' }}</div>
-      <el-switch
-        v-if="companyItem?.companyType === 2"
-        v-model="companyInfo.isValid"
-        inline-prompt
-        active-text="启用"
-        inactive-text="关闭"
-        :active-value="1"
-        :inactive-value="0"
-        :before-change="beforeChange" />
+      <div class="flex ai-c" v-if="companyItem?.companyType === 2">
+        <span class="link mr-12" @click="showNameDialog = true">编辑</span>
+        <el-switch
+          v-model="companyInfo.isValid"
+          inline-prompt
+          active-text="启用"
+          inactive-text="关闭"
+          :active-value="1"
+          :inactive-value="0"
+          :before-change="beforeChange" />
+      </div>
     </div>
     <!-- 合作信息 -->
     <div class="box-info">
@@ -79,30 +81,35 @@
         </div>
       </div>
     </div>
+    <!-- 设置余额提醒 -->
+    <BalanceRemind
+      :visible="balanceVisible"
+      :enterpriseId="companyInfo.id"
+      :enterpriseName="companyInfo.companyName"
+      :settlementOfficerInfos="settlementOfficerInfos"
+      @on-close="balanceVisible = false"
+      @on-confirm="balanceRemindConfirm"></BalanceRemind>
+    <!-- 发票单位编辑 -->
+    <InvoiceTitle
+      v-if="invoiceVisible"
+      :visible="invoiceVisible"
+      @on-close="invoiceVisible = false"
+      @on-confirm="invoiceTitleConfirm"></InvoiceTitle>
+    <!-- 组织架构中选择 -->
+    <GroupSelector
+      v-if="commonVisible"
+      v-model:visible="commonVisible"
+      :is-show-son-dep="false"
+      :isSingleChoice="true"
+      :popSelectType="2"
+      :showSettlementMember="true"
+      @on-ok="handleSelectConfirm" />
+    <AddEditCompanyNameDialog
+      v-if="showNameDialog"
+      :rowData="companyInfo"
+      @close="showNameDialog = false"
+      @confirm="handleEditName" />
   </div>
-  <!-- 设置余额提醒 -->
-  <BalanceRemind
-    :visible="balanceVisible"
-    :enterpriseId="companyInfo.id"
-    :enterpriseName="companyInfo.companyName"
-    :settlementOfficerInfos="settlementOfficerInfos"
-    @on-close="balanceVisible = false"
-    @on-confirm="balanceRemindConfirm"></BalanceRemind>
-  <!-- 发票单位编辑 -->
-  <InvoiceTitle
-    v-if="invoiceVisible"
-    :visible="invoiceVisible"
-    @on-close="invoiceVisible = false"
-    @on-confirm="invoiceTitleConfirm"></InvoiceTitle>
-  <!-- 组织架构中选择 -->
-  <GroupSelector
-    v-if="commonVisible"
-    v-model:visible="commonVisible"
-    :is-show-son-dep="false"
-    :isSingleChoice="true"
-    :popSelectType="2"
-    :showSettlementMember="true"
-    @on-ok="handleSelectConfirm" />
 </template>
 
 <script setup lang="ts">
@@ -111,7 +118,13 @@ import { saveEnterpriseAccount } from '@/api/modules/parentCompany'
 import mittBus from '@/utils/mitt.ts'
 import type { CompanyInfo } from '../../types'
 import { ElMessageBox, ElMessage } from 'element-plus'
+import AddEditCompanyNameDialog from './AddEditCompanyNameDialog.vue'
 
+const showNameDialog = ref(false)
+const handleEditName = () => {
+  getCompanyInfo(companyId.value)
+  mittBus.emit('mittGetCompanyList')
+}
 // 企业id
 let companyId = ref<string>('')
 const companyItem = ref<any>()
@@ -173,7 +186,7 @@ const typeFilter = (val: number) => {
 }
 
 // 公司状态
-const beforeChange = async () => {
+const beforeChange = async (): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const stopMsg =
       '停用之前创建的订单，若需要改签支付，仍会从该账户扣款，退款也会退至此公司。\n确定要停用该公司吗？'
@@ -262,6 +275,7 @@ const invoiceTitleConfirm = () => {
   background: var(--bg-white);
   border-radius: 8px;
   padding: 24px;
+  flex: 1;
   .title-label {
     font-size: 16px;
     font-weight: 600;
@@ -316,5 +330,10 @@ const invoiceTitleConfirm = () => {
       }
     }
   }
+}
+.link {
+  font-size: 14px;
+  color: var(--brand-blue);
+  cursor: pointer;
 }
 </style>

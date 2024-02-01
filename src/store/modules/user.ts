@@ -7,6 +7,7 @@ interface UserInfo {
   refId?: string
   version?: string
   enterpriseId?: number
+  isManager?: number
 }
 
 const KEY = 'userState'
@@ -20,7 +21,8 @@ export const useUserStore = defineStore({
       memberId: '',
       refId: '',
       version: '',
-      enterpriseId: 0
+      enterpriseId: 0,
+      isManager: 0
     } as UserInfo
   }),
   getters: {},

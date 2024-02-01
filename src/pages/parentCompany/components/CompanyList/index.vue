@@ -35,7 +35,7 @@ const zimuStore = useZimuStore()
 const UserStore = useUserStore()
 const userInfo = UserStore.userInfo
 
-const currentNodeKey = ref(`${userInfo.enterpriseId}`)
+let currentNodeKey = `${userInfo.enterpriseId}`
 interface Tree {
   companyName: string
   children?: Tree[]
@@ -43,7 +43,8 @@ interface Tree {
 // 获取公司列表
 const loading = ref(false)
 const TreeData = ref<Tree[]>([])
-const getDataList = async () => {
+let activeCompany = ref<any>(null)
+const getDataList = async (needResetId = true) => {
   loading.value = true
   const res: any = await accountAllList({})
   const parentList = (res.data || []).filter((f: any) => f.companyType === 1)
@@ -60,12 +61,20 @@ const getDataList = async () => {
   }
   TreeData.value = [parentObj, childObj]
   loading.value = false
-  // 高亮当前登录企业
-  const findItem = res.data.find((f: any) => f.accountEnterpriseId === currentNodeKey.value)
-  if (findItem) {
-    currentNodeKey.value = findItem.accountEnterpriseId
-    mittBus.emit('mittGetCompanyInfo', findItem)
-    zimuStore.setEnterpriseInfo(findItem)
+  if (needResetId) {
+    // 高亮当前登录企业
+    if (parentList.length > 0) {
+      activeCompany.value = parentList[0]
+    } else {
+      if (childList.length > 0) {
+        activeCompany.value = childList[0]
+      }
+    }
+    if (activeCompany.value) {
+      currentNodeKey = activeCompany.value.accountEnterpriseId
+      mittBus.emit('mittGetCompanyInfo', activeCompany.value)
+      zimuStore.setEnterpriseInfo(activeCompany.value)
+    }
   }
 }
 getDataList()
@@ -100,7 +109,7 @@ const defaultProps = {
 onMounted(() => {
   // 监听新增编辑公司信息，刷新列表
   mittBus.on('mittGetCompanyList', () => {
-    getDataList()
+    getDataList(false)
   })
 })
 
@@ -114,7 +123,7 @@ onUnmounted(() => {
   background: var(--bg-white);
   padding: 24px 12px;
   border-radius: 8px;
-  height: calc(100% - 120px);
+  flex: 1;
   box-sizing: border-box;
   :deep(.el-tree-node__content) {
     .el-tree-node__label {
